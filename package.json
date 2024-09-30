@@ -1,0 +1,68 @@
+{
+  "name": "@sv443/ytinfobot",
+  "version": "0.1.0",
+  "description": "Discord bot that replies to YouTube links with information from Return YouTube Dislike (approximate likes and dislikes), SponsorBlock (timestamps to skip certain segments) and DeArrow (crowdsourced thumbnails and titles).",
+  "license": "AGPL-3.0-or-later",
+  "main": "src/main.ts",
+  "type": "module",
+  "homepage": "https://github.com/Sv443/YTInfoBot",
+  "scripts": {
+    "start": "tsx src/main.ts",
+    "dev": "nodemon --exec pnpm run start",
+    "lint": "eslint . && tsc --noEmit",
+    "format": "eslint --fix ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sv443/YTInfoBot.git"
+  },
+  "engines": {
+    "node": ">=19",
+    "npm": ">=8"
+  },
+  "author": {
+    "name": "Sv443",
+    "url": "https://github.com/Sv443"
+  },
+  "bugs": {
+    "url": "https://github.com/Sv443/YTInfoBot/issues"
+  },
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/Sv443"
+  },
+  "nodemonConfig": {
+    "watch": [
+      "src/**",
+      ".env",
+      "package.json"
+    ],
+    "ext": "ts,mts,js,jsx,mjs,json",
+    "ignore": [
+      "dist/*",
+      "dev/*"
+    ]
+  },
+  "dependencies": {
+    "discord.js": "^14.16.3",
+    "kleur": "^4.1.5",
+    "tslib": "^2.7.0"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.1.0",
+    "@types/node": "^22.7.4",
+    "@typescript-eslint/eslint-plugin": "^8.7.0",
+    "@typescript-eslint/parser": "^8.7.0",
+    "@typescript-eslint/utils": "^8.7.0",
+    "dotenv": "^16.4.5",
+    "eslint": "^9.11.1",
+    "globals": "^15.9.0",
+    "nodemon": "^3.1.7",
+    "pnpm": "^9.11.0",
+    "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.10",
+    "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.2"
+  }
+}

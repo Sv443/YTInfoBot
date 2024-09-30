@@ -1,0 +1,46 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ESNext",
+    "outDir": "dist",
+    "useDefineForClassFields": true,
+    "lib": [
+      "ES5",
+      "ES6",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "skipLibCheck": true,
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "importHelpers": true,
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "paths": {
+      "@utils/*": ["src/utils/*"],
+      "@/*": ["src/*"],
+    },
+  },
+  "include": [
+    "src/**/*",
+  ],
+  "exclude": [
+    "node_modules/**/*",
+  ],
+  "ts-node": {
+    "require": ["tsconfig-paths/register"],
+    "esm": true,
+  },
+}
