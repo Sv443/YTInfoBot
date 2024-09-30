@@ -15,8 +15,8 @@ export const videoInfoTypeChoices: APIApplicationCommandOptionChoice<VideoInfoTy
 ] as const;
 
 export const numberFormatChoices: APIApplicationCommandOptionChoice<NumberFormat>[] = [
-  { name: "Short", value: "short" }, // (default)
-  { name: "Long", value: "long" }
+  { name: "Long", value: "long" }, // (default)
+  { name: "Short", value: "short" },
 ] as const;
 
 //#region types
