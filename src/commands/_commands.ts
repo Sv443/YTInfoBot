@@ -1,5 +1,5 @@
-import { Configure } from "@/commands/Configure.ts";
-import { VideoInfo } from "@/commands/VideoInfo.ts";
+import { Configure } from "@cmd/Configure.ts";
+import { VideoInfo } from "@cmd/VideoInfo.ts";
 
 export const commands = [
   new Configure(),

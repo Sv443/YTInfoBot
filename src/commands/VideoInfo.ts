@@ -1,8 +1,11 @@
-import { useEmbedify } from "@utils/embedify.ts";
-import { SlashCommand } from "@utils/SlashCommand.ts";
+import { useEmbedify } from "@/lib/embedify.ts";
+import { SlashCommand } from "@/lib/SlashCommand.ts";
+import type { VideoInfoType } from "@/types.ts";
 import { SlashCommandBuilder, type APIApplicationCommandOptionChoice, type CommandInteraction } from "discord.js";
 
-const choices: APIApplicationCommandOptionChoice<string>[] = [
+const allowedHosts = ["www.youtube.com", "youtube.com", "music.youtube.com", "youtu.be"];
+
+export const videoInfoTypeChoices: APIApplicationCommandOptionChoice<VideoInfoType>[] = [
   { name: "Reduced", value: "reduced" }, // (default)
   { name: "All", value: "all" },
   { name: "Votes only", value: "votes_only" },
@@ -10,7 +13,7 @@ const choices: APIApplicationCommandOptionChoice<string>[] = [
   { name: "Timestamps only", value: "timestamps_only" }
 ] as const;
 
-// type ChoiceValues = typeof choices[number]["value"];
+export type VideoInfoTypeChoiceValues = typeof videoInfoTypeChoices[number]["value"];
 
 export class VideoInfo extends SlashCommand {
   constructor() {
@@ -25,28 +28,33 @@ export class VideoInfo extends SlashCommand {
       .addStringOption(opt =>
         opt.setName("type")
           .setDescription("Type of information to show - defaults to reduced")
-          .addChoices(choices)
+          .addChoices(videoInfoTypeChoices)
       )
     );
   }
+
+  //#region run
 
   async run(int: CommandInteraction) {
     if(!int.inGuild())
       return int.reply(useEmbedify("This command can only be used in a server"));
 
-    const videoId = this.parseVideoId(int.options.get("video", true).value as string);
+    const videoId = VideoInfo.parseVideoId(int.options.get("video", true).value as string);
 
     if(!videoId)
       return int.reply(useEmbedify("Invalid video URL or ID"));
 
-    const type = int.options.get("type")?.value ?? "reduced";
+    const type = (int.options.get("type")?.value ?? "reduced") as VideoInfoType;
 
     await int.deferReply();
 
     console.log("#> VideoInfo", type, videoId);
   }
 
-  protected parseVideoId(video: string): string | null {
+  //#region utils
+
+  /** Parses a video URL or ID and returns the video ID or null */
+  public static parseVideoId(video: string): string | null {
     try {
       let videoUrl;
       try {
@@ -58,7 +66,7 @@ export class VideoInfo extends SlashCommand {
 
       let videoId;
       if(videoUrl) {
-        if(!(["www.youtube.com", "youtube.com", "music.youtube.com", "youtu.be"].includes(videoUrl.hostname)))
+        if(!(allowedHosts.includes(videoUrl.hostname)))
           return null;
 
         videoId = videoUrl?.hostname === "youtu.be"
