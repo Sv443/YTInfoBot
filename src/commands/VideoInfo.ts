@@ -1,5 +1,5 @@
-import { EbdColors, useEmbedify } from "@/lib/embedify.ts";
-import { SlashCommand } from "@/lib/SlashCommand.ts";
+import { EbdColors, useEmbedify } from "@lib/embedify.ts";
+import { SlashCommand } from "@lib/SlashCommand.ts";
 import { SlashCommandBuilder, type APIApplicationCommandOptionChoice, type CommandInteraction } from "discord.js";
 
 //#region constants

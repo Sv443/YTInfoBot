@@ -1,6 +1,6 @@
 import { ButtonBuilder, ButtonStyle, PermissionFlagsBits, SlashCommandBuilder, type AutocompleteInteraction, type CommandInteraction, type CommandInteractionOption } from "discord.js";
-import { EbdColors, useEmbedify } from "@/lib/embedify.ts";
-import { SlashCommand } from "@/lib/SlashCommand.ts";
+import { EbdColors, useEmbedify } from "@lib/embedify.ts";
+import { SlashCommand } from "@lib/SlashCommand.ts";
 import { numberFormatChoices, videoInfoTypeChoices } from "@cmd/VideoInfo.ts";
 import { em } from "@lib/db.ts";
 import { GuildConfig } from "@models/GuildSettings.model.ts";
@@ -35,7 +35,8 @@ const configurableOptions: Record<
   [scNames.locale]: {
     cfgProp: "locale",
     settingName: "locale",
-    getValue: (val) => val,
+    validateValue: (val) => localesJson.some(({ locale }) => locale === val),
+    invalidHint: "It must be in the format `language-COUNTRY`, like for example `en-US`",
   },
 } as const;
 
@@ -76,6 +77,7 @@ export class Configure extends SlashCommand {
           opt.setName("value")
             .setDescription("The new locale in the format `language-COUNTRY`, like for example `en-US`")
             .setAutocomplete(true)
+            .setMinLength(5)
             .setMaxLength(5)
         )
       )
@@ -173,13 +175,17 @@ export class Configure extends SlashCommand {
     opt,
     cfgProp,
     settingName,
-    getValue,
+    getValue = (val) => val,
+    validateValue,
+    invalidHint,
   }: {
     int: CommandInteraction;
     opt: CommandInteractionOption;
     cfgProp: TCfgKey;
     settingName: string;
-    getValue: (value: TCfgValue) => Stringifiable | undefined;
+    getValue?: (value: TCfgValue) => Stringifiable | undefined;
+    validateValue?: (value: TCfgValue) => boolean;
+    invalidHint?: string;
   }) {
     try {
       const cfg = await em.findOne(GuildConfig, { id: int.guildId });
@@ -196,6 +202,9 @@ export class Configure extends SlashCommand {
           return noConfigFound();
         return int.editReply(useEmbedify(`The current ${settingName} is \`${getValue(cfg[cfgProp] as TCfgValue) ?? cfg[cfgProp]}\``));
       }
+
+      if(typeof validateValue === "function" && !validateValue(newValue))
+        return int.editReply(useEmbedify(`Invalid ${settingName} specified: \`${newValue}\`${invalidHint ? `\n${invalidHint}` : ""}`, EbdColors.Error));
 
       cfg[cfgProp] = newValue;
       await em.flush();

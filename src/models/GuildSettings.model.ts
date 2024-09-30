@@ -1,6 +1,5 @@
-import type { NumberFormat } from "@cmd/VideoInfo.ts";
-import type { VideoInfoType } from "@cmd/VideoInfo.ts";
 import { Entity, PrimaryKey, Property } from "@mikro-orm/core";
+import type { NumberFormat, VideoInfoType } from "@cmd/VideoInfo.ts";
 import localesJson from "@assets/locales.json" with { type: "json" };
 
 @Entity()

@@ -1,5 +1,5 @@
-import { CommandBase } from "@/lib/Command.ts";
 import type { AutocompleteInteraction, CommandInteraction, CommandInteractionOption, SharedSlashCommand } from "discord.js";
+import { CommandBase } from "@lib/Command.ts";
 
 export interface SlashCommand {
   /** Optional method used in autocomplete interactions */

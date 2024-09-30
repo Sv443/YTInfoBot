@@ -5,12 +5,11 @@ export enum EbdColors {
   Error = Colors.Red,
   Warning = Colors.Orange,
   Info = Colors.Blue,
-  Default = EbdColors.Info,
-  Secondary = Colors.Grey,
+  Secondary = Colors.Greyple,
 }
 
 /** Creates a simple EmbedBuilder with the given text and color */
-export function embedify(text: string, color: ColorResolvable = EbdColors.Default): EmbedBuilder {
+export function embedify(text: string, color: ColorResolvable = EbdColors.Info): EmbedBuilder {
   return new EmbedBuilder()
     .setDescription(text).setColor(color);
 }

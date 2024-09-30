@@ -1,5 +1,5 @@
 import type { CommandInteraction, SharedSlashCommand } from "discord.js";
-import { CommandBase } from "@/lib/Command.ts";
+import { CommandBase } from "@lib/Command.ts";
 
 /** Abstract class for creating commands that can be used in the context menu */
 export abstract class ContextCommand extends CommandBase {

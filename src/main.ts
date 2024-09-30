@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { readFile, writeFile } from "node:fs/promises";
-import k from "kleur";
 import { Collection, Events, Routes } from "discord.js";
+import k from "kleur";
 import { client, rest, botToken, clientId } from "@/lib/client.ts";
 import { initDatabase } from "@lib/db.ts";
 import { EbdColors, useEmbedify } from "@lib/embedify.ts";
