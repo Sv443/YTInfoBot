@@ -2,25 +2,25 @@ import "dotenv/config";
 import { readFile, writeFile } from "node:fs/promises";
 import k from "kleur";
 import { Collection, Events, Routes } from "discord.js";
-import { client, rest, botToken, clientId } from "@/client.ts";
-import { loadConfigs } from "@/config.ts";
-import { useEmbedify } from "@utils/embedify.ts";
-import { getHash } from "@utils/crypto.ts";
-import { exists } from "@utils/fs.ts";
-import { commands } from "@/commands/_commands.ts";
-import type { SlashCommand } from "@utils/SlashCommand.ts";
-import type { ContextCommand } from "@utils/ContextCommand.ts";
+import { client, rest, botToken, clientId } from "@/lib/client.ts";
+import { initDatabase } from "@lib/db.ts";
+import { useEmbedify } from "@lib/embedify.ts";
+import { getHash } from "@lib/crypto.ts";
+import { exists } from "@lib/fs.ts";
+import { commands } from "@cmd/_commands.ts";
+import type { SlashCommand } from "@lib/SlashCommand.ts";
+import type { ContextCommand } from "@lib/ContextCommand.ts";
 
 const cmdInstances = new Collection<string, SlashCommand | ContextCommand>();
 
 async function init() {
   console.log(k.gray("\nLogging in..."));
   await Promise.all([
+    initDatabase(),
     new Promise((resolve) => {
       client.once("ready", resolve);
       client.login(botToken);
     }),
-    loadConfigs(),
   ]);
 
   run();
