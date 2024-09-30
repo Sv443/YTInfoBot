@@ -1,19 +1,29 @@
-import { useEmbedify } from "@/lib/embedify.ts";
+import { EbdColors, useEmbedify } from "@/lib/embedify.ts";
 import { SlashCommand } from "@/lib/SlashCommand.ts";
-import type { VideoInfoType } from "@/types.ts";
 import { SlashCommandBuilder, type APIApplicationCommandOptionChoice, type CommandInteraction } from "discord.js";
+
+//#region constants
 
 const allowedHosts = ["www.youtube.com", "youtube.com", "music.youtube.com", "youtu.be"];
 
 export const videoInfoTypeChoices: APIApplicationCommandOptionChoice<VideoInfoType>[] = [
   { name: "Reduced", value: "reduced" }, // (default)
-  { name: "All", value: "all" },
+  { name: "Everything", value: "everything" },
   { name: "Votes only", value: "votes_only" },
   { name: "DeArrow only", value: "dearrow_only" },
   { name: "Timestamps only", value: "timestamps_only" }
 ] as const;
 
-export type VideoInfoTypeChoiceValues = typeof videoInfoTypeChoices[number]["value"];
+//#region types
+
+export type VideoInfoType = 
+  | "reduced"
+  | "everything"
+  | "votes_only"
+  | "dearrow_only"
+  | "timestamps_only"
+
+//#region constructor
 
 export class VideoInfo extends SlashCommand {
   constructor() {
@@ -37,12 +47,12 @@ export class VideoInfo extends SlashCommand {
 
   async run(int: CommandInteraction) {
     if(!int.inGuild())
-      return int.reply(useEmbedify("This command can only be used in a server"));
+      return int.reply(useEmbedify("This command can only be used in a server", EbdColors.Error));
 
     const videoId = VideoInfo.parseVideoId(int.options.get("video", true).value as string);
 
     if(!videoId)
-      return int.reply(useEmbedify("Invalid video URL or ID"));
+      return int.reply(useEmbedify("Invalid video URL or ID", EbdColors.Error));
 
     const type = (int.options.get("type")?.value ?? "reduced") as VideoInfoType;
 

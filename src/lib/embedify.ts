@@ -1,7 +1,15 @@
-import { ColorResolvable, EmbedBuilder } from "discord.js";
+import { ColorResolvable, Colors, EmbedBuilder } from "discord.js";
+
+export enum EbdColors {
+  Success = Colors.Green,
+  Error = Colors.Red,
+  Warning = Colors.Yellow,
+  Info = Colors.Blue,
+  Default = EbdColors.Info,
+}
 
 /** Creates a simple EmbedBuilder with the given text and color */
-export function embedify(text: string, color: ColorResolvable = "DarkRed"): EmbedBuilder {
+export function embedify(text: string, color: ColorResolvable = EbdColors.Default): EmbedBuilder {
   return new EmbedBuilder()
     .setDescription(text).setColor(color);
 }

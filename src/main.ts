@@ -4,7 +4,7 @@ import k from "kleur";
 import { Collection, Events, Routes } from "discord.js";
 import { client, rest, botToken, clientId } from "@/lib/client.ts";
 import { initDatabase } from "@lib/db.ts";
-import { useEmbedify } from "@lib/embedify.ts";
+import { EbdColors, useEmbedify } from "@lib/embedify.ts";
 import { getHash } from "@lib/crypto.ts";
 import { exists } from "@lib/fs.ts";
 import { commands } from "@cmd/_commands.ts";
@@ -44,7 +44,7 @@ async function registerCommands() {
       }
       catch(err) {
         try {
-          int.reply(useEmbedify(`An error occurred while executing the command: ${err}`));
+          int.reply(useEmbedify(`An error occurred while executing the command: ${err}`, EbdColors.Error));
         }
         catch(err) {
           console.error(`Error while executing command "${int.commandName}":`, err);
