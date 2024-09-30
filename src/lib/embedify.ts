@@ -3,9 +3,10 @@ import { ColorResolvable, Colors, EmbedBuilder } from "discord.js";
 export enum EbdColors {
   Success = Colors.Green,
   Error = Colors.Red,
-  Warning = Colors.Yellow,
+  Warning = Colors.Orange,
   Info = Colors.Blue,
   Default = EbdColors.Info,
+  Secondary = Colors.Grey,
 }
 
 /** Creates a simple EmbedBuilder with the given text and color */

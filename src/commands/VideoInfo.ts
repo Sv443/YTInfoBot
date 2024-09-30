@@ -14,6 +14,11 @@ export const videoInfoTypeChoices: APIApplicationCommandOptionChoice<VideoInfoTy
   { name: "Timestamps only", value: "timestamps_only" }
 ] as const;
 
+export const numberFormatChoices: APIApplicationCommandOptionChoice<NumberFormat>[] = [
+  { name: "Short", value: "short" }, // (default)
+  { name: "Long", value: "long" }
+] as const;
+
 //#region types
 
 export type VideoInfoType = 
@@ -22,6 +27,10 @@ export type VideoInfoType =
   | "votes_only"
   | "dearrow_only"
   | "timestamps_only"
+
+export type NumberFormat =
+  | "short"
+  | "long";
 
 //#region constructor
 

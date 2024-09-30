@@ -72,6 +72,7 @@ const config = [
         allowTernary: true,
         allowTaggedTemplates: true,
       }],
+      "@typescript-eslint/no-unsafe-declaration-merging": "off",
       "comma-dangle": ["error", "only-multiline"],
       "no-misleading-character-class": "off",
     },

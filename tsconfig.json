@@ -31,9 +31,10 @@
     "sourceMap": true,
     "strict": true,
     "paths": {
+      "@assets/*": ["src/assets/*"],
+      "@cmd/*": ["src/commands/*"],
       "@lib/*": ["src/lib/*"],
       "@models/*": ["src/models/*"],
-      "@cmd/*": ["src/commands/*"],
       "@/*": ["src/*"],
     },
   },

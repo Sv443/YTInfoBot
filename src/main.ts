@@ -51,6 +51,19 @@ async function registerCommands() {
         }
       }
     }
+    else if(int.isAutocomplete()) {
+      try {
+        const command = cmdInstances.get(int.commandName);
+
+        if(!command || !("autocomplete" in command))
+          return;
+
+        await command.autocomplete?.(int);
+      }
+      catch(err) {
+        console.error(`Error while executing autocomplete for command "${int.commandName}":`, err);
+      }
+    }
   });
 
   const lastCmdHash = await exists(".cmd_hash")
@@ -74,7 +87,7 @@ async function registerCommands() {
           { body: cmdBody },
         );
 
-        console.log(k.gray(`Registered ${(data as unknown[])?.length} commands for guild "${client.guilds.cache.find(g => g.id === guildId)?.name ?? guildId}"`));
+        console.log(k.magenta(`Re-registered ${(data as unknown[])?.length} guild commands for "${client.guilds.cache.find(g => g.id === guildId)?.name ?? guildId}"`));
         resolve();
       }));
 

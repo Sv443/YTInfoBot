@@ -1,5 +1,7 @@
-import type { VideoInfoType } from "@/types.ts";
+import type { NumberFormat } from "@cmd/VideoInfo.ts";
+import type { VideoInfoType } from "@cmd/VideoInfo.ts";
 import { Entity, PrimaryKey, Property } from "@mikro-orm/core";
+import localesJson from "@assets/locales.json" with { type: "json" };
 
 @Entity()
 export class GuildConfig {
@@ -10,6 +12,12 @@ export class GuildConfig {
   @PrimaryKey({ type: "string", length: 24 })
     id!: string;
 
-  @Property({ type:"string", length: 24 })
+  @Property({ type: "string", length: 24 })
     defaultVideoInfoType: VideoInfoType = "reduced";
+
+  @Property({ type: "string", length: 12 })
+    numberFormat: NumberFormat = "long";
+
+  @Property({ type: "string", length: 5 })
+    locale: (typeof localesJson)[number]["locale"] = "en-US";
 }
