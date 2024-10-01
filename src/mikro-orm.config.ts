@@ -1,12 +1,12 @@
-import "dotenv/config";
 import { defineConfig } from "@mikro-orm/core";
+import { envVarEquals, getEnvVar } from "@lib/env.ts";
 
 export const config = defineConfig({
   dbName: "yt-info-bot",
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
+  user: getEnvVar("DB_USER")!,
+  password: getEnvVar("DB_PASSWORD")!,
   charset: "utf8",
   entities: ["dist/**/*.model.js"],
   entitiesTs: ["src/**/*.model.ts"],
-  debug: process.env.DB_DEBUG?.trim() === "true",
+  debug: envVarEquals("DB_DEBUG", true),
 });

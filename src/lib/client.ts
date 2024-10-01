@@ -1,8 +1,8 @@
-import "dotenv/config";
 import { ActivityType, Client, GatewayIntentBits, REST } from "discord.js";
+import { getEnvVar } from "@lib/env.ts";
 
-export const botToken = process.env.BOT_TOKEN!;
-export const clientId = process.env.APPLICATION_ID!;
+export const botToken = getEnvVar("BOT_TOKEN")!;
+export const clientId = getEnvVar("APPLICATION_ID")!;
 
 export const client = new Client({
   intents: [
@@ -21,4 +21,4 @@ export const client = new Client({
   },
 });
 
-export const rest = new REST().setToken(process.env.BOT_TOKEN!);
+export const rest = new REST().setToken(botToken);
