@@ -5,7 +5,9 @@ Discord bot that replies to YouTube links with information from Return YouTube D
   
 If you enjoy using this bot, please consider [donating](https://github.com/sponsors/Sv443) to support development ❤️
   
-<a href="https://discord.com/api/oauth2/authorize?client_id=1290320137223802912&permissions=292059212800&scope=bot%20applications.commands" target="_blank"><img src="https://img.shields.io/badge/Invite%20Bot-%E2%96%BA-6e7bf4" height="26"></a>
+<a href="https://discord.com/api/oauth2/authorize?client_id=1290320137223802912&permissions=292058098752&scope=bot%20applications.commands" target="_blank"><img src="https://img.shields.io/badge/Invite%20Bot-%E2%96%BA-78f05d" height="30"></a>
+
+<a href="https://dc.sv443.net/" target="_blank"><img src="https://img.shields.io/badge/Join-Support%20Server-6e7bf4" height="20"></a>
 </div>
 
 <br>
@@ -38,17 +40,33 @@ To access these, right-click (or hold on mobile) on a message and select the com
 
 ## Slash Commands:
 - `/video_info video:<URL or ID> [type:<reduced|all|votes_only|dearrow_only|timestamps_only>]`  
-  Shows detailed information about a video, given its URL (supports [music.]youtube.com, youtu.be or just the video ID).  
+  Shows detailed information about a video, given its URL (supports youtube.com, music.youtube.com, youtu.be or just the video ID).  
   If no type is provided, the bot will default to `reduced`.
-- `/configure <setting> [value:<new value>]`  
-  Changes the bot's settings for the current server.  
-  If no value is provided, the value of the current setting will be shown.  
-  Requires the `Manage Server` permission.
+- 🔒 `/configure setting <name> [new_value:<value>]`  
+  If no new_value argument is provided, the value of the current setting will be shown.  
+  Otherwise, the value of that setting is changed for the current server.  
+  Requires the `Manage Server` permission to use.
+- 🔒 `/configure reset`  
+  Resets the configuration for the current server to the default values.  
+  Shows a confirmation before actually resetting.  
+  Requires the `Manage Server` permission to use.
 
 > [!NOTE]  
+> Commands prefixed with 🔒 require special permissions, while others can be used by any member.  
 > Arguments surrounded by `[]` are optional.  
 > Whatever is surrounded by `<>` is a placeholder and should be replaced with an actual value.  
 > If there is a list of options, they are separated by `|` and only one of them can be specified.
+
+<br>
+
+## Local Installation:
+1. Have [Node.js](https://nodejs.org/) and [pnpm](https://pnpm.io/installation) installed.
+2. Clone the repository or download the ZIP file and extract it.
+3. Open a terminal in the folder containing `package.json` and run `pnpm i` to install all dependencies.
+4. Copy the file `.env.template` to `.env` and fill in the required values.
+5. Run `pnpm start` to start the bot or `pnpm dev` to start it in development mode.
+  
+Refer to `scripts` in `package.json` for a list of all commands.
 
 <br>
 
