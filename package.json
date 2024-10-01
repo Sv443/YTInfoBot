@@ -1,7 +1,7 @@
 {
   "name": "@sv443/ytinfobot",
   "version": "0.1.0",
-  "description": "Discord bot that replies to YouTube links with information from Return YouTube Dislike (approximate likes and dislikes), SponsorBlock (timestamps to skip certain segments) and DeArrow (crowdsourced thumbnails and titles).",
+  "description": "Free Discord bot that replies to YouTube links with information from Return YouTube Dislike (approximate likes and dislikes), SponsorBlock (timestamps to skip certain segments) and DeArrow (crowdsourced thumbnails and titles).",
   "license": "AGPL-3.0-or-later",
   "main": "src/main.ts",
   "type": "module",
@@ -46,13 +46,16 @@
   "dependencies": {
     "@mikro-orm/core": "^6.3.11",
     "@mikro-orm/postgresql": "^6.3.11",
+    "axios": "^1.7.7",
     "discord.js": "^14.16.3",
     "kleur": "^4.1.5",
+    "qs": "^6.13.0",
     "tslib": "^2.7.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.1.0",
     "@types/node": "^22.7.4",
+    "@types/qs": "^6.9.16",
     "@typescript-eslint/eslint-plugin": "^8.7.0",
     "@typescript-eslint/parser": "^8.7.0",
     "@typescript-eslint/utils": "^8.7.0",

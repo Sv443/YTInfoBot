@@ -6,7 +6,7 @@ import { em } from "@lib/db.ts";
 import { GuildConfig } from "@models/GuildConfig.model.ts";
 import localesJson from "@assets/locales.json" with { type: "json" };
 import { useButtons } from "@lib/components.ts";
-import type { Stringifiable } from "@lib/types.ts";
+import type { Stringifiable } from "@/types.ts";
 
 //#region constants
 
