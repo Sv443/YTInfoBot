@@ -1,7 +1,7 @@
 import type { Guild } from "discord.js";
 import { Event } from "@lib/Event.ts";
 import { em } from "@lib/db.ts";
-import { GuildConfig } from "@models/GuildSettings.model.ts";
+import { GuildConfig } from "@models/GuildConfig.model.ts";
 
 export class GuildDelete extends Event {
   constructor() {

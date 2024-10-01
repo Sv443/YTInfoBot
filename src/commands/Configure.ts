@@ -3,7 +3,7 @@ import { EbdColors, useEmbedify } from "@lib/embedify.ts";
 import { SlashCommand } from "@lib/SlashCommand.ts";
 import { numberFormatChoices, videoInfoTypeChoices } from "@cmd/VideoInfo.ts";
 import { em } from "@lib/db.ts";
-import { GuildConfig } from "@models/GuildSettings.model.ts";
+import { GuildConfig } from "@models/GuildConfig.model.ts";
 import localesJson from "@assets/locales.json" with { type: "json" };
 import { useButtons } from "@lib/components.ts";
 import type { Stringifiable } from "@lib/types.ts";
