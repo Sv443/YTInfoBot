@@ -1,7 +1,7 @@
 <div style="text-align:center;" align="center">
 
 # YTInfoBot
-Discord bot that replies to YouTube links with information from Return YouTube Dislike (approximate likes and dislikes), SponsorBlock (timestamps to skip certain segments) and DeArrow (crowdsourced thumbnails and titles).  
+Free Discord bot that replies to YouTube links with information from Return YouTube Dislike (approximate likes and dislikes), SponsorBlock (timestamps to skip certain segments) and DeArrow (crowdsourced thumbnails and titles).  
   
 If you enjoy using this bot, please consider [donating](https://github.com/sponsors/Sv443) to support development ❤️
   
@@ -64,7 +64,8 @@ To access these, right-click (or hold on mobile) on a message and select the com
 2. Clone the repository or download the ZIP file and extract it.
 3. Open a terminal in the folder containing `package.json` and run `pnpm i` to install all dependencies.
 4. Copy the file `.env.template` to `.env` and fill in the required values.
-5. Run `pnpm start` to start the bot or `pnpm dev` to start it in development mode.
+5. Run `pnpm start` to start the bot or `pnpm dev` to start it in development mode.  
+  You may also use the VS Code debugger to start and debug the bot using breakpoints.
   
 Refer to `scripts` in `package.json` for a list of all commands.
 
