@@ -52,26 +52,21 @@ export function generateProgressBar(percentage: number, maxLength: number) {
   const quarterBlock = "░";
   const emptyBlock = "─";
 
-  // Calculate the number of fully filled characters
   const filledLength = Math.floor((percentage / 100) * maxLength);
-  // Calculate the remaining percentage for the last character
   const remainingPercentage = (percentage / 100) * maxLength - filledLength;
 
-  // Determine the character for the last partially filled block
   let lastBlock = "";
-  if (remainingPercentage >= 0.75) {
+  if(remainingPercentage >= 0.75)
     lastBlock = threeQuarterBlock;
-  } else if (remainingPercentage >= 0.5) {
+  else if(remainingPercentage >= 0.5)
     lastBlock = halfBlock;
-  } else if (remainingPercentage >= 0.25) {
+  else if (remainingPercentage >= 0.25)
     lastBlock = quarterBlock;
-  }
 
-  // Construct the progress bar
   const filledBar = fullBlock.repeat(filledLength);
   const emptyBar = emptyBlock.repeat(maxLength - filledLength - (lastBlock ? 1 : 0));
 
-  return filledBar + lastBlock + emptyBar;
+  return `${filledBar}${lastBlock}${emptyBar}`;
 }
 
 /** Converts seconds into the YouTube timestamp format (HH:)MM:SS */
