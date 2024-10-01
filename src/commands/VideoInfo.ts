@@ -383,15 +383,15 @@ export class VideoInfo extends SlashCommand {
   ) {
     try {
       const catParam = `["${categories.join("\",\"")}"]`;
-      const atParam = `["${actionTypes.join("\",\"")}"]`;
+      const actTypeParam = `["${actionTypes.join("\",\"")}"]`;
 
       const { data, status } = await axios.get<SponsorBlockSegmentObj[]>("https://sponsor.ajay.app/api/skipSegments", {
         params: {
           videoID: videoId,
           categories: catParam,
-          actionTypes: atParam,
+          actionTypes: actTypeParam,
         },
-        // because sponsorblock for some idiotic reason requires ["this","stupid","format"]
+        // because sponsorblock for some idiotic reason requires ?this=["stupid","format"]
         paramsSerializer: params => qs.stringify(params, { encode: false }),
       });
 

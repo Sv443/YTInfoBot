@@ -3,7 +3,7 @@ import type { NumberFormat } from "@cmd/VideoInfo.ts";
 
 /** Formats a number with the given locale and format */
 export function formatNumber(number: number, locale: (typeof localesJson)[number]["code"], format: NumberFormat): string {
-  return new Intl.NumberFormat(locale, format === "short"
+  return number.toLocaleString(locale, format === "short"
     ? {
       notation: "compact",
       compactDisplay: "short",
@@ -13,5 +13,5 @@ export function formatNumber(number: number, locale: (typeof localesJson)[number
       style: "decimal",
       maximumFractionDigits: 0,
     }
-  ).format(number);
+  );
 }
