@@ -14,7 +14,7 @@ export const client = new Client({
     status: "online",
     activities: [
       {
-        name: "Awaiting video links",
+        name: "Waiting for video links",
         type: ActivityType.Custom,
       },
     ],

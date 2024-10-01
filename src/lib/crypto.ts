@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import type { Stringifiable } from "@lib/types.ts";
+import type { Stringifiable } from "@/types.ts";
 
 /** Creates a hash from the given stringifiable data */
 export function getHash(data: Stringifiable): string {
