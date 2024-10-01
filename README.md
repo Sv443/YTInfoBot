@@ -42,17 +42,22 @@ To access these, right-click (or hold on mobile) on a message and select the com
 - `/video_info video:<URL or ID> [type:<reduced|all|votes_only|dearrow_only|timestamps_only>]`  
   Shows detailed information about a video, given its URL (supports youtube.com, music.youtube.com, youtu.be or just the video ID).  
   If no type is provided, the bot will default to `reduced`.
+- 🔒 `/configure list`  
+  Shows a list of all available settings and their current values.  
+  Requires the `Manage Server` permission to use.
 - 🔒 `/configure setting <name> [new_value:<value>]`  
   If no new_value argument is provided, the value of the current setting will be shown.  
-  Otherwise, the value of that setting is changed for the current server.  
+  Otherwise, that setting is changed to the given value.  
   Requires the `Manage Server` permission to use.
 - 🔒 `/configure reset`  
-  Resets the configuration for the current server to the default values.  
+  Resets the configuration to the default values.  
   Shows a confirmation before actually resetting.  
   Requires the `Manage Server` permission to use.
 
 > [!NOTE]  
 > Commands prefixed with 🔒 require special permissions, while others can be used by any member.  
+> They are also generally ephemeral (only visible to the user who executed them).  
+>   
 > Arguments surrounded by `[]` are optional.  
 > Whatever is surrounded by `<>` is a placeholder and should be replaced with an actual value.  
 > If there is a list of options, they are separated by `|` and only one of them can be specified.
