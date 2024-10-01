@@ -92,10 +92,12 @@ export class VideoInfo extends SlashCommand {
           ? videoUrl.pathname.slice(1)
           : videoUrl?.searchParams.get("v");
       }
-      else if(video?.match(/^[a-zA-Z0-9_-]+$/))
+      else
         videoId = video;
 
-      return videoId ?? null;
+      return videoId?.match(/^[a-zA-Z0-9_-]+$/)
+        ? videoId
+        : null;
     }
     catch {
       return null;

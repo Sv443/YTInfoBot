@@ -10,7 +10,7 @@ import type { Stringifiable } from "@lib/types.ts";
 
 //#region constants
 
-/** Configuration setting name mapping */
+/** Configuration setting name mapping - value has to adhere to Discord slash command naming rules (lowercase and underscores only!) */
 const scNames = {
   defaultVideoInfoType: "default_video_info_type",
   numberFormat: "number_format",
@@ -170,7 +170,7 @@ export class Configure extends SlashCommand {
   public static async editConfigSetting<
     TCfgKey extends keyof GuildConfig,
     TCfgValue extends GuildConfig[TCfgKey],
-  > ({
+  >({
     int,
     opt,
     cfgProp,
