@@ -50,7 +50,7 @@ export function generateProgressBar(percentage: number, maxLength: number) {
   const threeQuarterBlock = "▓";
   const halfBlock = "▒";
   const quarterBlock = "░";
-  const emptyBlock = "-";
+  const emptyBlock = "─";
 
   // Calculate the number of fully filled characters
   const filledLength = Math.floor((percentage / 100) * maxLength);
