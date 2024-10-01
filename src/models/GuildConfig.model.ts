@@ -18,5 +18,5 @@ export class GuildConfig {
     numberFormat: NumberFormat = "long";
 
   @Property({ type: "string", length: 5 })
-    locale: (typeof localesJson)[number]["locale"] = "en-US";
+    locale: (typeof localesJson)[number]["code"] = "en-US";
 }

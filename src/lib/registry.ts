@@ -39,7 +39,7 @@ async function registerGuildCommands() {
       }
       catch(err) {
         try {
-          int.reply(useEmbedify(`An error occurred while executing the command: ${err}`, EbdColors.Error));
+          int[int.deferred || int.replied ? "editReply" : "reply"](useEmbedify(`An error occurred while executing the command: ${err}`, EbdColors.Error));
         }
         catch(err) {
           console.error(`Error while executing command "${int.commandName}":`, err);
@@ -99,8 +99,14 @@ async function registerEvents() {
   for(const evt of events)
     evtInstances.set(evt.name, evt);
 
-  for(const [evtName, evt] of evtInstances)
-    client[evt.once ? "once" : "on"](evtName, evt.run);
+  for(const [evtName, evt] of evtInstances) {
+    try {
+      client[evt.once ? "once" : "on"](evtName, evt.run);
+    }
+    catch(err) {
+      console.error(`Error while executing event "${evtName}": ${err}`);
+    }
+  }
 }
 
 /** Called after the client is ready to initialize the commands and events */

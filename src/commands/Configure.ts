@@ -1,4 +1,4 @@
-import { ButtonBuilder, ButtonStyle, PermissionFlagsBits, SlashCommandBuilder, type AutocompleteInteraction, type CommandInteraction, type CommandInteractionOption } from "discord.js";
+import { ButtonBuilder, ButtonStyle, PermissionFlagsBits, SlashCommandBuilder, type AutocompleteInteraction, type CommandInteraction, type CommandInteractionOption, type SlashCommandSubcommandBuilder } from "discord.js";
 import { EbdColors, useEmbedify } from "@lib/embedify.ts";
 import { SlashCommand } from "@lib/SlashCommand.ts";
 import { numberFormatChoices, videoInfoTypeChoices } from "@cmd/VideoInfo.ts";
@@ -20,23 +20,48 @@ const scNames = {
 /** All options that can be configured */
 const configurableOptions: Record<
   typeof scNames[keyof typeof scNames],
-  Omit<Parameters<typeof Configure.editConfigSetting>[0], "int" | "opt">
+  Omit<Parameters<typeof Configure.editConfigSetting>[0], "int" | "opt"> & {
+    builder: (grpOpt: SlashCommandSubcommandBuilder) => SlashCommandSubcommandBuilder;
+  }
 > = {
   [scNames.defaultVideoInfoType]: {
     cfgProp: "defaultVideoInfoType",
     settingName: "default video info type",
     getValue: (val) => videoInfoTypeChoices.find(c => c.value === val)?.name,
+    builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
+      .setDescription("View or change the default video_info type, used when a link is sent or no type argument is given")
+      .addStringOption(opt =>
+        opt.setName("new_value")
+          .setDescription("The new default video_info type")
+          .setChoices(videoInfoTypeChoices)
+      )
   },
   [scNames.numberFormat]: {
     cfgProp: "numberFormat",
     settingName: "number format",
     getValue: (val) => numberFormatChoices.find(c => c.value === val)?.name,
+    builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
+      .setDescription("View or change the format for numbers, for example when displaying likes and dislikes")
+      .addStringOption(opt =>
+        opt.setName("new_value")
+          .setDescription("The new number format")
+          .setChoices(numberFormatChoices)
+      )
   },
   [scNames.locale]: {
     cfgProp: "locale",
     settingName: "locale",
-    validateValue: (val) => localesJson.some(({ locale }) => locale === val),
-    invalidHint: "It must be in the format `language-COUNTRY`, like for example `en-US`",
+    validateValue: (val) => localesJson.some(({ code }) => code === val),
+    invalidHint: "It must be in the format `language-COUNTRY` (case sensitive), like `en-US`.\nAlso, not all locales are supported - look up `BCP 47` for more info.",
+    builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
+      .setDescription("View or change the locale for the bot, used for formatting dates, numbers and more")
+      .addStringOption(opt =>
+        opt.setName("new_value")
+          .setDescription("The new locale")
+          .setAutocomplete(true)
+          .setMinLength(5)
+          .setMaxLength(5)
+      )
   },
 } as const;
 
@@ -52,35 +77,16 @@ export class Configure extends SlashCommand {
         .setName("reset")
         .setDescription("Reset the configuration to the default settings")
       )
-      .addSubcommand(option => option
-        .setName(scNames.defaultVideoInfoType)
-        .setDescription("View or change the default video info type, used when a video is sent or no type parameter is given")
-        .addStringOption(opt =>
-          opt.setName("value")
-            .setDescription("The new default video info type")
-            .setChoices(videoInfoTypeChoices)
-        )
-      )
-      .addSubcommand(option => option
-        .setName(scNames.numberFormat)
-        .setDescription("View or change the format for numbers, for example when displaying likes and dislikes")
-        .addStringOption(opt =>
-          opt.setName("value")
-            .setDescription("The new number format")
-            .setChoices(numberFormatChoices)
-        )
-      )
-      .addSubcommand(option => option
-        .setName(scNames.locale)
-        .setDescription("View or change the locale for the bot, used for formatting dates, numbers and more")
-        .addStringOption(opt =>
-          opt.setName("value")
-            .setDescription("The new locale in the format `language-COUNTRY`, like for example `en-US`")
-            .setAutocomplete(true)
-            .setMinLength(5)
-            .setMaxLength(5)
-        )
-      )
+      .addSubcommandGroup(grpOpt => {
+        grpOpt
+          .setName("setting")
+          .setDescription("View the value or edit a specific setting");
+
+        for(const [name, { builder }] of Object.entries(configurableOptions))
+          grpOpt.addSubcommand(option => builder(option).setName(name));
+
+        return grpOpt;
+      })
     );
   }
 
@@ -90,15 +96,17 @@ export class Configure extends SlashCommand {
     if(!int.inGuild())
       return int.reply(useEmbedify("This command can only be used in a server", EbdColors.Error));
 
-    const res = await int.deferReply({ ephemeral: true });
+    const reply = await int.deferReply({ ephemeral: true });
 
     switch(opt.name) {
-    // we love doing weird stuff like this
-    case (opt.name in configurableOptions ? opt.name : "_"):
+    case "setting":
+      if(!opt.options?.[0])
+        throw new Error("No subcommand provided in /configure setting");
+
       return await Configure.editConfigSetting({
         int,
         opt,
-        ...configurableOptions[opt.name as keyof typeof configurableOptions],
+        ...configurableOptions[opt.options[0].name as keyof typeof configurableOptions],
       });
     case "reset": {
       const confirmBtns = [
@@ -122,7 +130,7 @@ export class Configure extends SlashCommand {
       let conf;
 
       try {
-        conf = await res.awaitMessageComponent({
+        conf = await reply.awaitMessageComponent({
           filter: ({ user }) => user.id === int.user.id,
           time: 30_000,
         });
@@ -157,11 +165,12 @@ export class Configure extends SlashCommand {
   //#region autocomplete
 
   async autocomplete(int: AutocompleteInteraction) {
+    const searchVal = int.options.getFocused().toLowerCase();
     const locales = localesJson
-      .filter(({ locale }) => locale.startsWith(int.options.getFocused()))
-      .slice(0, 24);
+      .filter(({ code, name }) => code.toLowerCase().includes(searchVal) || name.toLowerCase().includes(searchVal))
+      .slice(0, 25);
 
-    await int.respond(locales.map(({ locale }) => ({ name: locale, value: locale })));
+    await int.respond(locales.map(({ code, name }) => ({ value: code, name })));
   }
 
   //#region utils
@@ -195,7 +204,7 @@ export class Configure extends SlashCommand {
       if(!cfg)
         return noConfigFound();
 
-      const newValue = opt.options?.[0]?.value as TCfgValue | undefined;
+      const newValue = opt.options?.[0]?.options?.find(o => o.name === "new_value")?.value as TCfgValue | undefined;
       if(!newValue) {
         const cfg = await em.findOne(GuildConfig, { id: int.guildId });
         if(!cfg)
