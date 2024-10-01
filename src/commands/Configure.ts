@@ -4,8 +4,9 @@ import { SlashCommand } from "@lib/SlashCommand.ts";
 import { numberFormatChoices, videoInfoTypeChoices } from "@cmd/VideoInfo.ts";
 import { em } from "@lib/db.ts";
 import { GuildConfig } from "@models/GuildConfig.model.ts";
-import localesJson from "@assets/locales.json" with { type: "json" };
 import { useButtons } from "@lib/components.ts";
+import { capitalize } from "@lib/text.ts";
+import localesJson from "@assets/locales.json" with { type: "json" };
 import type { Stringifiable } from "@/types.ts";
 
 //#region constants
@@ -27,7 +28,7 @@ const configurableOptions: Record<
   [scNames.defaultVideoInfoType]: {
     cfgProp: "defaultVideoInfoType",
     settingName: "default video info type",
-    getValue: (val) => videoInfoTypeChoices.find(c => c.value === val)?.name,
+    getValueLabel: (val) => videoInfoTypeChoices.find(c => c.value === val)?.name,
     builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
       .setDescription("View or change the default video_info type, used when a link is sent or no type argument is given")
       .addStringOption(opt =>
@@ -39,7 +40,7 @@ const configurableOptions: Record<
   [scNames.numberFormat]: {
     cfgProp: "numberFormat",
     settingName: "number format",
-    getValue: (val) => numberFormatChoices.find(c => c.value === val)?.name,
+    getValueLabel: (val) => numberFormatChoices.find(c => c.value === val)?.name,
     builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
       .setDescription("View or change the format for numbers, for example when displaying likes and dislikes")
       .addStringOption(opt =>
@@ -51,6 +52,7 @@ const configurableOptions: Record<
   [scNames.locale]: {
     cfgProp: "locale",
     settingName: "locale",
+    getValueLabel: (val) => localesJson.find(({ code }) => code === val)?.name,
     validateValue: (val) => localesJson.some(({ code }) => code === val),
     invalidHint: "It must be in the format `language-COUNTRY` (case sensitive), like `en-US`.\nAlso, not all locales are supported - look up `BCP 47` for more info.",
     builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
@@ -76,6 +78,10 @@ export class Configure extends SlashCommand {
       .addSubcommand(option => option
         .setName("reset")
         .setDescription("Reset the configuration to the default settings")
+      )
+      .addSubcommand(option => option
+        .setName("list")
+        .setDescription("List all configurable settings and their current values")
       )
       .addSubcommandGroup(grpOpt => {
         grpOpt
@@ -108,6 +114,19 @@ export class Configure extends SlashCommand {
         opt,
         ...configurableOptions[opt.options[0].name as keyof typeof configurableOptions],
       });
+    case "list": {
+      const cfg = await em.findOne(GuildConfig, { id: int.guildId });
+
+      if(!cfg)
+        return Configure.noConfigFound(int);
+
+      const cfgList = Object.entries(configurableOptions).reduce((acc, [, { cfgProp, settingName, getValueLabel: getLabel }], i) => {
+        const val = getLabel ? getLabel(cfg[cfgProp]) : cfg[cfgProp];
+        return `${acc}${i !== 0 ? "\n" : ""}- **${capitalize(settingName)}**: \`${val}\``;
+      }, "");
+
+      return int.editReply(useEmbedify(`Current configuration settings:\n${cfgList}`, EbdColors.Info));
+    }
     case "reset": {
       const confirmBtns = [
         new ButtonBuilder()
@@ -175,6 +194,10 @@ export class Configure extends SlashCommand {
 
   //#region utils
 
+  static noConfigFound(int: CommandInteraction) {
+    int[int.deferred || int.replied ? "editReply" : "reply"](useEmbedify("No server configuration found - please run `/configure reset`", EbdColors.Error));
+  }
+
   /** Call to edit or view the passed configuration setting */
   public static async editConfigSetting<
     TCfgKey extends keyof GuildConfig,
@@ -184,7 +207,7 @@ export class Configure extends SlashCommand {
     opt,
     cfgProp,
     settingName,
-    getValue = (val) => val,
+    getValueLabel = (val) => val,
     validateValue,
     invalidHint,
   }: {
@@ -192,24 +215,22 @@ export class Configure extends SlashCommand {
     opt: CommandInteractionOption;
     cfgProp: TCfgKey;
     settingName: string;
-    getValue?: (value: TCfgValue) => Stringifiable | undefined;
+    getValueLabel?: (value: TCfgValue) => Stringifiable | undefined;
     validateValue?: (value: TCfgValue) => boolean;
     invalidHint?: string;
   }) {
     try {
       const cfg = await em.findOne(GuildConfig, { id: int.guildId });
 
-      const noConfigFound = () => int.editReply(useEmbedify("No server configuration found - please run `/configure reset`", EbdColors.Error));
-
       if(!cfg)
-        return noConfigFound();
+        return Configure.noConfigFound(int);
 
       const newValue = opt.options?.[0]?.options?.find(o => o.name === "new_value")?.value as TCfgValue | undefined;
       if(!newValue) {
         const cfg = await em.findOne(GuildConfig, { id: int.guildId });
         if(!cfg)
-          return noConfigFound();
-        return int.editReply(useEmbedify(`The current ${settingName} is \`${getValue(cfg[cfgProp] as TCfgValue) ?? cfg[cfgProp]}\``));
+          return Configure.noConfigFound(int);
+        return int.editReply(useEmbedify(`The current ${settingName} is \`${getValueLabel(cfg[cfgProp] as TCfgValue) ?? cfg[cfgProp]}\``));
       }
 
       if(typeof validateValue === "function" && !validateValue(newValue))
@@ -218,7 +239,7 @@ export class Configure extends SlashCommand {
       cfg[cfgProp] = newValue;
       await em.flush();
 
-      return int.editReply(useEmbedify(`Successfully set the ${settingName} to \`${getValue(newValue) ?? newValue}\``, EbdColors.Success));
+      return int.editReply(useEmbedify(`Successfully set the ${settingName} to \`${getValueLabel(newValue) ?? newValue}\``, EbdColors.Success));
     }
     catch(err) {
       return int.editReply(useEmbedify(`Couldn't set the ${settingName} due to an error: ${err}`, EbdColors.Error));
