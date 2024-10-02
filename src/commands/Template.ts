@@ -1,13 +1,14 @@
 import { SlashCommandBuilder, type CommandInteraction } from "discord.js";
 import { useEmbedify } from "@lib/embedify.ts";
 import { SlashCommand } from "@lib/SlashCommand.ts";
+import { CommandBase } from "@lib/CommandBase.ts";
 
 //#region constructor
 
 export class TemplateCommand extends SlashCommand {
   constructor() {
     super(new SlashCommandBuilder()
-      .setName("template_command")
+      .setName(CommandBase.getCmdName("template_command"))
       .setDescription("TEMPLATE_COMMAND")
     );
   }

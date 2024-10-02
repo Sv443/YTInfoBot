@@ -9,6 +9,8 @@ import { generateProgressBar, joinArrayReadable, secToYtTime } from "@lib/text.t
 import { getBestThumbnailUrl } from "@lib/thumbnail.ts";
 import { GuildConfig } from "@models/GuildConfig.model.ts";
 import { formatNumber } from "@lib/math.ts";
+import { CommandBase } from "@lib/CommandBase.ts";
+import { Settings } from "@cmd/Settings.ts";
 
 //#region constants
 
@@ -77,7 +79,7 @@ export type VideoInfoFetchData = {
 export class VideoInfo extends SlashCommand {
   constructor() {
     super(new SlashCommandBuilder()
-      .setName("video_info")
+      .setName(CommandBase.getCmdName("video_info"))
       .setDescription("Show information about a video, given its URL")
       .addStringOption(opt =>
         opt.setName("video")
@@ -106,6 +108,8 @@ export class VideoInfo extends SlashCommand {
     const type = (int.options.get("type")?.value ?? "reduced") as VideoInfoType;
 
     await int.deferReply();
+
+    await Settings.ensureSettingsExist(int.user.id);
 
     console.log("#> VideoInfo", type, videoId);
   }
