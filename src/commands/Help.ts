@@ -39,6 +39,7 @@ export class Help extends SlashCommand {
     case "commands": {
       let cmdList = "";
 
+      const hiddenCmds = new Set<string>();
       const showHidden = int.options.get("show_hidden")?.value as boolean ?? true;
       let ephemeral = false;
 
@@ -51,16 +52,19 @@ export class Help extends SlashCommand {
           if(typeof int.member?.permissions === "undefined")
             return false;
           const hasPerms = bitFieldContains(BigInt(int.member.permissions as string), permNum);
-          if(hasPerms)
+          if(hasPerms) {
             ephemeral = true;
+            if(showHidden)
+              hiddenCmds.add(cmd.builderJson.name);
+          }
           return showHidden ? hasPerms : false;
         });
 
       if(!showHidden)
         ephemeral = false;
 
-      for(const cmd of allowedCmds)
-        cmdList += `- \`/${cmd.builderJson.name}\`\n  ${cmd.builderJson.description}\n`;
+      for(const { builderJson: { name, description } } of allowedCmds)
+        cmdList += `- ${hiddenCmds.has(name) ? "🔒 " : ""}\`/${name}\`\n  ${description}\n`;
 
       return int.reply({
         ...useEmbedify(`**Commands:**\n${cmdList}`),
