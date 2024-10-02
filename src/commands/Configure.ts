@@ -8,6 +8,7 @@ import { useButtons } from "@lib/components.ts";
 import { capitalize } from "@lib/text.ts";
 import localesJson from "@assets/locales.json" with { type: "json" };
 import type { Stringifiable } from "@/types.ts";
+import { CommandBase } from "@lib/CommandBase.ts";
 
 //#region constants
 
@@ -16,7 +17,13 @@ const scNames = {
   defaultVideoInfoType: "default_video_info_type",
   numberFormat: "number_format",
   locale: "locale",
+  autoReplyEnabled: "auto_reply",
 } as const satisfies Partial<Record<keyof GuildConfig, string>>;
+
+export const autoReplyValues = [
+  { name: "Enabled", value: true },
+  { name: "Disabled", value: false },
+];
 
 /** All options that can be configured */
 const configurableOptions: Record<
@@ -42,7 +49,7 @@ const configurableOptions: Record<
     settingName: "number format",
     getValueLabel: (val) => numberFormatChoices.find(c => c.value === val)?.name,
     builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
-      .setDescription("View or change the format for numbers, for example when displaying likes and dislikes")
+      .setDescription("View or change number format for this server, for example when displaying likes and dislikes")
       .addStringOption(opt =>
         opt.setName("new_value")
           .setDescription("The new number format")
@@ -56,13 +63,24 @@ const configurableOptions: Record<
     validateValue: (val) => localesJson.some(({ code }) => code === val),
     invalidHint: "It must be in the format `language-COUNTRY` (case sensitive), like `en-US`.\nAlso, not all locales are supported - look up `BCP 47` for more info.",
     builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
-      .setDescription("View or change the locale for the bot, used for formatting dates, numbers and more")
+      .setDescription("View or change the locale for the server, used for formatting dates, numbers and more")
       .addStringOption(opt =>
         opt.setName("new_value")
           .setDescription("The new locale")
           .setAutocomplete(true)
           .setMinLength(5)
           .setMaxLength(5)
+      )
+  },
+  [scNames.autoReplyEnabled]: {
+    cfgProp: "autoReplyEnabled",
+    settingName: "auto reply",
+    getValueLabel: (val) => autoReplyValues.find(c => c.value === Boolean(val))?.name,
+    builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
+      .setDescription("Change whether the bot will automatically reply to all messages containing a video link")
+      .addBooleanOption(opt =>
+        opt.setName("new_value")
+          .setDescription("Whether auto-reply should be enabled")
       )
   },
 } as const;
@@ -72,7 +90,7 @@ const configurableOptions: Record<
 export class Configure extends SlashCommand {
   constructor() {
     super(new SlashCommandBuilder()
-      .setName("configure")
+      .setName(CommandBase.getCmdName("configure"))
       .setDescription("View or edit the bot's configuration for your server")
       .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
       .addSubcommand(option => option
@@ -226,7 +244,7 @@ export class Configure extends SlashCommand {
         return Configure.noConfigFound(int);
 
       const newValue = opt.options?.[0]?.options?.find(o => o.name === "new_value")?.value as TCfgValue | undefined;
-      if(!newValue) {
+      if(typeof newValue === "undefined") {
         const cfg = await em.findOne(GuildConfig, { id: int.guildId });
         if(!cfg)
           return Configure.noConfigFound(int);

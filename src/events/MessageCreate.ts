@@ -3,6 +3,7 @@ import { Event } from "@lib/Event.ts";
 import { VideoInfo } from "@cmd/VideoInfo.ts";
 import { em } from "@lib/db.ts";
 import { GuildConfig } from "@models/GuildConfig.model.ts";
+import { Settings } from "@cmd/Settings.ts";
 
 /** Regex that detects youtube.com, music.youtube.com, and youtu.be links */
 const ytVideoRegexStr = "(?:https?:\\/\\/)?(?:www\\.)?(?:youtube\\.com\\/watch\\?v=|music\\.youtube\\.com\\/watch\\?v=|youtu\\.be\\/)([a-zA-Z0-9_-]+)";
@@ -37,7 +38,12 @@ export class MessageCreate extends Event {
     const guildCfg = await em.findOne(GuildConfig, { id: msg.guildId });
     const embeds = [] as EmbedBuilder[];
 
-    if(!guildCfg)
+    if(!guildCfg || !guildCfg.autoReplyEnabled)
+      return;
+
+    const usrSett = await Settings.ensureSettingsExist(msg.author.id);
+
+    if(!usrSett.autoReplyEnabled)
       return;
 
     for(const { videoId, url } of allVids) {
