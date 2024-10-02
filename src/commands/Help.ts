@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, type CommandInteraction, type CommandInteractionOption } from "discord.js";
-import { embedify, useEmbedify } from "@lib/embedify.ts";
+import { embedify } from "@lib/embedify.ts";
 import { SlashCommand } from "@lib/SlashCommand.ts";
 import { CommandBase } from "@lib/CommandBase.ts";
 import { commands } from "@cmd/_commands.ts";
@@ -67,7 +67,10 @@ export class Help extends SlashCommand {
         cmdList += `- ${hiddenCmds.has(name) ? "🔒 " : ""}\`/${name}\`\n  ${description}\n`;
 
       return int.reply({
-        ...useEmbedify(`**Commands:**\n${cmdList}`),
+        embeds: [
+          embedify(cmdList)
+            .setTitle("Commands"),
+        ],
         ephemeral,
       });
     }
