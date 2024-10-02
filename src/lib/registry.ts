@@ -61,7 +61,8 @@ async function registerGuildCommands() {
     }
   });
 
-  const lastCmdHash = await exists(cmdHashFile)
+  const lastHashExists = await exists(cmdHashFile);
+  const lastCmdHash = lastHashExists
     ? String(await readFile(cmdHashFile)).replace(/\n/gm, "").trim()
     : "";
   const cmdJsons = [...cmdInstances.values()].map(cmd => cmd.builderJson);
@@ -77,7 +78,7 @@ async function registerGuildCommands() {
       promises.push(new Promise(async (resolve) => {
         const data = await registerCommandsForGuild(guildId);
 
-        console.log(k.magenta(`Re-registered ${(data as unknown[])?.length} guild commands for "${client.guilds.cache.find(g => g.id === guildId)?.name ?? guildId}"`));
+        console.log(k.magenta(`R${lastHashExists ? "e-r" : ""}egistered ${(data as unknown[])?.length} guild commands for "${client.guilds.cache.find(g => g.id === guildId)?.name ?? guildId}"`));
         resolve();
       }));
     }

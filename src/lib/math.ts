@@ -15,3 +15,8 @@ export function formatNumber(number: number, locale: (typeof localesJson)[number
     }
   );
 }
+
+/** Checks if the given {@linkcode bitField} contains the {@linkcode checkVal} */
+export function bitFieldContains<TValueType extends number | bigint>(bitField: TValueType, checkVal: TValueType): boolean {
+  return (bitField & checkVal) === checkVal;
+}
