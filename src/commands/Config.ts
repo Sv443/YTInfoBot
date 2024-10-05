@@ -1,6 +1,6 @@
 import { ButtonBuilder, ButtonStyle, PermissionFlagsBits, SlashCommandBuilder, type AutocompleteInteraction, type CommandInteraction, type CommandInteractionOption, type SlashCommandSubcommandBuilder } from "discord.js";
 import { EbdColors, embedify, useEmbedify } from "@lib/embedify.ts";
-import { SlashCommand } from "@lib/SlashCommand.ts";
+import { CommandBase, SlashCommand } from "@lib/SlashCommand.ts";
 import { numberFormatChoices, videoInfoTypeChoices } from "@cmd/VideoInfo.ts";
 import { em } from "@lib/db.ts";
 import { GuildConfig } from "@models/GuildConfig.model.ts";
@@ -8,7 +8,6 @@ import { useButtons } from "@lib/components.ts";
 import { capitalize } from "@lib/text.ts";
 import localesJson from "@assets/locales.json" with { type: "json" };
 import type { Stringifiable } from "@/types.ts";
-import { CommandBase } from "@lib/CommandBase.ts";
 
 //#region constants
 

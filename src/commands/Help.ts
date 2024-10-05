@@ -1,7 +1,6 @@
 import { SlashCommandBuilder, type CommandInteraction, type CommandInteractionOption } from "discord.js";
 import { embedify } from "@lib/embedify.ts";
-import { SlashCommand } from "@lib/SlashCommand.ts";
-import { CommandBase } from "@lib/CommandBase.ts";
+import { CommandBase, SlashCommand } from "@lib/SlashCommand.ts";
 import { commands } from "@cmd/_commands.ts";
 import packageJson from "@root/package.json" with { type: "json" };
 import { getEnvVar } from "@lib/env.ts";

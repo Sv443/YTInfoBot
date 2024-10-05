@@ -2,14 +2,13 @@ import { EmbedBuilder, SlashCommandBuilder, type APIApplicationCommandOptionChoi
 import { AxiosError } from "axios";
 import qs from "qs";
 import { EbdColors, useEmbedify } from "@lib/embedify.ts";
-import { SlashCommand } from "@lib/SlashCommand.ts";
+import { CommandBase, SlashCommand } from "@lib/SlashCommand.ts";
 import { axios } from "@lib/axios.ts";
 import type { DeArrowObj, ReturnYouTubeDislikeObj, SponsorBlockActionType, SponsorBlockCategory, SponsorBlockSegmentObj, YTVidDataObj } from "@/types.ts";
 import { generateProgressBar, joinArrayReadable, secsToYtTime } from "@lib/text.ts";
 import { getBestThumbnailUrl } from "@lib/thumbnail.ts";
 import { GuildConfig } from "@models/GuildConfig.model.ts";
 import { formatNumber } from "@lib/math.ts";
-import { CommandBase } from "@lib/CommandBase.ts";
 import { SettingsCmd } from "@cmd/Settings.ts";
 
 //#region constants

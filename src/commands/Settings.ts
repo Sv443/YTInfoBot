@@ -1,12 +1,11 @@
 import { ButtonBuilder, ButtonStyle, SlashCommandBuilder, type CommandInteraction, type CommandInteractionOption, type SlashCommandSubcommandBuilder } from "discord.js";
 import { EbdColors, embedify, useEmbedify } from "@lib/embedify.ts";
-import { SlashCommand } from "@lib/SlashCommand.ts";
+import { CommandBase, SlashCommand } from "@lib/SlashCommand.ts";
 import { em } from "@lib/db.ts";
 import { UserSettings } from "@models/UserSettings.model.ts";
 import { useButtons } from "@lib/components.ts";
 import { capitalize } from "@lib/text.ts";
 import type { Stringifiable } from "@/types.ts";
-import { CommandBase } from "@lib/CommandBase.ts";
 import { autoReplyValues } from "@cmd/Config.ts";
 
 //#region constants

@@ -2,7 +2,7 @@ import type { AxiosResponse } from "axios";
 import { axios } from "@lib/axios.ts";
 
 /** Quality identifier for a thumbnail - from highest to lowest res: `maxresdefault` > `sddefault` > `hqdefault` > `mqdefault` > `default` */
-type ThumbQuality = `${"maxres" | "sd" | "hq" | "mq" | ""}default`;
+export type ThumbQuality = `${"maxres" | "sd" | "hq" | "mq" | ""}default`;
 
 /** Returns the thumbnail URL for a video with the given video ID and quality (defaults to "hqdefault") */
 export function getThumbnailUrl(videoId: string, quality?: ThumbQuality): string
