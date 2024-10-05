@@ -166,6 +166,8 @@ export class VideoInfo extends SlashCommand {
     if(!ytData)
       return null;
 
+    embed.setAuthor({ name: ytData.author_name, url: ytData.author_url });
+
     //#SECTION title & thumbnail
 
     embed.setTitle(ytData.title ?? url);
