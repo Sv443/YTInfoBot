@@ -80,6 +80,7 @@ export class Help extends SlashCommand {
           embedify([
             `Version: ${packageJson.version}`,
             `Created by [${packageJson.author.name}](${packageJson.author.url})\n`,
+            "Opt out of automatic replies across every server by using the command `/settings configure auto_reply new_value:false\n`",
             `- Submit bugs or feature requests on [GitHub](${packageJson.bugs.url})`,
             `- Join the [support server](${getEnvVar("SUPPORT_SERVER_INVITE_URL")}) if you have any questions or need help`,
             `- This bot is completely free so please consider [supporting the development ❤️](${packageJson.funding.url})\n`,

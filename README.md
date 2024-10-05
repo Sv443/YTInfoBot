@@ -1,6 +1,8 @@
 <div style="text-align:center;" align="center">
 
 # YTInfoBot
+[Features](#features) &bull; [Usage](#regular-usage) &bull; [Commands](#slash-commands) &bull; [Privacy](#privacy) &bull; [Development](#local-installation)
+
 Free Discord bot that replies to YouTube links with information from Return YouTube Dislike (approximate likes and dislikes), SponsorBlock (timestamps to skip certain segments) and DeArrow (crowdsourced thumbnails and titles).  
   
 If you enjoy using this bot, please consider [donating](https://github.com/sponsors/Sv443) to support development ❤️
@@ -13,9 +15,6 @@ If you enjoy using this bot, please consider [donating](https://github.com/spons
 <br>
 
 ## Features:
-- **General video info:**  
-  Shows a larger part of the video description than Discord does by default and makes links clickable.  
-  Also shows the upload date and view count (configurable).
 - [**Return YouTube Dislike:**](https://returnyoutubedislike.com/)  
   Shows the approximate like and dislike count, as well as ratio between them.  
   These numbers are crowdsourced and extrapolated, so they might not be 100% accurate.
@@ -25,34 +24,53 @@ If you enjoy using this bot, please consider [donating](https://github.com/spons
 - [**DeArrow:**](https://dearrow.com/)  
   Shows a crowdsourced thumbnail and title for the video.  
   These are usually made to reduce clickbait, but they also might spoil parts of the video.
+- **Fallback:**  
+  If no information is present in the DeArrow database, the bot will fall back to the original video's title and thumbnail.  
+  If all three providers from above have no information on the video, the bot will not reply to the link at all.
 
 <br>
 
 ## Regular Usage:
 The bot will automatically reply to YouTube links in any channel it has access to.  
-If there are multiple links in a single message, it will reply to up to 5 links.  
-These automatic replies contain slightly reduced information to reduce spam.  
+If there are multiple links in a single message, it will reply to up to 5 links (<!--TODO:-->configurable).  
+These automatic replies contain slightly reduced information by default to reduce spam.  
   
-Additionally, there are right-click context menu options to get more detailed information about a video.  
-To access these, right-click (or hold on mobile) on a message and select the command under "Apps".
+<!--TODO:-->Additionally, there are right-click context menu options to get more detailed information about a video.  
+To access these, right-click (or hold on mobile) on a message and select the command under "Apps".  
+  
+If you want to opt out of automatic replies across every server, you can use the command `/settings configure auto_reply new_value:false`
 
 <br>
 
 ## Slash Commands:
-- `/video_info video:<URL or ID> [type:<reduced|all|votes_only|dearrow_only|timestamps_only>]`  
-  Shows detailed information about a video, given its URL (supports youtube.com, music.youtube.com, youtu.be or just the video ID).  
-  If no type is provided, the bot will default to `reduced`.
-- 🔒 `/configure list`  
-  Shows a list of all available settings and their current values.  
-  Requires the `Manage Server` permission to use.
-- 🔒 `/configure setting <name> [new_value:<value>]`  
-  If no new_value argument is provided, the value of the current setting will be shown.  
-  Otherwise, that setting is changed to the given value.  
-  Requires the `Manage Server` permission to use.
-- 🔒 `/configure reset`  
-  Resets the configuration to the default values.  
-  Shows a confirmation before actually resetting.  
-  Requires the `Manage Server` permission to use.
+- **Video Info:**
+  - `/video_info video:<URL or ID> [type:<reduced|all|votes_only|dearrow_only|timestamps_only>]`  
+    Shows detailed information about a video, given its URL (supports youtube.com, music.youtube.com and youtu.be), or just the video ID.  
+    If no type is provided, the bot will default to what the server configuration specifies (`reduced` by default).
+- **User settings:**
+  - `/settings list`  
+    Shows a list of all available user settings and their current values.
+  - `/settings configure <name> [new_value:<value>]`  
+    If no new_value argument is provided, the value of the current setting will be shown.  
+    Otherwise, that setting is changed to the given value.
+  - `/settings reset`  
+    Resets the settings to the default values.  
+    (Shows a confirmation before actually resetting.)
+  - `/settings delete_data`  
+    Deletes all data stored about your user.  
+    (Shows a confirmation before actually deleting.)
+- **Server configuration:**
+  - 🔒 `/configure list`  
+    Shows a list of all available server settings and their current values.  
+    Requires the `Manage Server` permission to use.
+  - 🔒 `/configure setting <name> [new_value:<value>]`  
+    If no new_value argument is provided, the value of the current setting will be shown.  
+    Otherwise, that setting is changed to the given value.  
+    Requires the `Manage Server` permission to use.
+  - 🔒 `/configure reset`  
+    Resets the configuration to the default values.  
+    (Shows a confirmation before actually resetting.)  
+    Requires the `Manage Server` permission to use.
 
 > [!NOTE]  
 > Commands prefixed with 🔒 require special permissions, while others can be used by any member.  
@@ -61,6 +79,17 @@ To access these, right-click (or hold on mobile) on a message and select the com
 > Arguments surrounded by `[]` are optional.  
 > Whatever is surrounded by `<>` is a placeholder and should be replaced with an actual value.  
 > If there is a list of options, they are separated by `|` and only one of them can be specified.
+
+<br>
+
+## Privacy:
+The bot stores rudimentary information about the servers it is in and the users that use it, related to configuration settings.  
+The only uniquely identifiable information stored are the user ID and server ID (which are publicly obtainable by every member anyway).  
+  
+At no point will user account info or message content be persistently stored or shared with third parties.  
+  
+To get rid of all data stored about your server, just kick the bot.  
+To delete your personal cross-server data, use the command `/settings delete_data` - note that it will be recreated if you manually use the bot again. After deleting, automatic replies will use the default settings.
 
 <br>
 
