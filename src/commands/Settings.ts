@@ -108,7 +108,7 @@ export class SettingsCmd extends SlashCommand {
         new ButtonBuilder()
           .setCustomId("confirm-delete-data")
           .setStyle(ButtonStyle.Danger)
-          .setLabel("Confirm")
+          .setLabel("Delete")
           .setEmoji("🗑️"),
         new ButtonBuilder()
           .setCustomId("cancel-delete-data")
@@ -119,7 +119,7 @@ export class SettingsCmd extends SlashCommand {
 
       await int.editReply({
         embeds: [
-          embedify("Are you sure you want to delete all data associated with your user account?\nNote: if you manually use a command, the entry about your user will be recreated.\nThe bot will not recreate it for automatic replies.", EbdColors.Warning)
+          embedify("**Are you sure you want to delete all data associated with your user account?**\nNote: if you manually use a command, your user ID might be recorded again.\nFor enhanced privacy you can also block the bot to prevent it from reading your message content.\nNo persistent data will be saved for automatic replies.", EbdColors.Warning)
             .setFooter({ text: "This prompt will expire in 60s" }),
         ],
         ...useButtons([confirmBtns]),
@@ -136,7 +136,8 @@ export class SettingsCmd extends SlashCommand {
         await conf.deferUpdate();
 
         if(conf.customId === "confirm-delete-data") {
-          await em.nativeDelete(UserSettings.name, { id: int.user.id });
+          await em.nativeDelete(UserSettings, { id: int.user.id });
+          await em.flush();
           return conf.editReply({
             ...useEmbedify("Data successfully deleted.", EbdColors.Success),
             components: [],
@@ -161,8 +162,8 @@ export class SettingsCmd extends SlashCommand {
         new ButtonBuilder()
           .setCustomId("confirm-reset-settings")
           .setStyle(ButtonStyle.Danger)
-          .setLabel("Confirm")
-          .setEmoji("🗑️"),
+          .setLabel("Reset")
+          .setEmoji("♻️"),
         new ButtonBuilder()
           .setCustomId("cancel-reset-settings")
           .setStyle(ButtonStyle.Secondary)
@@ -171,7 +172,10 @@ export class SettingsCmd extends SlashCommand {
       ];
 
       await int.editReply({
-        ...useEmbedify("Are you sure you want to reset your settings?", EbdColors.Warning),
+        embeds: [
+          embedify("**Are you sure you want to reset your settings?**", EbdColors.Warning)
+            .setFooter({ text: "This prompt will expire in 60s" }),
+        ],
         ...useButtons([confirmBtns]),
       });
 
@@ -180,13 +184,14 @@ export class SettingsCmd extends SlashCommand {
       try {
         conf = await reply.awaitMessageComponent({
           filter: ({ user }) => user.id === int.user.id,
-          time: 30_000,
+          time: 60_000,
         });
 
         await conf.deferUpdate();
 
         if(conf.customId === "confirm-reset-settings") {
-          await em.nativeDelete(UserSettings.name, { id: int.user.id });
+          await em.nativeDelete(UserSettings, { id: int.user.id });
+          await em.flush();
           await em.persistAndFlush(new UserSettings(int.user.id));
           return conf.editReply({
             ...useEmbedify("Settings successfully reset to the default values.", EbdColors.Success),

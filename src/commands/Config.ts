@@ -159,8 +159,8 @@ export class ConfigCmd extends SlashCommand {
         new ButtonBuilder()
           .setCustomId("confirm-reset-config")
           .setStyle(ButtonStyle.Danger)
-          .setLabel("Confirm")
-          .setEmoji("🗑️"),
+          .setLabel("Reset")
+          .setEmoji("♻️"),
         new ButtonBuilder()
           .setCustomId("cancel-reset-config")
           .setStyle(ButtonStyle.Secondary)
@@ -170,7 +170,7 @@ export class ConfigCmd extends SlashCommand {
 
       await int.editReply({
         embeds: [
-          embedify("Are you sure you want to reset the configuration?", EbdColors.Warning)
+          embedify("**Are you sure you want to reset the configuration?**", EbdColors.Warning)
             .setFooter({ text: "This prompt will expire in 60s" }),
         ],
         ...useButtons([confirmBtns]),
@@ -187,7 +187,8 @@ export class ConfigCmd extends SlashCommand {
         await conf.deferUpdate();
 
         if(conf.customId === "confirm-reset-config") {
-          await em.nativeDelete(GuildConfig.name, { id: int.guildId });
+          await em.nativeDelete(GuildConfig, { id: int.guildId });
+          await em.flush();
           await em.persistAndFlush(new GuildConfig(int.guildId));
           return conf.editReply({
             ...useEmbedify("Configuration successfully reset to default settings.", EbdColors.Success),
