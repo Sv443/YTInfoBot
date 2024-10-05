@@ -51,6 +51,10 @@ export class Settings extends SlashCommand {
         .setName("list")
         .setDescription("List all configurable settings and their current values")
       )
+      .addSubcommand(option => option
+        .setName("delete_data")
+        .setDescription("Delete all data associated with your user account")
+      )
       .addSubcommandGroup(grpOpt => {
         grpOpt
           .setName("configure")
@@ -91,6 +95,56 @@ export class Settings extends SlashCommand {
       }, "");
 
       return int.editReply(useEmbedify(`Current user settings:\n${cfgList}`, EbdColors.Info));
+    }
+    case "delete_data": {
+      const confirmBtns = [
+        new ButtonBuilder()
+          .setCustomId("confirm-delete-data")
+          .setStyle(ButtonStyle.Danger)
+          .setLabel("Confirm")
+          .setEmoji("🗑️"),
+        new ButtonBuilder()
+          .setCustomId("cancel-delete-data")
+          .setStyle(ButtonStyle.Secondary)
+          .setLabel("Cancel")
+          .setEmoji("❌"),
+      ];
+
+      await int.editReply({
+        ...useEmbedify("Are you sure you want to delete all data associated with your user account?\nNote: if you manually use a command, the entry about your user will be recreated.\nThe bot will not recreate it for automatic replies.", EbdColors.Warning),
+        ...useButtons([confirmBtns]),
+      });
+
+      let conf;
+
+      try {
+        conf = await reply.awaitMessageComponent({
+          filter: ({ user }) => user.id === int.user.id,
+          time: 30_000,
+        });
+
+        await conf.deferUpdate();
+
+        if(conf.customId === "confirm-delete-data") {
+          await em.nativeDelete(UserSettings.name, { id: int.user.id });
+          return conf.editReply({
+            ...useEmbedify("Data successfully deleted.", EbdColors.Success),
+            components: [],
+          });
+        }
+        else {
+          return await conf.editReply({
+            ...useEmbedify("Deletion cancelled.", EbdColors.Secondary),
+            components: [],
+          });
+        }
+      }
+      catch {
+        return await (conf ?? int).editReply({
+          ...useEmbedify("Confirmation not received within 30s, cancelling deletion.", EbdColors.Secondary),
+          components: [],
+        });
+      }
     }
     case "reset": {
       const confirmBtns = [
