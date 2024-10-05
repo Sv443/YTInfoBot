@@ -104,6 +104,9 @@ export class SettingsCmd extends SlashCommand {
       });
     }
     case "delete_data": {
+      if(!await em.findOne(UserSettings, { id: int.user.id }))
+        return int.editReply(useEmbedify("No user settings found - there is nothing to delete", EbdColors.Info));
+
       const confirmBtns = [
         new ButtonBuilder()
           .setCustomId("confirm-delete-data")
@@ -136,8 +139,7 @@ export class SettingsCmd extends SlashCommand {
         await conf.deferUpdate();
 
         if(conf.customId === "confirm-delete-data") {
-          await em.nativeDelete(UserSettings, { id: int.user.id });
-          await em.flush();
+          await em.removeAndFlush(await em.find(UserSettings, { id: int.user.id }));
           return conf.editReply({
             ...useEmbedify("Data successfully deleted.", EbdColors.Success),
             components: [],
@@ -190,8 +192,8 @@ export class SettingsCmd extends SlashCommand {
         await conf.deferUpdate();
 
         if(conf.customId === "confirm-reset-settings") {
-          await em.nativeDelete(UserSettings, { id: int.user.id });
-          await em.flush();
+          const sett = await em.findOne(UserSettings, { id: int.guildId });
+          sett && await em.removeAndFlush(sett);
           await em.persistAndFlush(new UserSettings(int.user.id));
           return conf.editReply({
             ...useEmbedify("Settings successfully reset to the default values.", EbdColors.Success),

@@ -9,7 +9,7 @@ export class GuildDelete extends Event {
   }
 
   public async run({ id }: Guild) {
-    await em.nativeDelete(GuildConfig, { id });
-    await em.flush();
+    const cfg = await em.findOne(GuildConfig, { id });
+    cfg && await em.removeAndFlush(cfg);
   }
 }

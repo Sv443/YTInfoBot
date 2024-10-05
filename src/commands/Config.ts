@@ -187,8 +187,8 @@ export class ConfigCmd extends SlashCommand {
         await conf.deferUpdate();
 
         if(conf.customId === "confirm-reset-config") {
-          await em.nativeDelete(GuildConfig, { id: int.guildId });
-          await em.flush();
+          const cfg = await em.findOne(GuildConfig, { id: int.guildId });
+          cfg && await em.removeAndFlush(cfg);
           await em.persistAndFlush(new GuildConfig(int.guildId));
           return conf.editReply({
             ...useEmbedify("Configuration successfully reset to default settings.", EbdColors.Success),
