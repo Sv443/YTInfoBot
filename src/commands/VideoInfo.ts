@@ -256,31 +256,24 @@ export class VideoInfo extends SlashCommand {
 
     //#SECTION footer
 
-    const poweredBy = {
-      returnYTDislike: "ReturnYouTubeDislike",
-      sponsorBlock: "SponsorBlock",
-      deArrow: "DeArrow",
-    };
+    const poweredByStr = [
+      ...(returnYTDislikeData ? ["ReturnYouTubeDislike"] : []),
+      ...(deArrowData ? ["SponsorBlock"] : []),
+      ...(sponsorBlockData ? ["DeArrow"] : []),
+    ];
 
-    const footers: Record<VideoInfoType, string> = {
-      everything: joinArrayReadable(Object.values(poweredBy)),
-      reduced: joinArrayReadable([poweredBy.returnYTDislike, poweredBy.deArrow]),
-      votes_only: poweredBy.returnYTDislike,
-      dearrow_only: poweredBy.deArrow,
-      timestamps_only: poweredBy.sponsorBlock,
-    };
-
-    embed.setFooter({ text: `Powered by ${footers[type]}` });
+    embed.setFooter({ text: `Powered by ${joinArrayReadable(poweredByStr)}` });
 
     return embed;
   }
 
   //#region fetch all data
 
-  /** Fetches all necessary data for a video, given a type - parallelizes the requests */
+  /** Fetches all necessary data for a video given its ID and the info type - parallelizes the XHRs */
   public static async fetchAllData(videoId: string, type: VideoInfoType) {
-    const getNullPromise = () => Promise.resolve(null);
+    const getNullPromise = async () => null;
 
+    // only fetch the data that is needed - the rest immediately resolves null
     const [ytData, deArrowData, returnYTDislikeData, sponsorBlockData] = (
       await Promise.allSettled([
         VideoInfo.fetchYouTubeData(videoId),
