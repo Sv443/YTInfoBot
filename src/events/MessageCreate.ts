@@ -32,7 +32,9 @@ export class MessageCreate extends Event {
       videoId: VideoInfo.parseVideoId(url) ?? undefined,
     }));
 
-    if(!allVids || allVids.length === 0)
+    const allVidsDeduped = allVids?.filter((vid, idx, self) => self.findIndex((v) => v.videoId === vid.videoId) === idx);
+
+    if(!allVidsDeduped || allVidsDeduped.length === 0)
       return;
 
     const guildCfg = await em.findOne(GuildConfig, { id: msg.guildId });
@@ -46,7 +48,7 @@ export class MessageCreate extends Event {
     if(!usrSett.autoReplyEnabled)
       return;
 
-    for(const { videoId, url } of allVids) {
+    for(const { videoId, url } of allVidsDeduped) {
       if(!videoId)
         continue;
 
