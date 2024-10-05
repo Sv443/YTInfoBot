@@ -161,6 +161,10 @@ export class VideoInfo extends SlashCommand {
       .setURL(url)
       .setColor(EbdColors.Secondary);
 
+    let hasRYDData = false,
+      hasDeArrowData = false,
+      hasSponsorBlockData = false;
+
     const { ytData, returnYTDislikeData, deArrowData, sponsorBlockData } = await VideoInfo.fetchAllData(videoId, type);
 
     if(!ytData)
@@ -194,11 +198,16 @@ export class VideoInfo extends SlashCommand {
       inline: false,
     });
 
+    if(bestDeArrowThumb || bestDeArrowTitle)
+      hasDeArrowData = true;
+
     //#SECTION votes
 
     const fmt = (num: number) => formatNumber(num, guildCfg.locale, guildCfg.numberFormat);
 
     if(["votes_only", "everything", "reduced"].includes(type) && returnYTDislikeData) {
+      hasRYDData = true;
+
       const likes = returnYTDislikeData?.likes ?? 0;
       const dislikes = returnYTDislikeData?.dislikes ?? 0;
       const ratioPerc = (returnYTDislikeData?.rating ?? 0) * 20;
@@ -238,6 +247,8 @@ export class VideoInfo extends SlashCommand {
       });
 
       for(const { category, segment, actionType } of reorderedSegments) {
+        hasSponsorBlockData = true;
+
         const startUrl = new URL(url);
         startUrl.searchParams.set("t", String(Math.floor(segment[0])));
         const endUrl = new URL(url);
@@ -259,9 +270,9 @@ export class VideoInfo extends SlashCommand {
     //#SECTION footer
 
     const poweredByStr = [
-      ...(returnYTDislikeData ? ["ReturnYouTubeDislike"] : []),
-      ...(deArrowData ? ["SponsorBlock"] : []),
-      ...(sponsorBlockData ? ["DeArrow"] : []),
+      ...(hasRYDData ? ["ReturnYouTubeDislike"] : []),
+      ...(hasDeArrowData ? ["SponsorBlock"] : []),
+      ...(hasSponsorBlockData ? ["DeArrow"] : []),
     ];
 
     embed.setFooter({ text: `Powered by ${joinArrayReadable(poweredByStr)}` });
