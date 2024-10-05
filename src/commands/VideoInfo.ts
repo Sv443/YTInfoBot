@@ -5,7 +5,7 @@ import { EbdColors, useEmbedify } from "@lib/embedify.ts";
 import { SlashCommand } from "@lib/SlashCommand.ts";
 import { axios } from "@lib/axios.ts";
 import type { DeArrowObj, ReturnYouTubeDislikeObj, SponsorBlockActionType, SponsorBlockCategory, SponsorBlockSegmentObj, YTVidDataObj } from "@/types.ts";
-import { generateProgressBar, joinArrayReadable, secToYtTime } from "@lib/text.ts";
+import { generateProgressBar, joinArrayReadable, secsToYtTime } from "@lib/text.ts";
 import { getBestThumbnailUrl } from "@lib/thumbnail.ts";
 import { GuildConfig } from "@models/GuildConfig.model.ts";
 import { formatNumber } from "@lib/math.ts";
@@ -242,9 +242,9 @@ export class VideoInfo extends SlashCommand {
         endUrl.searchParams.set("t", String(Math.floor(segment[1])));
 
         if(actionType === "poi")
-          timestampList += `${sponsorBlockCategoryColorEmojiMap[category]} [${secToYtTime(segment[0])}](${startUrl}) (${sponsorBlockCategoryMap[category]})\n`;
+          timestampList += `${sponsorBlockCategoryColorEmojiMap[category]} [${secsToYtTime(segment[0])}](${startUrl}) (${sponsorBlockCategoryMap[category]})\n`;
         else
-          timestampList += `${sponsorBlockCategoryColorEmojiMap[category]} [${secToYtTime(segment[0])}](${startUrl})-[${secToYtTime(segment[1])}](${endUrl}) (${sponsorBlockCategoryMap[category]})\n`;
+          timestampList += `${sponsorBlockCategoryColorEmojiMap[category]} [${secsToYtTime(segment[0])}](${startUrl})-[${secsToYtTime(segment[1])}](${endUrl}) (${sponsorBlockCategoryMap[category]})\n`;
       }
 
       embed.addFields({

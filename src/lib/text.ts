@@ -19,29 +19,29 @@ export function truncField(content: string, endStr = "...") {
  * Automatically appends an `s` to the passed `word`, if `num` is not equal to 1.  
  * This doesn't work for all words, but it's a simple and dynamic way to handle most cases.
  * @param word A word in singular form, to auto-convert to plural
- * @param num If this is an array, the amount of items is used
+ * @param num If this is an array, d.js Collection or Map, the amount of items is used
  */
-export function autoPlural(word: string, num: number | unknown[] | Collection<unknown, unknown>) {
+export function autoPlural(word: string, num: number | unknown[] | Collection<unknown, unknown> | Map<unknown, unknown>) {
   if(Array.isArray(num))
     num = num.length;
-  else if(num instanceof Collection)
+  else if(num instanceof Collection || num instanceof Map)
     num = num.size;
   return `${word}${num === 1 ? "" : "s"}`;
 }
 
 /** Joins an array of strings with a separator and a last separator - defaults to `,` & `and` */
 export function joinArrayReadable(array: unknown[], separators = ", ", lastSeparator = " and "): string {
-  if(array.length === 0)
+  const arr = [...array];
+  if(arr.length === 0)
     return "";
-  else if(array.length === 1)
-    return String(array[0]);
-  else if(array.length === 2)
-    return array.join(lastSeparator);
-  else {
-    const lastItm = lastSeparator + array[array.length - 1];
-    array.pop();
-    return array.join(separators) + lastItm;
-  }
+  else if(arr.length === 1)
+    return String(arr[0]);
+  else if(arr.length === 2)
+    return arr.join(lastSeparator);
+
+  const lastItm = lastSeparator + arr[arr.length - 1];
+  arr.pop();
+  return arr.join(separators) + lastItm;
 }
 
 /** Generates an ASCII progress bar with the given percentage and max length - uses opaque characters for extra detail */
@@ -69,8 +69,8 @@ export function generateProgressBar(percentage: number, maxLength: number) {
   return `${filledBar}${lastBlock}${emptyBar}`;
 }
 
-/** Converts seconds into the YouTube timestamp format (HH:)MM:SS */
-export function secToYtTime(seconds: number) {
+/** Converts seconds into the YT timestamp format `(hh:)mm:ss` */
+export function secsToYtTime(seconds: number) {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
   const secs = Math.floor(seconds % 60);

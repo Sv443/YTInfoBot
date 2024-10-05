@@ -14,8 +14,11 @@ export abstract class CommandBase {
     this.name = builder.name;
   }
 
-  /** Returns the command name, optionally prefixed by the env var `CMD_PREFIX` */
-  public static getCmdName(name: string) {
-    return `${cmdPrefix ?? ""}${name}`;
+  /**
+   * Returns the command name, optionally prefixed by the env var `CMD_PREFIX`  
+   * If no name is passed, returns only the prefix, or an empty string if none is set
+   */
+  public static getCmdName(name?: string) {
+    return `${cmdPrefix ?? ""}${name ?? ""}`;
   }
 }
