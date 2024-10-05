@@ -72,16 +72,12 @@ async function registerGuildCommands() {
     await writeFile(cmdHashFile, newCmdHash);
 
     const guilds = client.guilds.cache.map((g) => g.id);
-    const promises: Promise<void>[] = [];
 
-    for(const guildId of guilds) {
-      promises.push(new Promise(async (resolve) => {
-        const data = await registerCommandsForGuild(guildId);
+    const promises = guilds.map(async (guildId) => {
+      const data = await registerCommandsForGuild(guildId);
 
-        console.log(k.magenta(`R${lastHashExists ? "e-r" : ""}egistered ${(data as unknown[])?.length} guild commands for "${client.guilds.cache.find(g => g.id === guildId)?.name ?? guildId}"`));
-        resolve();
-      }));
-    }
+      console.log(k.magenta(`Registered ${(data as unknown[])?.length} guild commands for "${client.guilds.cache.find(g => g.id === guildId)?.name ?? guildId}"`));
+    });
 
     await Promise.allSettled(promises);
   }

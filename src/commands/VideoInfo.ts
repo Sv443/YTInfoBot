@@ -10,7 +10,7 @@ import { getBestThumbnailUrl } from "@lib/thumbnail.ts";
 import { GuildConfig } from "@models/GuildConfig.model.ts";
 import { formatNumber } from "@lib/math.ts";
 import { CommandBase } from "@lib/CommandBase.ts";
-import { Settings } from "@cmd/Settings.ts";
+import { SettingsCmd } from "@cmd/Settings.ts";
 
 //#region constants
 
@@ -76,7 +76,7 @@ export type VideoInfoFetchData = {
 
 //#region constructor
 
-export class VideoInfo extends SlashCommand {
+export class VideoInfoCmd extends SlashCommand {
   constructor() {
     super(new SlashCommandBuilder()
       .setName(CommandBase.getCmdName("video_info"))
@@ -100,7 +100,7 @@ export class VideoInfo extends SlashCommand {
     if(!int.inGuild())
       return int.reply(useEmbedify("This command can only be used in a server", EbdColors.Error));
 
-    const videoId = VideoInfo.parseVideoId(int.options.get("video", true).value as string);
+    const videoId = VideoInfoCmd.parseVideoId(int.options.get("video", true).value as string);
 
     if(!videoId)
       return int.reply(useEmbedify("Invalid video URL or ID", EbdColors.Error));
@@ -109,7 +109,7 @@ export class VideoInfo extends SlashCommand {
 
     await int.deferReply();
 
-    await Settings.ensureSettingsExist(int.user.id);
+    await SettingsCmd.ensureSettingsExist(int.user.id);
 
     console.log("#> VideoInfo", type, videoId);
   }
@@ -165,7 +165,7 @@ export class VideoInfo extends SlashCommand {
       hasDeArrowData = false,
       hasSponsorBlockData = false;
 
-    const { ytData, returnYTDislikeData, deArrowData, sponsorBlockData } = await VideoInfo.fetchAllData(videoId, type);
+    const { ytData, returnYTDislikeData, deArrowData, sponsorBlockData } = await VideoInfoCmd.fetchAllData(videoId, type);
 
     if(!ytData)
       return null;
@@ -181,7 +181,7 @@ export class VideoInfo extends SlashCommand {
       ?? null;
 
     if(bestDeArrowThumb && bestDeArrowThumb.timestamp)
-      embed.setThumbnail(await VideoInfo.getDeArrowThumbUrl(videoId, bestDeArrowThumb.timestamp) ?? ytData.thumbnail_url);
+      embed.setThumbnail(await VideoInfoCmd.getDeArrowThumbUrl(videoId, bestDeArrowThumb.timestamp) ?? ytData.thumbnail_url);
     else
       embed.setThumbnail(await getBestThumbnailUrl(videoId) ?? ytData.thumbnail_url);
 
@@ -289,10 +289,10 @@ export class VideoInfo extends SlashCommand {
     // only fetch the data that is needed - the rest immediately resolves null
     const [ytData, deArrowData, returnYTDislikeData, sponsorBlockData] = (
       await Promise.allSettled([
-        VideoInfo.fetchYouTubeData(videoId),
-        ["dearrow_only", "everything"].includes(type) ? VideoInfo.fetchDeArrowData(videoId) : getNullPromise(),
-        ["votes_only", "everything", "reduced"].includes(type) ? VideoInfo.fetchReturnYouTubeDislikeData(videoId) : getNullPromise(),
-        ["timestamps_only", "everything"].includes(type) ? VideoInfo.fetchSponsorBlockData(videoId) : getNullPromise(),
+        VideoInfoCmd.fetchYouTubeData(videoId),
+        ["dearrow_only", "everything"].includes(type) ? VideoInfoCmd.fetchDeArrowData(videoId) : getNullPromise(),
+        ["votes_only", "everything", "reduced"].includes(type) ? VideoInfoCmd.fetchReturnYouTubeDislikeData(videoId) : getNullPromise(),
+        ["timestamps_only", "everything"].includes(type) ? VideoInfoCmd.fetchSponsorBlockData(videoId) : getNullPromise(),
       ])
     ).map((res) => res.status === "fulfilled" ? res.value : null);
 

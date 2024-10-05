@@ -38,7 +38,7 @@ These automatic replies contain slightly reduced information by default to reduc
 <!--TODO:-->Additionally, there are right-click context menu options to get more detailed information about a video.  
 To access these, right-click (or hold on mobile) on a message and select the command under "Apps".  
   
-If you want to opt out of automatic replies across every server, you can use the command `/settings configure auto_reply new_value:false`
+If you want to opt out of automatic replies across every server, you can use the command `/settings set auto_reply new_value:false`
 
 <br>
 
@@ -50,7 +50,7 @@ If you want to opt out of automatic replies across every server, you can use the
 - **User settings:**
   - `/settings list`  
     Shows a list of all available user settings and their current values.
-  - `/settings configure <name> [new_value:<value>]`  
+  - `/settings set <name> new_value:<value>`  
     If no new_value argument is provided, the value of the current setting will be shown.  
     Otherwise, that setting is changed to the given value.
   - `/settings reset`  
@@ -60,14 +60,14 @@ If you want to opt out of automatic replies across every server, you can use the
     Deletes all data stored about your user.  
     (Shows a confirmation before actually deleting.)
 - **Server configuration:**
-  - 🔒 `/configure list`  
-    Shows a list of all available server settings and their current values.  
+  - 🔒 `/config list`  
+    Shows a list of all available server configuration settings and their current values.  
     Requires the `Manage Server` permission to use.
-  - 🔒 `/configure setting <name> [new_value:<value>]`  
+  - 🔒 `/config set <name> new_value:<value>`  
     If no new_value argument is provided, the value of the current setting will be shown.  
     Otherwise, that setting is changed to the given value.  
     Requires the `Manage Server` permission to use.
-  - 🔒 `/configure reset`  
+  - 🔒 `/config reset`  
     Resets the configuration to the default values.  
     (Shows a confirmation before actually resetting.)  
     Requires the `Manage Server` permission to use.

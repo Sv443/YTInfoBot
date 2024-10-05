@@ -1,6 +1,6 @@
 import { type EmbedBuilder, type Message } from "discord.js";
 import { Event } from "@lib/Event.ts";
-import { VideoInfo } from "@cmd/VideoInfo.ts";
+import { VideoInfoCmd } from "@cmd/VideoInfo.ts";
 import { em } from "@lib/db.ts";
 import { GuildConfig } from "@models/GuildConfig.model.ts";
 import { UserSettings } from "@models/UserSettings.model.ts";
@@ -29,7 +29,7 @@ export class MessageCreate extends Event {
   public static async handleYtVideoMsg(msg: Message) {
     const allVids = msg.content.match(ytVideoRegexGlobal)?.map((url) => ({
       url,
-      videoId: VideoInfo.parseVideoId(url) ?? undefined,
+      videoId: VideoInfoCmd.parseVideoId(url) ?? undefined,
     }));
 
     const allVidsDeduped = allVids?.filter((vid, idx, self) => self.findIndex((v) => v.videoId === vid.videoId) === idx);
@@ -52,7 +52,7 @@ export class MessageCreate extends Event {
       if(!videoId)
         continue;
 
-      const embed = await VideoInfo.getVideoInfoEmbed({
+      const embed = await VideoInfoCmd.getVideoInfoEmbed({
         url,
         videoId,
         guildCfg,

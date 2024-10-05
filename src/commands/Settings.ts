@@ -1,5 +1,5 @@
 import { ButtonBuilder, ButtonStyle, SlashCommandBuilder, type CommandInteraction, type CommandInteractionOption, type SlashCommandSubcommandBuilder } from "discord.js";
-import { EbdColors, useEmbedify } from "@lib/embedify.ts";
+import { EbdColors, embedify, useEmbedify } from "@lib/embedify.ts";
 import { SlashCommand } from "@lib/SlashCommand.ts";
 import { em } from "@lib/db.ts";
 import { UserSettings } from "@models/UserSettings.model.ts";
@@ -7,7 +7,7 @@ import { useButtons } from "@lib/components.ts";
 import { capitalize } from "@lib/text.ts";
 import type { Stringifiable } from "@/types.ts";
 import { CommandBase } from "@lib/CommandBase.ts";
-import { autoReplyValues } from "@cmd/Configure.ts";
+import { autoReplyValues } from "@cmd/Config.ts";
 
 //#region constants
 
@@ -19,26 +19,27 @@ const scNames = {
 /** All options that can be configured */
 const configurableOptions: Record<
   typeof scNames[keyof typeof scNames],
-  Omit<Parameters<typeof Settings.editSetting>[0], "int" | "opt"> & {
+  Omit<Parameters<typeof SettingsCmd.editSetting>[0], "int" | "opt"> & {
     builder: (grpOpt: SlashCommandSubcommandBuilder) => SlashCommandSubcommandBuilder;
   }
 > = {
   [scNames.autoReplyEnabled]: {
     settProp: "autoReplyEnabled",
-    settingName: "auto reply",
+    settingName: "auto reply state",
     getValueLabel: (val) => autoReplyValues.find(c => c.value === Boolean(val))?.name,
     builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
       .setDescription("Change whether the bot will automatically reply to your messages containing a video link")
       .addBooleanOption(opt =>
         opt.setName("new_value")
           .setDescription("Whether auto-reply should be enabled")
+          .setRequired(true)
       )
   },
 } as const;
 
 //#region constructor
 
-export class Settings extends SlashCommand {
+export class SettingsCmd extends SlashCommand {
   constructor() {
     super(new SlashCommandBuilder()
       .setName(CommandBase.getCmdName("settings"))
@@ -57,8 +58,8 @@ export class Settings extends SlashCommand {
       )
       .addSubcommandGroup(grpOpt => {
         grpOpt
-          .setName("configure")
-          .setDescription("View the value or edit a specific setting");
+          .setName("set")
+          .setDescription("Set a specific setting to a new value");
 
         for(const [name, { builder }] of Object.entries(configurableOptions))
           grpOpt.addSubcommand(option => builder(option).setName(name));
@@ -74,11 +75,11 @@ export class Settings extends SlashCommand {
     const reply = await int.deferReply({ ephemeral: true });
 
     switch(opt.name) {
-    case "configure":
+    case "set":
       if(!opt.options?.[0])
-        throw new Error("No subcommand provided in /settings configure");
+        throw new Error("No subcommand provided in /settings set");
 
-      return await Settings.editSetting({
+      return await SettingsCmd.editSetting({
         int,
         opt,
         ...configurableOptions[opt.options[0].name as keyof typeof configurableOptions],
@@ -87,14 +88,20 @@ export class Settings extends SlashCommand {
       const sett = await em.findOne(UserSettings, { id: int.user.id });
 
       if(!sett)
-        return Settings.noSettingsFound(int);
+        return SettingsCmd.noSettingsFound(int);
 
       const cfgList = Object.entries(configurableOptions).reduce((acc, [, { settProp: cfgProp, settingName, getValueLabel: getLabel }], i) => {
         const val = getLabel ? getLabel(sett[cfgProp]) : sett[cfgProp];
         return `${acc}${i !== 0 ? "\n" : ""}- **${capitalize(settingName)}**: \`${val}\``;
       }, "");
 
-      return int.editReply(useEmbedify(`Current user settings:\n${cfgList}`, EbdColors.Info));
+      return int.editReply({
+        embeds: [
+          embedify(cfgList, EbdColors.Info)
+            .setTitle("User settings values:")
+            .setFooter({ text: "Use /settings set <name> to edit a setting" }),
+        ],
+      });
     }
     case "delete_data": {
       const confirmBtns = [
@@ -111,7 +118,10 @@ export class Settings extends SlashCommand {
       ];
 
       await int.editReply({
-        ...useEmbedify("Are you sure you want to delete all data associated with your user account?\nNote: if you manually use a command, the entry about your user will be recreated.\nThe bot will not recreate it for automatic replies.", EbdColors.Warning),
+        embeds: [
+          embedify("Are you sure you want to delete all data associated with your user account?\nNote: if you manually use a command, the entry about your user will be recreated.\nThe bot will not recreate it for automatic replies.", EbdColors.Warning)
+            .setFooter({ text: "This prompt will expire in 60s" }),
+        ],
         ...useButtons([confirmBtns]),
       });
 
@@ -120,7 +130,7 @@ export class Settings extends SlashCommand {
       try {
         conf = await reply.awaitMessageComponent({
           filter: ({ user }) => user.id === int.user.id,
-          time: 30_000,
+          time: 60_000,
         });
 
         await conf.deferUpdate();
@@ -243,13 +253,13 @@ export class Settings extends SlashCommand {
       const cfg = await em.findOne(UserSettings, { id: int.user.id });
 
       if(!cfg)
-        return Settings.noSettingsFound(int);
+        return SettingsCmd.noSettingsFound(int);
 
       const newValue = opt.options?.[0]?.options?.find(o => o.name === "new_value")?.value as TSettValue | undefined;
       if(typeof newValue === "undefined") {
         const cfg = await em.findOne(UserSettings, { id: int.user.id });
         if(!cfg)
-          return Settings.noSettingsFound(int);
+          return SettingsCmd.noSettingsFound(int);
         return int.editReply(useEmbedify(`The current ${settingName} is \`${getValueLabel(cfg[settProp] as TSettValue) ?? cfg[settProp]}\``));
       }
 

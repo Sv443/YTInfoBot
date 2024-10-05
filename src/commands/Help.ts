@@ -9,7 +9,7 @@ import { bitFieldContains } from "@lib/math.ts";
 
 //#region constructor
 
-export class Help extends SlashCommand {
+export class HelpCmd extends SlashCommand {
   constructor() {
     super(new SlashCommandBuilder()
       .setName(CommandBase.getCmdName("help"))
@@ -69,7 +69,7 @@ export class Help extends SlashCommand {
       return int.reply({
         embeds: [
           embedify(cmdList)
-            .setTitle("Commands"),
+            .setTitle("Commands:"),
         ],
         ephemeral,
       });
@@ -80,13 +80,13 @@ export class Help extends SlashCommand {
           embedify([
             `Version: ${packageJson.version}`,
             `Created by [${packageJson.author.name}](${packageJson.author.url})\n`,
-            "Opt out of automatic replies across every server by using the command `/settings configure auto_reply new_value:false\n`",
+            "Opt out of automatic replies across every server by using the command `/settings set auto_reply new_value:false\n`",
             `- Submit bugs or feature requests on [GitHub](${packageJson.bugs.url})`,
             `- Join the [support server](${getEnvVar("SUPPORT_SERVER_INVITE_URL")}) if you have any questions or need help`,
             `- This bot is completely free so please consider [supporting the development ❤️](${packageJson.funding.url})\n`,
             "Powered by [ReturnYoutubeDislike](https://returnyoutubedislike.com/), [SponsorBlock](https://sponsor.ajay.app/), and [DeArrow](https://dearrow.ajay.app/)",
           ].join("\n"))
-            .setTitle("Bot Information")
+            .setTitle("Information:")
         ],
       });
     }

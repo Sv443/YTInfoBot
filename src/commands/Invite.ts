@@ -6,7 +6,7 @@ import { CommandBase } from "@lib/CommandBase.ts";
 
 //#region constructor
 
-export class Invite extends SlashCommand {
+export class InviteCmd extends SlashCommand {
   constructor() {
     super(new SlashCommandBuilder()
       .setName(CommandBase.getCmdName("invite"))

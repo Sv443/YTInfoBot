@@ -1,5 +1,5 @@
 import { ButtonBuilder, ButtonStyle, PermissionFlagsBits, SlashCommandBuilder, type AutocompleteInteraction, type CommandInteraction, type CommandInteractionOption, type SlashCommandSubcommandBuilder } from "discord.js";
-import { EbdColors, useEmbedify } from "@lib/embedify.ts";
+import { EbdColors, embedify, useEmbedify } from "@lib/embedify.ts";
 import { SlashCommand } from "@lib/SlashCommand.ts";
 import { numberFormatChoices, videoInfoTypeChoices } from "@cmd/VideoInfo.ts";
 import { em } from "@lib/db.ts";
@@ -28,7 +28,7 @@ export const autoReplyValues = [
 /** All options that can be configured */
 const configurableOptions: Record<
   typeof scNames[keyof typeof scNames],
-  Omit<Parameters<typeof Configure.editConfigSetting>[0], "int" | "opt"> & {
+  Omit<Parameters<typeof ConfigCmd.editConfigSetting>[0], "int" | "opt"> & {
     builder: (grpOpt: SlashCommandSubcommandBuilder) => SlashCommandSubcommandBuilder;
   }
 > = {
@@ -42,6 +42,7 @@ const configurableOptions: Record<
         opt.setName("new_value")
           .setDescription("The new default video_info type")
           .setChoices(videoInfoTypeChoices)
+          .setRequired(true)
       )
   },
   [scNames.numberFormat]: {
@@ -54,6 +55,7 @@ const configurableOptions: Record<
         opt.setName("new_value")
           .setDescription("The new number format")
           .setChoices(numberFormatChoices)
+          .setRequired(true)
       )
   },
   [scNames.locale]: {
@@ -70,28 +72,30 @@ const configurableOptions: Record<
           .setAutocomplete(true)
           .setMinLength(5)
           .setMaxLength(5)
+          .setRequired(true)
       )
   },
   [scNames.autoReplyEnabled]: {
     cfgProp: "autoReplyEnabled",
-    settingName: "auto reply",
+    settingName: "auto reply state",
     getValueLabel: (val) => autoReplyValues.find(c => c.value === Boolean(val))?.name,
     builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
       .setDescription("Change whether the bot will automatically reply to all messages containing a video link")
       .addBooleanOption(opt =>
         opt.setName("new_value")
           .setDescription("Whether auto-reply should be enabled")
+          .setRequired(true)
       )
   },
 } as const;
 
 //#region constructor
 
-export class Configure extends SlashCommand {
+export class ConfigCmd extends SlashCommand {
   constructor() {
     super(new SlashCommandBuilder()
-      .setName(CommandBase.getCmdName("configure"))
-      .setDescription("View or edit the bot's configuration for your server")
+      .setName(CommandBase.getCmdName("config"))
+      .setDescription("View or edit the bot configuration for your server")
       .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
       .addSubcommand(option => option
         .setName("reset")
@@ -103,8 +107,8 @@ export class Configure extends SlashCommand {
       )
       .addSubcommandGroup(grpOpt => {
         grpOpt
-          .setName("setting")
-          .setDescription("View the value or edit a specific setting");
+          .setName("set")
+          .setDescription("Set a specific setting to a new value");
 
         for(const [name, { builder }] of Object.entries(configurableOptions))
           grpOpt.addSubcommand(option => builder(option).setName(name));
@@ -123,11 +127,11 @@ export class Configure extends SlashCommand {
     const reply = await int.deferReply({ ephemeral: true });
 
     switch(opt.name) {
-    case "setting":
+    case "set":
       if(!opt.options?.[0])
-        throw new Error("No subcommand provided in /configure setting");
+        throw new Error("No subcommand provided in /config set");
 
-      return await Configure.editConfigSetting({
+      return await ConfigCmd.editConfigSetting({
         int,
         opt,
         ...configurableOptions[opt.options[0].name as keyof typeof configurableOptions],
@@ -136,14 +140,19 @@ export class Configure extends SlashCommand {
       const cfg = await em.findOne(GuildConfig, { id: int.guildId });
 
       if(!cfg)
-        return Configure.noConfigFound(int);
+        return ConfigCmd.noConfigFound(int);
 
       const cfgList = Object.entries(configurableOptions).reduce((acc, [, { cfgProp, settingName, getValueLabel: getLabel }], i) => {
         const val = getLabel ? getLabel(cfg[cfgProp]) : cfg[cfgProp];
         return `${acc}${i !== 0 ? "\n" : ""}- **${capitalize(settingName)}**: \`${val}\``;
       }, "");
 
-      return int.editReply(useEmbedify(`Current configuration settings:\n${cfgList}`, EbdColors.Info));
+      return int.editReply({
+        embeds: [
+          embedify(cfgList, EbdColors.Info)
+            .setTitle("Server configuration values:")
+        ],
+      });
     }
     case "reset": {
       const confirmBtns = [
@@ -160,7 +169,10 @@ export class Configure extends SlashCommand {
       ];
 
       await int.editReply({
-        ...useEmbedify("Are you sure you want to reset the configuration?", EbdColors.Warning),
+        embeds: [
+          embedify("Are you sure you want to reset the configuration?", EbdColors.Warning)
+            .setFooter({ text: "This prompt will expire in 60s" }),
+        ],
         ...useButtons([confirmBtns]),
       });
 
@@ -169,7 +181,7 @@ export class Configure extends SlashCommand {
       try {
         conf = await reply.awaitMessageComponent({
           filter: ({ user }) => user.id === int.user.id,
-          time: 30_000,
+          time: 60_000,
         });
 
         await conf.deferUpdate();
@@ -213,7 +225,7 @@ export class Configure extends SlashCommand {
   //#region utils
 
   static noConfigFound(int: CommandInteraction) {
-    int[int.deferred || int.replied ? "editReply" : "reply"](useEmbedify("No server configuration found - please run `/configure reset`", EbdColors.Error));
+    int[int.deferred || int.replied ? "editReply" : "reply"](useEmbedify("No server configuration found - please run `/config reset`", EbdColors.Error));
   }
 
   /** Call to edit or view the passed configuration setting */
@@ -241,13 +253,13 @@ export class Configure extends SlashCommand {
       const cfg = await em.findOne(GuildConfig, { id: int.guildId });
 
       if(!cfg)
-        return Configure.noConfigFound(int);
+        return ConfigCmd.noConfigFound(int);
 
       const newValue = opt.options?.[0]?.options?.find(o => o.name === "new_value")?.value as TCfgValue | undefined;
       if(typeof newValue === "undefined") {
         const cfg = await em.findOne(GuildConfig, { id: int.guildId });
         if(!cfg)
-          return Configure.noConfigFound(int);
+          return ConfigCmd.noConfigFound(int);
         return int.editReply(useEmbedify(`The current ${settingName} is \`${getValueLabel(cfg[cfgProp] as TCfgValue) ?? cfg[cfgProp]}\``));
       }
 
