@@ -1,7 +1,6 @@
 import { SlashCommandBuilder, type CommandInteraction } from "discord.js";
 import { useEmbedify } from "@lib/embedify.ts";
-import { SlashCommand } from "@lib/Command.ts";
-import { CommandBase } from "@lib/CommandBase.ts";
+import { CommandBase, SlashCommand } from "@lib/Command.ts";
 
 //#region constructor
 
