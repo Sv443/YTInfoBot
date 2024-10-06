@@ -1,13 +1,12 @@
 <div style="text-align:center;" align="center">
 
 ### 🚧 Work in progress 🚧
-This bot is currently in development and not yet ready for public use. Inviting it will not work until this notice is removed.  
-Feel free to create your own instance using the instructions below though.
+This bot is currently in development and not yet ready for public use. Inviting it will not work until this notice is removed. Feel free to create your own instance using the instructions below though.
 
 <br><br><br><br>
 
 # YTInfoBot
-[Features](#features) &bull; [Usage](#regular-usage) &bull; [Commands](#slash-commands) &bull; [Privacy](#privacy) &bull; [Development](#local-installation)
+[Features](#features) &bull; [Usage](#regular-usage) &bull; [Commands](#slash-commands) &bull; [Privacy](#privacy) &bull; [Local development](#local-development)
 
 Free Discord bot that replies to YouTube links with information from Return YouTube Dislike (approximate likes and dislikes), SponsorBlock (timestamps to skip certain segments) and DeArrow (crowdsourced thumbnails and titles).  
   
@@ -100,7 +99,7 @@ To delete your personal cross-server data, use the command `/settings delete_dat
 
 <br>
 
-## Local Installation:
+## Local Development:
 1. Have [Node.js](https://nodejs.org/) and [pnpm](https://pnpm.io/installation) installed.
 2. Have a [PostgreSQL database](https://www.postgresql.org/) and a user set up (you may [follow this guide](https://medium.com/coding-blocks/creating-user-database-and-adding-access-on-postgresql-8bfcd2f4a91e) on Linux or [WSL](https://learn.microsoft.com/en-us/windows/wsl/install)).
 3. Clone the repository or download the ZIP file and extract it.
