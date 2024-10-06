@@ -5,7 +5,8 @@
 
 Free Discord bot that replies to YouTube links with information from Return YouTube Dislike (approximate likes and dislikes), SponsorBlock (timestamps to skip certain segments) and DeArrow (crowdsourced thumbnails and titles).  
   
-If you enjoy using this bot, please consider [donating](https://github.com/sponsors/Sv443) to support development ❤️
+Since the bot is free to use, I rely on donations to keep the bot running and maintained.  
+Please consider [donating](https://github.com/sponsors/Sv443) to support development. Any help is greatly appreciated ❤️  
   
 <a href="https://discord.com/api/oauth2/authorize?client_id=1290320137223802912&permissions=292058098752&scope=bot%20applications.commands" target="_blank"><img src="https://img.shields.io/badge/Invite%20Bot-%E2%96%BA-78f05d" height="30"></a>
 
