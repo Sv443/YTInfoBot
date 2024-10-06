@@ -1,3 +1,8 @@
+
+                    GNU AFFERO GENERAL PUBLIC LICENSE
+                       Version 3, 19 November 2007
+
+
 YTInfoBot
 Copyright (C) 2024 Sv443
 
@@ -14,10 +19,6 @@ General Public License for more details.
 A copy of the GNU Affero General Public License 3.0 is available below:
 
 
-
-
-                    GNU AFFERO GENERAL PUBLIC LICENSE
-                       Version 3, 19 November 2007
 
  Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>
  Everyone is permitted to copy and distribute verbatim copies
