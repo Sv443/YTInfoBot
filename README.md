@@ -1,5 +1,11 @@
 <div style="text-align:center;" align="center">
 
+### 🚧 Work in progress 🚧
+This bot is currently in development and not yet ready for public use. Inviting it will not work until this notice is removed.  
+Feel free to create your own instance using the instructions below though.
+
+<br><br><br><br>
+
 # YTInfoBot
 [Features](#features) &bull; [Usage](#regular-usage) &bull; [Commands](#slash-commands) &bull; [Privacy](#privacy) &bull; [Development](#local-installation)
 
