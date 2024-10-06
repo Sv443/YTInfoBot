@@ -1,4 +1,4 @@
-import { type EmbedBuilder, type Message } from "discord.js";
+import { type CommandInteraction, type ContextMenuCommandInteraction, type EmbedBuilder, type Message } from "discord.js";
 import { Event } from "@lib/Event.ts";
 import { VideoInfoCmd } from "@cmd/VideoInfo.ts";
 import { em } from "@lib/db.ts";
@@ -26,7 +26,9 @@ export class MessageCreate extends Event {
   //#region utils
 
   /** Handles a message that contains at least one YT video link */
-  public static async handleYtVideoMsg(msg: Message) {
+  public static async handleYtVideoMsg(msg: Pick<Message, "content" | "guildId" | "author" | "reply">, int?: CommandInteraction | ContextMenuCommandInteraction) {
+    int && !int.deferred && await int.deferReply();
+
     const allVids = msg.content.match(ytVideoRegexGlobal)?.map((url) => ({
       url,
       videoId: VideoInfoCmd.parseVideoId(url) ?? undefined,
@@ -65,7 +67,13 @@ export class MessageCreate extends Event {
       embeds.push(embed);
     }
 
-    msg.reply({
+    if(int)
+      return int[int.deferred || int.replied ? "editReply" : "reply"]({
+        embeds,
+        allowedMentions: { repliedUser: false },
+      });
+
+    return msg.reply({
       embeds,
       allowedMentions: { repliedUser: false },
     });

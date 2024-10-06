@@ -33,6 +33,7 @@
     "paths": {
       "@assets/*": ["src/assets/*"],
       "@cmd/*": ["src/commands/*"],
+      "@ctx/*": ["src/contexts/*"],
       "@evt/*": ["src/events/*"],
       "@lib/*": ["src/lib/*"],
       "@models/*": ["src/models/*"],

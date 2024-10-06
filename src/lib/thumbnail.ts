@@ -30,6 +30,7 @@ export async function getBestThumbnailUrl(videoId: string) {
       if(response && response.status < 300 && response.status >= 200)
         return url;
     }
+    return null;
   }
   catch {
     return null;

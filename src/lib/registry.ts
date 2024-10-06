@@ -6,9 +6,9 @@ import { EbdColors, useEmbedify } from "@lib/embedify.ts";
 import { getHash } from "@lib/crypto.ts";
 import { exists } from "@lib/fs.ts";
 import { commands } from "@cmd/_commands.ts";
+import { contextCommands } from "@ctx/_contexts.ts";
 import { events } from "@evt/_events.ts";
-import type { SlashCommand } from "@lib/SlashCommand.ts";
-import type { ContextCommand } from "@lib/ContextCommand.ts";
+import type { ContextCommand, SlashCommand } from "@lib/Command.ts";
 import type { Event } from "@lib/Event.ts";
 import { client, clientId, rest } from "@lib/client.ts";
 
@@ -22,7 +22,7 @@ const cmdHashFile = resolve(".cmd_hash");
 
 /** Registers all slash- and context-commands for all guilds (if they were changed), as well as registers listeners for them and for autocomplete */
 async function registerGuildCommands() {
-  for(const cmd of commands)
+  for(const cmd of [...commands, ...contextCommands])
     cmdInstances.set(cmd.name, cmd);
 
   client.on(Events.InteractionCreate, async (int) => {

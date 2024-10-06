@@ -2,7 +2,7 @@ import { EmbedBuilder, SlashCommandBuilder, type APIApplicationCommandOptionChoi
 import { AxiosError } from "axios";
 import qs from "qs";
 import { EbdColors, useEmbedify } from "@lib/embedify.ts";
-import { CommandBase, SlashCommand } from "@lib/SlashCommand.ts";
+import { CommandBase, SlashCommand } from "@lib/Command.ts";
 import { axios } from "@lib/axios.ts";
 import type { DeArrowObj, ReturnYouTubeDislikeObj, SponsorBlockActionType, SponsorBlockCategory, SponsorBlockSegmentObj, YTVidDataObj } from "@/types.ts";
 import { generateProgressBar, joinArrayReadable, secsToYtTime } from "@lib/text.ts";
