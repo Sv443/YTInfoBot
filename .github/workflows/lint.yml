@@ -1,6 +1,15 @@
 name: Lint
 
-on: [pull_request]
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+    # manual trigger
 
 jobs:
   linter:
@@ -8,7 +17,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [21.x]
+        node-version: [22.x]
 
     steps:
       - uses: actions/checkout@v4
@@ -18,10 +27,13 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
       - name: Install dependencies
-        run: |
-          npm i -g pnpm
-          pnpm i
+        run: pnpm i
 
       - name: Lint code
         run: pnpm run lint
