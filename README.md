@@ -16,6 +16,11 @@ Please consider [donating](https://github.com/sponsors/Sv443) to support develop
 <a href="https://discord.com/api/oauth2/authorize?client_id=1290320137223802912&permissions=292058098752&scope=bot%20applications.commands" target="_blank"><img src="https://img.shields.io/badge/Invite%20Bot-%E2%96%BA-78f05d" height="30"></a>
 
 <a href="https://dc.sv443.net/" target="_blank"><img src="https://img.shields.io/badge/Join-Support%20Server-6e7bf4" height="20"></a>
+
+<br>
+
+<img alt="example 1" src="./src/assets/example1.png" width="375" /> <img alt="example 2" src="./src/assets/example2.png" width="375" />
+
 </div>
 
 <br>
