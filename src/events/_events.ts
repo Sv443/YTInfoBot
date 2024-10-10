@@ -1,10 +1,12 @@
-import { GuildCreate } from "@evt/GuildCreate.ts";
-import { GuildDelete } from "@evt/GuildDelete.ts";
-import { MessageCreate } from "@evt/MessageCreate.ts";
+import { GuildCreateEvt } from "@evt/GuildCreate.ts";
+import { GuildDeleteEvt } from "@evt/GuildDelete.ts";
+import { MessageCreateEvt } from "@evt/MessageCreate.ts";
+import { ReadyEvt } from "@evt/Ready.ts";
 
 /** All events that the bot listens for on the client instance */
 export const events = [
-  new GuildCreate(),
-  new GuildDelete(),
-  new MessageCreate(),
+  new GuildCreateEvt(),
+  new GuildDeleteEvt(),
+  new MessageCreateEvt(),
+  new ReadyEvt(),
 ];

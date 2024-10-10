@@ -10,7 +10,7 @@ const ytVideoRegexStr = "(?:https?:\\/\\/)?(?:www\\.)?(?:youtube\\.com\\/watch\\
 const ytVideoRegex = new RegExp(ytVideoRegexStr);
 const ytVideoRegexGlobal = new RegExp(ytVideoRegexStr, "gm");
 
-export class MessageCreate extends Event {
+export class MessageCreateEvt extends Event {
   constructor() {
     super("messageCreate");
   }
@@ -22,7 +22,7 @@ export class MessageCreate extends Event {
       return;
 
     if(msg.content.match(ytVideoRegex))
-      MessageCreate.handleYtVideoMsg(msg);
+      MessageCreateEvt.handleYtVideoMsg(msg);
   }
 
   //#region s:utils

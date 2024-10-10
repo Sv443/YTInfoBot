@@ -1,6 +1,6 @@
 import { ButtonBuilder, ButtonStyle, SlashCommandBuilder, type CommandInteraction, type CommandInteractionOption, type SlashCommandSubcommandBuilder } from "discord.js";
 import { EbdColors, embedify, useEmbedify } from "@lib/embedify.ts";
-import { CommandBase, SlashCommand } from "@lib/Command.ts";
+import { CmdBase, SlashCommand } from "@lib/Command.ts";
 import { em } from "@lib/db.ts";
 import { UserSettings } from "@models/UserSettings.model.ts";
 import { useButtons } from "@lib/components.ts";
@@ -41,7 +41,7 @@ const configurableOptions: Record<
 export class SettingsCmd extends SlashCommand {
   constructor() {
     super(new SlashCommandBuilder()
-      .setName(CommandBase.getCmdName("settings"))
+      .setName(CmdBase.getCmdName("settings"))
       .setDescription("View or edit the bot's settings for your user account")
       .addSubcommand(option => option
         .setName("reset")

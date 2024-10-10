@@ -2,7 +2,7 @@ import { EmbedBuilder, SlashCommandBuilder, type APIApplicationCommandOptionChoi
 import { AxiosError } from "axios";
 import qs from "qs";
 import { EbdColors, useEmbedify } from "@lib/embedify.ts";
-import { CommandBase, SlashCommand } from "@lib/Command.ts";
+import { CmdBase, SlashCommand } from "@lib/Command.ts";
 import { axios } from "@lib/axios.ts";
 import type { DeArrowObj, ReturnYouTubeDislikeObj, SponsorBlockActionType, SponsorBlockCategory, SponsorBlockSegmentObj, YTVidDataObj } from "@/types.ts";
 import { generateProgressBar, joinArrayReadable, secsToYtTime } from "@lib/text.ts";
@@ -78,7 +78,7 @@ export type VideoInfoFetchData = {
 export class VideoInfoCmd extends SlashCommand {
   constructor() {
     super(new SlashCommandBuilder()
-      .setName(CommandBase.getCmdName("video_info"))
+      .setName(CmdBase.getCmdName("video_info"))
       .setDescription("Show information about a video, given its URL")
       .addStringOption(opt =>
         opt.setName("video")

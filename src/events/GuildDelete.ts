@@ -3,7 +3,7 @@ import { Event } from "@lib/Event.ts";
 import { em } from "@lib/db.ts";
 import { GuildConfig } from "@models/GuildConfig.model.ts";
 
-export class GuildDelete extends Event {
+export class GuildDeleteEvt extends Event {
   constructor() {
     super("guildDelete");
   }

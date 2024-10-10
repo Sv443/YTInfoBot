@@ -4,7 +4,7 @@ import { em } from "@lib/db.ts";
 import { GuildConfig } from "@models/GuildConfig.model.ts";
 import { registerCommandsForGuild } from "@lib/registry.ts";
 
-export class GuildCreate extends Event {
+export class GuildCreateEvt extends Event {
   constructor() {
     super("guildCreate");
   }

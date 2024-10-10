@@ -1,5 +1,5 @@
-import { VideoInfoCtxCmd } from "@root/src/contexts/VideoInfo.ts";
+import { VideoInfoCtx } from "@ctx/VideoInfo.ts";
 
 export const contextCommands = [
-  new VideoInfoCtxCmd(),
+  new VideoInfoCtx(),
 ];

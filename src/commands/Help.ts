@@ -1,6 +1,6 @@
 import { SlashCommandBuilder, type CommandInteraction, type CommandInteractionOption } from "discord.js";
 import { embedify } from "@lib/embedify.ts";
-import { CommandBase, SlashCommand } from "@lib/Command.ts";
+import { CmdBase, SlashCommand } from "@lib/Command.ts";
 import { commands } from "@cmd/_commands.ts";
 import packageJson from "@root/package.json" with { type: "json" };
 import { getEnvVar } from "@lib/env.ts";
@@ -11,7 +11,7 @@ import { bitFieldContains } from "@lib/math.ts";
 export class HelpCmd extends SlashCommand {
   constructor() {
     super(new SlashCommandBuilder()
-      .setName(CommandBase.getCmdName("help"))
+      .setName(CmdBase.getCmdName("help"))
       .setDescription("List all commands or get information about the bot")
       .addSubcommand(subcommand =>
         subcommand

@@ -1,6 +1,6 @@
 import { ButtonBuilder, ButtonStyle, PermissionFlagsBits, SlashCommandBuilder, type AutocompleteInteraction, type CommandInteraction, type CommandInteractionOption, type SlashCommandSubcommandBuilder } from "discord.js";
 import { EbdColors, embedify, useEmbedify } from "@lib/embedify.ts";
-import { CommandBase, SlashCommand } from "@lib/Command.ts";
+import { CmdBase, SlashCommand } from "@lib/Command.ts";
 import { numberFormatChoices, videoInfoTypeChoices } from "@cmd/VideoInfo.ts";
 import { em } from "@lib/db.ts";
 import { GuildConfig } from "@models/GuildConfig.model.ts";
@@ -93,7 +93,7 @@ const configurableOptions: Record<
 export class ConfigCmd extends SlashCommand {
   constructor() {
     super(new SlashCommandBuilder()
-      .setName(CommandBase.getCmdName("config"))
+      .setName(CmdBase.getCmdName("config"))
       .setDescription("View or edit the bot configuration for your server")
       .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
       .addSubcommand(option => option

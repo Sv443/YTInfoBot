@@ -3,9 +3,10 @@ import { getEnvVar } from "@lib/env.ts";
 
 const cmdPrefix = getEnvVar("CMD_PREFIX", "stringNoEmpty");
 
-//#region CommandBase
+//#region CmdBase
 
-export abstract class CommandBase {
+export abstract class CmdBase {
+  /** Name of the command */
   public readonly name: string;
 
   constructor(name: string) {
@@ -29,7 +30,7 @@ export interface SlashCommand {
 }
 
 /** Abstract class for creating slash commands */
-export abstract class SlashCommand extends CommandBase {
+export abstract class SlashCommand extends CmdBase {
   public readonly builder: SharedSlashCommand;
   public readonly builderJson: RESTPostAPIChatInputApplicationCommandsJSONBody;
 
@@ -44,10 +45,10 @@ export abstract class SlashCommand extends CommandBase {
   abstract run(int: CommandInteraction, opt?: CommandInteractionOption): Promise<void | unknown>;
 }
 
-//#region ContextCommand
+//#region CtxCommand
 
 /** Abstract class for creating commands that can be used in the context menu */
-export abstract class ContextCommand extends CommandBase {
+export abstract class ContextCommand extends CmdBase {
   public readonly builder: ContextMenuCommandBuilder;
   public readonly builderJson: RESTPostAPIContextMenuApplicationCommandsJSONBody;
 

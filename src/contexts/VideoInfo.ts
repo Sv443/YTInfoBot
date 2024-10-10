@@ -1,8 +1,8 @@
-import { MessageCreate } from "@evt/MessageCreate.ts";
+import { MessageCreateEvt } from "@evt/MessageCreate.ts";
 import { ContextCommand } from "@lib/Command.ts";
 import { ApplicationCommandType, ContextMenuCommandBuilder, InteractionContextType, type ContextMenuCommandInteraction } from "discord.js";
 
-export class VideoInfoCtxCmd extends ContextCommand {
+export class VideoInfoCtx extends ContextCommand {
   constructor() {
     super(new ContextMenuCommandBuilder()
       .setName("Video Info") // @ts-ignore
@@ -27,6 +27,6 @@ export class VideoInfoCtxCmd extends ContextCommand {
         content: "The targeted message could not be accessed.",
       });
 
-    return await MessageCreate.handleYtVideoMsg(targetMsg, int);
+    return await MessageCreateEvt.handleYtVideoMsg(targetMsg, int);
   }
 }

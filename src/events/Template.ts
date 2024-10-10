@@ -1,6 +1,6 @@
 import { Event } from "@lib/Event.ts";
 
-export class TemplateEvent extends Event {
+export class TemplateEvt extends Event {
   constructor() {
     super("ready");
   }
