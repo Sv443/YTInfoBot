@@ -6,9 +6,10 @@ import { initRegistry } from "@lib/registry.ts";
 import { autoPlural } from "@lib/text.ts";
 import { getEnvVar } from "@lib/env.ts";
 
+const requiredEnvVars = ["BOT_TOKEN", "APPLICATION_ID", "DB_URL", "BOT_INVITE_URL", "SUPPORT_SERVER_INVITE_URL"];
+
 /** Called before the client is ready to check for environment variables and to initialize the client and database */
 async function preInit() {
-  const requiredEnvVars = ["BOT_TOKEN", "APPLICATION_ID", "DB_USER", "DB_PASSWORD", "BOT_INVITE_URL", "SUPPORT_SERVER_INVITE_URL"];
   const missingEnvVars = requiredEnvVars.filter((envVar) => !getEnvVar(envVar, "stringNoEmpty"));
 
   if(missingEnvVars.length > 0) {

@@ -2,9 +2,7 @@ import { defineConfig } from "@mikro-orm/core";
 import { envVarEquals, getEnvVar } from "@lib/env.ts";
 
 export const config = defineConfig({
-  dbName: "yt-info-bot",
-  user: getEnvVar("DB_USER")!,
-  password: getEnvVar("DB_PASSWORD")!,
+  clientUrl: getEnvVar("DB_URL", "stringNoEmpty"),
   charset: "utf8",
   entities: ["dist/**/*.model.js"],
   entitiesTs: ["src/**/*.model.ts"],
