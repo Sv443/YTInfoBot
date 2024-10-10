@@ -15,6 +15,8 @@ export class MessageCreate extends Event {
     super("messageCreate");
   }
 
+  //#region pb:run
+
   public async run(msg: Message) {
     if(msg.author.bot)
       return;
@@ -23,7 +25,7 @@ export class MessageCreate extends Event {
       MessageCreate.handleYtVideoMsg(msg);
   }
 
-  //#region utils
+  //#region s:utils
 
   /** Handles a message that contains at least one YT video link */
   public static async handleYtVideoMsg(msg: Pick<Message, "content" | "guildId" | "author" | "reply">, int?: CommandInteraction | ContextMenuCommandInteraction) {

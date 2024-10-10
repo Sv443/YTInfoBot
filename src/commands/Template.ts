@@ -12,9 +12,9 @@ export class TemplateCommand extends SlashCommand {
     );
   }
 
-  //#region run
+  //#region pb:run
 
-  async run(int: CommandInteraction) {
+  public async run(int: CommandInteraction) {
     return int.reply({
       ...useEmbedify("TEMPLATE"),
       ephemeral: true,

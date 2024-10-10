@@ -14,7 +14,9 @@ export class VideoInfoCtxCmd extends ContextCommand {
     );
   }
 
-  async run(int: ContextMenuCommandInteraction) {
+  //#region pb:run
+
+  public async run(int: ContextMenuCommandInteraction) {
     await int.deferReply();
 
     const fetchColl = await int.channel?.messages.fetch({ limit: 1, around: int.targetId });

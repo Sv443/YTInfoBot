@@ -8,6 +8,8 @@ export class GuildDelete extends Event {
     super("guildDelete");
   }
 
+  //#region pb:run
+
   public async run({ id }: Guild) {
     const cfg = await em.findOne(GuildConfig, { id });
     cfg && await em.removeAndFlush(cfg);

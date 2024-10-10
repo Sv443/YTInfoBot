@@ -5,6 +5,8 @@ export class TemplateEvent extends Event {
     super("ready");
   }
 
+  //#region pb:run
+
   public async run(...args: unknown[]) {
     void args;
   }

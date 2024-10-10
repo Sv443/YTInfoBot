@@ -13,9 +13,9 @@ export class InviteCmd extends SlashCommand {
     );
   }
 
-  //#region run
+  //#region pb:run
 
-  async run(int: CommandInteraction) {
+  public async run(int: CommandInteraction) {
     return int.reply({
       ...useEmbedify(`You can invite YTInfoBot to your server by [clicking this link.](${getEnvVar("BOT_INVITE_URL")})`, EbdColors.Info),
       ephemeral: true,

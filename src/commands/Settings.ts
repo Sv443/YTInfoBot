@@ -68,9 +68,9 @@ export class SettingsCmd extends SlashCommand {
     );
   }
 
-  //#region run
+  //#region pb:run
 
-  async run(int: CommandInteraction, opt: CommandInteractionOption) {
+  public async run(int: CommandInteraction, opt: CommandInteractionOption) {
     const reply = await int.deferReply({ ephemeral: true });
 
     switch(opt.name) {
@@ -216,7 +216,7 @@ export class SettingsCmd extends SlashCommand {
     }
   }
 
-  //#region utils
+  //#region s:utils
 
   static noSettingsFound(int: CommandInteraction) {
     int[int.deferred || int.replied ? "editReply" : "reply"](useEmbedify("No user settings found - please run `/settings reset`", EbdColors.Error));

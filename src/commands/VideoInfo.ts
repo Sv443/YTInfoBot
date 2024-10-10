@@ -93,9 +93,9 @@ export class VideoInfoCmd extends SlashCommand {
     );
   }
 
-  //#region run
+  //#region pb:run
 
-  async run(int: CommandInteraction) {
+  public async run(int: CommandInteraction) {
     if(!int.inGuild())
       return int.reply(useEmbedify("This command can only be used in a server", EbdColors.Error));
 
@@ -113,7 +113,7 @@ export class VideoInfoCmd extends SlashCommand {
     console.log("#> VideoInfo", type, videoId);
   }
 
-  //#region parse video ID
+  //#region s:parse video ID
 
   /** Parses a video URL or ID and returns the video ID or null */
   public static parseVideoId(video: string): string | null {
@@ -147,7 +147,7 @@ export class VideoInfoCmd extends SlashCommand {
     }
   }
 
-  //#region get embed
+  //#region s:get embed
 
   /** Returns an embed with information about the video */
   public static async getVideoInfoEmbed({
@@ -279,7 +279,7 @@ export class VideoInfoCmd extends SlashCommand {
     return embed;
   }
 
-  //#region fetch all data
+  //#region s:fetch all data
 
   /** Fetches all necessary data for a video given its ID and the info type - parallelizes the XHRs */
   public static async fetchAllData(videoId: string, type: VideoInfoType) {
@@ -308,7 +308,7 @@ export class VideoInfoCmd extends SlashCommand {
     };
   }
 
-  //#region YT data
+  //#region s:YT data
 
   /** Fetches YouTube data for a video */
   public static async fetchYouTubeData(videoId: string) {
@@ -323,7 +323,7 @@ export class VideoInfoCmd extends SlashCommand {
     return data;
   }
 
-  //#region DeArrow
+  //#region s:DeArrow
 
   /** Fetches DeArrow data for a video */
   public static async fetchDeArrowData(videoId: string) {
@@ -361,7 +361,7 @@ export class VideoInfoCmd extends SlashCommand {
     }
   }
 
-  //#region ReturnYTDislike
+  //#region s:RetYTDislike
 
   /** Fetches ReturnYouTubeDislike data for a video */
   public static async fetchReturnYouTubeDislikeData(videoId: string) {
@@ -382,7 +382,7 @@ export class VideoInfoCmd extends SlashCommand {
     }
   }
 
-  //#region SponsorBlock
+  //#region s:SponsorBlock
 
   /** Fetches SponsorBlock data for a video */
   public static async fetchSponsorBlockData(

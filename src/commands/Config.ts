@@ -117,9 +117,9 @@ export class ConfigCmd extends SlashCommand {
     );
   }
 
-  //#region run
+  //#region pb:run
 
-  async run(int: CommandInteraction, opt: CommandInteractionOption) {
+  public async run(int: CommandInteraction, opt: CommandInteractionOption) {
     if(!int.inGuild())
       return int.reply(useEmbedify("This command can only be used in a server", EbdColors.Error));
 
@@ -211,9 +211,9 @@ export class ConfigCmd extends SlashCommand {
     }
   }
 
-  //#region autocomplete
+  //#region pb:autocompl.
 
-  async autocomplete(int: AutocompleteInteraction) {
+  public async autocomplete(int: AutocompleteInteraction) {
     const searchVal = int.options.getFocused().toLowerCase();
     const locales = localesJson
       .filter(({ code, name }) => code.toLowerCase().includes(searchVal) || name.toLowerCase().includes(searchVal))
@@ -222,7 +222,7 @@ export class ConfigCmd extends SlashCommand {
     await int.respond(locales.map(({ code, name }) => ({ value: code, name })));
   }
 
-  //#region utils
+  //#region s:utils
 
   static noConfigFound(int: CommandInteraction) {
     int[int.deferred || int.replied ? "editReply" : "reply"](useEmbedify("No server configuration found - please run `/config reset`", EbdColors.Error));

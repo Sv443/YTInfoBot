@@ -9,6 +9,8 @@ export class GuildCreate extends Event {
     super("guildCreate");
   }
 
+  //#region pb:run
+
   public async run({ id }: Guild) {
     await em.persistAndFlush(new GuildConfig(id));
     await registerCommandsForGuild(id);

@@ -9,7 +9,9 @@ export class ContextTemplateCmd extends ContextCommand {
     );
   }
 
-  async run(int: ContextMenuCommandInteraction) {
+  //#region pb:run
+
+  public async run(int: ContextMenuCommandInteraction) {
     return int.reply({
       ...useEmbedify("CONTEXT_TEMPLATE"),
       ephemeral: true,

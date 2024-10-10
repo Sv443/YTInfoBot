@@ -31,9 +31,9 @@ export class HelpCmd extends SlashCommand {
     );
   }
 
-  //#region run
+  //#region pb:run
 
-  async run(int: CommandInteraction, opt: CommandInteractionOption) {
+  public async run(int: CommandInteraction, opt: CommandInteractionOption) {
     switch(opt.name) {
     case "commands": {
       let cmdList = "";
