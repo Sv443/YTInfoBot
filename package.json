@@ -7,7 +7,7 @@
   "type": "module",
   "homepage": "https://github.com/Sv443/YTInfoBot",
   "scripts": {
-    "start": "tsx src/main.ts",
+    "start": "node --import tsx ./src/main.ts",
     "dev": "nodemon --exec pnpm run start",
     "lint": "eslint . && tsc --noEmit",
     "format": "eslint --fix .",
