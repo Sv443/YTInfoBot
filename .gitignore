@@ -3,3 +3,4 @@ dev/
 .env
 .cmd_hash
 emojis.json
+.metrics.json

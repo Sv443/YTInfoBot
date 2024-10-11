@@ -1,15 +1,34 @@
-import type { Client } from "discord.js";
-import tx2 from "tx2";
+import { EmbedBuilder, type Client, type Message } from "discord.js";
+import { readFile, writeFile } from "node:fs/promises";
 import { em } from "@lib/db.ts";
 import { Event } from "@lib/Event.ts";
 import { registerCommandsForGuild } from "@lib/registry.ts";
 import { GuildConfig } from "@models/GuildConfig.model.ts";
+import { getEnvVar } from "@lib/env.ts";
+import { getHash } from "@lib/crypto.ts";
+import { EbdColors } from "@lib/embedify.ts";
 
-let guildAmt = 0;
-let userAmt = 0;
+//#region types
 
-tx2.metric("Guilds", () => guildAmt);
-tx2.metric("Users", () => userAmt);
+type MetricsDataObj = {
+  msgId: string | null;
+  metricsHash: string | null;
+};
+
+type Metrics = {
+  guilds: number;
+};
+
+//#region vars
+
+const metGuildId = getEnvVar("METRICS_GUILD", "stringNoEmpty");
+const metChanId = getEnvVar("METRICS_CHANNEL", "stringNoEmpty");
+
+const metricsDataFile = ".metrics.json";
+let metricsData: MetricsDataObj | undefined;
+let firstMetricRun = true;
+
+//#region constructor
 
 export class ReadyEvt extends Event {
   constructor() {
@@ -34,7 +53,7 @@ export class ReadyEvt extends Event {
     try {
       const tasks: Promise<void | unknown>[] = [];
 
-      if(i === 0 || i % 10 === 0)
+      if(i === 0 || i % 3 === 0)
         tasks.push(ReadyEvt.updateMetrics(client));
 
       if(i === 0 || i % 20 === 0)
@@ -62,11 +81,78 @@ export class ReadyEvt extends Event {
         ]);
   }
 
-  //#region s:pm2 metrics
+  //#region s:updateMetrics
 
-  /** Update pm2 metrics */
+  /** Update metrics */
   private static async updateMetrics(client: Client) {
-    guildAmt = client.guilds.cache.size;
-    userAmt = client.guilds.cache.reduce((acc, g) => acc + g.memberCount, 0);
+    if(!metGuildId || !metChanId)
+      return;
+
+    const latestMetrics: Metrics = {
+      guilds: client.guilds.cache.size,
+    };
+
+    const metricsChan = client.guilds.cache.find(g => g.id === metGuildId)?.channels.cache.find(c => c.id === metChanId);
+    let metricsMsg: Message | undefined;
+
+    if(!metricsData) {
+      try {
+        metricsData = JSON.parse(String(await readFile(metricsDataFile, "utf8")));
+      }
+      catch {
+        metricsData = { msgId: null, metricsHash: null };
+      }
+    }
+
+    if(metricsData && metricsChan && metricsChan.isTextBased()) {
+      const metricsChanged = firstMetricRun || metricsData.metricsHash !== getHash(JSON.stringify(latestMetrics));
+      if(metricsChanged)
+        metricsData.metricsHash = getHash(JSON.stringify(latestMetrics));
+
+      if(metricsChanged && metricsData.msgId && metricsData.msgId.length > 0) {
+        metricsMsg = (await metricsChan.messages.fetch({ limit: 1, around: metricsData.msgId })).first();
+        const recreateMsg = async () => {
+          await metricsMsg?.delete();
+          metricsMsg = await metricsChan?.send(ReadyEvt.useMetricsEmbed(latestMetrics));
+          metricsData!.msgId = metricsMsg?.id;
+          await writeFile(metricsDataFile, JSON.stringify(metricsData));
+          console.log("Recreated metrics message");
+        };
+        try {
+          if(!metricsMsg)
+            recreateMsg();
+          else {
+            await metricsMsg?.edit(ReadyEvt.useMetricsEmbed(latestMetrics));
+            console.log("Updated metrics message");
+          }
+        }
+        catch {
+          recreateMsg();
+        }
+      }
+      else if(!metricsData.msgId || metricsData.msgId.length === 0) {
+        metricsMsg = await metricsChan?.send(ReadyEvt.useMetricsEmbed(latestMetrics));
+        metricsData.msgId = metricsMsg?.id;
+        await writeFile(metricsDataFile, JSON.stringify(metricsData));
+        console.log("Created metrics message");
+      }
+      firstMetricRun = false;
+    }
+  }
+
+  //#region s:metricsEmbed
+
+  /** Get the metrics content */
+  private static useMetricsEmbed(metrics: Metrics) {
+    const ebd = new EmbedBuilder()
+      .setTitle("Metrics")
+      .setFields([
+        { name: "Guilds", value: String(metrics.guilds), inline: true },
+      ])
+      .setColor(EbdColors.Info);
+
+    return {
+      embeds: [ebd],
+    };
   }
 }
