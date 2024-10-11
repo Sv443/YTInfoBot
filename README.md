@@ -109,7 +109,8 @@ To delete your personal cross-server data, use the command `/settings delete_dat
 2. Have a [PostgreSQL database](https://www.postgresql.org/) and a user set up (you may [follow this guide](https://medium.com/coding-blocks/creating-user-database-and-adding-access-on-postgresql-8bfcd2f4a91e) on Linux or [WSL](https://learn.microsoft.com/en-us/windows/wsl/install)).
 3. Clone the repository or download the ZIP file and extract it.
 4. Open a terminal in the folder containing `package.json` and run `pnpm i` to install all dependencies.
-5. Copy the file `.env.template` to `.env` and fill in the required values, like bot token and database credentials.
+5. Run `pnpm run prepare-env` to create all environment files.  
+  Edit all files that are listed in the console to fill in the required values.
 6. Run `pnpm start` to start the bot or `pnpm dev` to start it in development mode.  
   You may also use the VS Code debugger to start and debug the bot using breakpoints.
   

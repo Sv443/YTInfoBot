@@ -1,6 +1,7 @@
 import { cp, access, constants } from "node:fs/promises";
+import k from "kleur";
 
-console.log("Running prepare-env script...");
+console.log("\nRunning prepare-env script...");
 
 const copyIfNotExists = [
   { from: "src/assets/emojis.template.json", to: "src/assets/emojis.json" },
@@ -21,17 +22,17 @@ for(const { from, to } of copyIfNotExists) {
   try {
     if(!await exists(to)) {
       await cp(from, to);
-      console.log(`Copied '${from}' to '${to}'`);
+      console.log(k.green(`Successfully created file '${to}'`), `from template '${from}'`);
     }
     else
-      console.log(`File '${to}' already exists, skipping...`);
+      console.log(k.gray(`File '${to}' already exists, skipping...`));
   }
   catch(err) {
-    console.error(`Failed to copy '${from}' to '${to}':`, err);
+    console.error(k.red(`Failed to copy '${from}' to '${to}':`), err);
   }
 }
 
 setImmediate(() => {
-  console.log("Done!");
+  console.log("Done!\n");
   process.exit(0);
 });
