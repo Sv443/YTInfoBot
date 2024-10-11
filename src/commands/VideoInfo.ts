@@ -5,7 +5,7 @@ import { EbdColors, useEmbedify } from "@lib/embedify.ts";
 import { CmdBase, SlashCommand } from "@lib/Command.ts";
 import { axios } from "@lib/axios.ts";
 import type { DeArrowObj, ReturnYouTubeDislikeObj, SponsorBlockActionType, SponsorBlockCategory, SponsorBlockSegmentObj, YTVidDataObj } from "@/types.ts";
-import { generateProgressBar, joinArrayReadable, secsToYtTime } from "@lib/text.ts";
+import { generateEmojiProgressBar, joinArrayReadable, secsToYtTime } from "@lib/text.ts";
 import { getBestThumbnailUrl } from "@lib/thumbnail.ts";
 import { GuildConfig } from "@models/GuildConfig.model.ts";
 import { formatNumber } from "@lib/math.ts";
@@ -215,7 +215,7 @@ export class VideoInfoCmd extends SlashCommand {
 
       embed.addFields({
         name: "Votes (estimated):",
-        value: `${fmt(likes)} 👍  •  ${fmt(dislikes)} 👎\n${generateProgressBar(ratioPerc, 14)} ${ratioPercent}%`,
+        value: `${fmt(likes)} 👍  •  ${fmt(dislikes)} 👎\n${generateEmojiProgressBar(ratioPerc, 7)} ${ratioPercent}%`,
         inline: true,
       });
     }
