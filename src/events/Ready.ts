@@ -1,14 +1,15 @@
 import type { Client } from "discord.js";
-import pm2 from "@pm2/io";
+import tx2 from "tx2";
 import { em } from "@lib/db.ts";
 import { Event } from "@lib/Event.ts";
 import { registerCommandsForGuild } from "@lib/registry.ts";
 import { GuildConfig } from "@models/GuildConfig.model.ts";
 
-const metrics = {
-  guilds: pm2.metric({ name: "Guilds", historic: true }),
-  users: pm2.metric({ name: "Users", historic: true }),
-};
+let guildAmt = 0;
+let userAmt = 0;
+
+tx2.metric("Guilds", () => guildAmt);
+tx2.metric("Users", () => userAmt);
 
 export class ReadyEvt extends Event {
   constructor() {
@@ -65,10 +66,7 @@ export class ReadyEvt extends Event {
 
   /** Update pm2 metrics */
   private static async updateMetrics(client: Client) {
-    const guilds = client.guilds.cache.size;
-    const users = client.guilds.cache.reduce((acc, g) => acc + g.memberCount, 0);
-
-    metrics.guilds.set(guilds);
-    metrics.users.set(users);
+    guildAmt = client.guilds.cache.size;
+    userAmt = client.guilds.cache.reduce((acc, g) => acc + g.memberCount, 0);
   }
 }
