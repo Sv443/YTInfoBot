@@ -1,4 +1,5 @@
 import { Collection } from "discord.js";
+import emojis from "@assets/emojis.json" with { type: "json" };
 
 /** Capitalizes the first letter of a string */
 export function capitalize(text: string) {
@@ -45,7 +46,7 @@ export function joinArrayReadable(array: unknown[], separators = ", ", lastSepar
 }
 
 /** Generates an ASCII progress bar with the given percentage and max length - uses opaque characters for extra detail */
-export function generateProgressBar(percentage: number, maxLength: number) {
+export function generateAsciiProgressBar(percentage: number, maxLength: number) {
   const fullBlock = "█";
   const threeQuarterBlock = "▓";
   const halfBlock = "▒";
@@ -67,6 +68,56 @@ export function generateProgressBar(percentage: number, maxLength: number) {
   const emptyBar = emptyBlock.repeat(maxLength - filledLength - (lastBlock ? 1 : 0));
 
   return `${filledBar}${lastBlock}${emptyBar}`;
+}
+
+/**
+ * Generates a progress bar out of emojis with the given percentage and max length.  
+ * The bar is made out of 3 emoji types: left end, middle, and right end.  
+ * Each piece is divided into quarters and an empty space, in total ranging from 0 to 4.
+ */
+export function generateEmojiProgressBar(percentage: number, maxLength: number) {
+  const getEmoji = (x: "L" | "M" | "R", y: 0 | 1 | 2 | 3 | 4) => getEmojiStr(emojis[`PB_${x}_${y}`]);
+
+  /**
+   * Figures out which amount of the bar is filled at the given position of the bar, which has the absolute float value from`percentage` from 0.0 to 100.0  
+   * The bar is of integer length `maxLength` and `pos` is an integer index within that range.  
+   * Has to return one of 0.0, 0.25, 0.5, 0.75 or 1.0
+   */
+  const getFractionAtPos = (pos: number): 0.0 | 0.25 | 0.5 | 0.75 | 1.0 => {
+    const filledLength = (percentage / 100) * maxLength;
+    const remainingFraction = filledLength - pos;
+
+    if(pos <= filledLength - 1)
+      return 1.0;
+    else if(remainingFraction >= 0 && remainingFraction < 1)
+      return remainingFraction >= 0.75
+        ? 0.75
+        : remainingFraction >= 0.5
+          ? 0.5
+          : remainingFraction >= 0.25
+            ? 0.25
+            : 0.0;
+    else
+      return 0.0;
+  };
+
+  const idxArr = Array.from({ length: maxLength }, (_, i) => i);
+  const pbNumbers = idxArr.map(v => getFractionAtPos(v) / 0.25);
+  const pbEmojis = [
+    getEmoji("L", pbNumbers[0] as 0),
+    ...idxArr.slice(1, -1).map(v => getEmoji("M", pbNumbers[v] as 0)),
+    getEmoji("R", pbNumbers[maxLength - 1] as 0),
+  ];
+
+  return pbEmojis.join("");
+}
+
+/** Returns the emoji string for the given emoji name or ID */
+export function getEmojiStr(emojiNameOrId: keyof typeof emojis | (string & {})) {
+  const em = Object.entries(emojis).find(([name, id]) => id === emojiNameOrId || name === emojiNameOrId);
+  if(em)
+    return `<:${em[0]}:${em[1]}>`;
+  return emojiNameOrId;
 }
 
 /** Converts seconds into the YT timestamp format `(hh:)mm:ss` */
