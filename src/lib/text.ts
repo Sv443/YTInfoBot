@@ -76,7 +76,7 @@ export function generateAsciiProgressBar(percentage: number, maxLength: number) 
  * Each piece is divided into quarters and an empty space, in total ranging from 0 to 4.
  */
 export function generateEmojiProgressBar(percentage: number, maxLength: number) {
-  const getEmoji = (x: "L" | "M" | "R", y: 0 | 1 | 2 | 3 | 4) => getEmojiStr(emojis[`PB_${x}_${y}`]);
+  const getEmoji = (part: "L" | "M" | "R", fillIdx: 0 | 1 | 2 | 3 | 4) => getEmojiStr(emojis[`PB_${part}_${fillIdx}`]);
 
   /**
    * Figures out which amount of the bar is filled at the given position of the bar, which has the absolute float value from`percentage` from 0.0 to 100.0  

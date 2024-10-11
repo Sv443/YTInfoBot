@@ -2,3 +2,4 @@ node_modules/
 dev/
 .env
 .cmd_hash
+emojis.json
