@@ -21,6 +21,7 @@ async function preInit() {
   console.log(k.gray("\nLogging in..."));
   await Promise.all([
     initDatabase(),
+    initRegistry(),
     new Promise((resolve) => {
       client.once("ready", resolve);
       client.login(botToken);
@@ -38,8 +39,6 @@ async function preInit() {
 
 /** Initializes the bot after the client is ready */
 async function init() {
-  await initRegistry();
-
   console.log(`${k.blue("Bot is ready")}`);
 }
 

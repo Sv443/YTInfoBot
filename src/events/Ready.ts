@@ -1,8 +1,14 @@
+import type { Client } from "discord.js";
+import pm2 from "@pm2/io";
 import { em } from "@lib/db.ts";
 import { Event } from "@lib/Event.ts";
 import { registerCommandsForGuild } from "@lib/registry.ts";
 import { GuildConfig } from "@models/GuildConfig.model.ts";
-import type { Client } from "discord.js";
+
+const metrics = {
+  guilds: pm2.metric({ name: "Guilds", historic: true }),
+  users: pm2.metric({ name: "Users", historic: true }),
+};
 
 export class ReadyEvt extends Event {
   constructor() {
@@ -24,11 +30,13 @@ export class ReadyEvt extends Event {
 
   /** Runs all interval checks */
   public static async intervalChecks(client: Client, i: number) {
-    if(i === 0)
-      return;
     try {
       const tasks: Promise<void | unknown>[] = [];
-      if(i % 20 === 0)
+
+      if(i === 0 || i % 10 === 0)
+        tasks.push(ReadyEvt.updateMetrics(client));
+
+      if(i === 0 || i % 20 === 0)
         tasks.push(ReadyEvt.checkGuildJoin(client));
 
       await Promise.allSettled(tasks);
@@ -51,5 +59,16 @@ export class ReadyEvt extends Event {
           em.persistAndFlush(new GuildConfig(guild.id)),
           registerCommandsForGuild(guild.id),
         ]);
+  }
+
+  //#region s:pm2 metrics
+
+  /** Update pm2 metrics */
+  private static async updateMetrics(client: Client) {
+    const guilds = client.guilds.cache.size;
+    const users = client.guilds.cache.reduce((acc, g) => acc + g.memberCount, 0);
+
+    metrics.guilds.set(guilds);
+    metrics.users.set(users);
   }
 }
