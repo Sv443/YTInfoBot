@@ -116,15 +116,12 @@ export class ReadyEvt extends Event {
           metricsMsg = await metricsChan?.send(ReadyEvt.useMetricsEmbed(latestMetrics));
           metricsData!.msgId = metricsMsg?.id;
           await writeFile(metricsDataFile, JSON.stringify(metricsData));
-          console.log("Recreated metrics message");
         };
         try {
           if(!metricsMsg)
             recreateMsg();
-          else {
+          else
             await metricsMsg?.edit(ReadyEvt.useMetricsEmbed(latestMetrics));
-            console.log("Updated metrics message");
-          }
         }
         catch {
           recreateMsg();
@@ -134,7 +131,6 @@ export class ReadyEvt extends Event {
         metricsMsg = await metricsChan?.send(ReadyEvt.useMetricsEmbed(latestMetrics));
         metricsData.msgId = metricsMsg?.id;
         await writeFile(metricsDataFile, JSON.stringify(metricsData));
-        console.log("Created metrics message");
       }
       firstMetricRun = false;
     }

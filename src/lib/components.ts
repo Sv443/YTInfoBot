@@ -9,11 +9,7 @@ import { ActionRowBuilder, ButtonBuilder } from "discord.js";
  */
 export function useButtons(buttons?: ButtonBuilder | ButtonBuilder[][]) {
   const actRows = Array.isArray(buttons) ? buttons : (buttons ? [[buttons]] : []);
-  const rows: ActionRowBuilder<ButtonBuilder>[] = [];
-
-  actRows.forEach(row => {
-    rows.push(new ActionRowBuilder<ButtonBuilder>().setComponents(row));
-  });
+  const rows: ActionRowBuilder<ButtonBuilder>[] = actRows.map(row => new ActionRowBuilder<ButtonBuilder>().setComponents(row));
 
   return rows.length > 0 ? { components: rows } : {};
 }
