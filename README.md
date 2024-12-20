@@ -114,7 +114,9 @@ To delete your personal cross-server data, use the command `/settings delete_dat
 6. Run `pnpm start` to start the bot or `pnpm dev` to start it in development mode.  
   You may also use the VS Code debugger to start and debug the bot using breakpoints.
   
-Refer to `scripts` in `package.json` for a list of all commands.
+Refer to `scripts` in `package.json` for a list of all commands.  
+  
+Use `pnpm start -R` to manually reregister commands for all guilds the bot is in.
 
 <br>
 
