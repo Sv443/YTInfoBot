@@ -10,6 +10,7 @@ import { getBestThumbnailUrl } from "@lib/thumbnail.ts";
 import { GuildConfig } from "@models/GuildConfig.model.ts";
 import { formatNumber } from "@lib/math.ts";
 import { SettingsCmd } from "@cmd/Settings.ts";
+import { em } from "@lib/db.ts";
 
 //#region constants
 
@@ -71,6 +72,7 @@ export type VideoInfoFetchData = {
   videoId: string;
   guildCfg: GuildConfig;
   type: VideoInfoType;
+  noTitle?: boolean;
 }
 
 //#region constructor
@@ -110,7 +112,19 @@ export class VideoInfoCmd extends SlashCommand {
 
     await SettingsCmd.ensureSettingsExist(int.user.id);
 
-    console.log("#> VideoInfo", type, videoId);
+    const guildCfg = await em.findOneOrFail(GuildConfig, { id: int.guildId });
+
+    const embed = await VideoInfoCmd.getVideoInfoEmbed({
+      guildCfg,
+      type,
+      url: `https://youtu.be/${videoId}`,
+      videoId,
+    });
+
+    if(!embed)
+      return int.editReply(useEmbedify("Found no data for this video - please try again later", Col.Error));
+
+    return int.editReply({ embeds: [embed] });
   }
 
   //#region s:parse video ID
@@ -155,6 +169,7 @@ export class VideoInfoCmd extends SlashCommand {
     videoId,
     guildCfg,
     type = "reduced",
+    noTitle = false,
   }: VideoInfoFetchData): Promise<EmbedBuilder | null> {
     const embed = new EmbedBuilder()
       .setURL(url)
@@ -182,12 +197,10 @@ export class VideoInfoCmd extends SlashCommand {
     if(bestDeArrowThumb || bestDeArrowTitle)
       hasDeArrowData = true;
 
-    if(hasDeArrowData) {
-      if(bestDeArrowThumb && bestDeArrowThumb.timestamp)
-        embed.setThumbnail(await VideoInfoCmd.getDeArrowThumbUrl(videoId, bestDeArrowThumb.timestamp) ?? ytData.thumbnail_url);
-      else
-        embed.setThumbnail(await getBestThumbnailUrl(videoId) ?? ytData.thumbnail_url);
-    }
+    if(hasDeArrowData && bestDeArrowThumb && bestDeArrowThumb.timestamp)
+      embed.setThumbnail(await VideoInfoCmd.getDeArrowThumbUrl(videoId, bestDeArrowThumb.timestamp) ?? ytData.thumbnail_url);
+    else
+      embed.setThumbnail(await getBestThumbnailUrl(videoId) ?? ytData.thumbnail_url);
 
     if(type === "dearrow_only" && !hasDeArrowData)
       return null;
@@ -266,6 +279,8 @@ export class VideoInfoCmd extends SlashCommand {
         inline: false,
       });
     }
+
+    !noTitle && !embed.data.title && embed.setTitle(ytData.title ?? `https://youtu.be/${videoId}`);
 
     //#SECTION footer
 
