@@ -20,7 +20,7 @@ export class HelpCmd extends SlashCommand {
           .addBooleanOption(option =>
             option
               .setName("show_hidden")
-              .setDescription("Show commands other members might not see - this also hides the reply for everyone but you")
+              .setDescription("Show commands that need higher permissions, as long as you can use them - reply is only shown to you")
           )
       )
       .addSubcommand(subcommand =>
@@ -28,7 +28,6 @@ export class HelpCmd extends SlashCommand {
           .setName("info")
           .setDescription("Get information about the bot")
       )
-      .addSubcommand(sc => sc.setName("test").setDescription("Test command"))
     );
   }
 
@@ -79,11 +78,14 @@ export class HelpCmd extends SlashCommand {
         embeds: [
           embedify([
             `Version: ${packageJson.version}`,
-            `Created by [${packageJson.author.name}](${packageJson.author.url})\n`,
-            "Opt out of automatic replies across every server by using the command `/settings set auto_reply new_value:false\n`",
+            `Created by [${packageJson.author.name}](${packageJson.author.url})`,
+            "",
+            "Opt out of automatic replies across every server by using the command `/settings set auto_reply new_value:false`",
+            "",
             `- Submit bugs or feature requests on [GitHub](${packageJson.bugs.url})`,
             `- Join the [support server](${getEnvVar("SUPPORT_SERVER_INVITE_URL")}) if you have any questions or need help`,
-            `- This bot is completely free so please consider [supporting the development ❤️](${packageJson.funding.url})\n`,
+            `- This bot is completely free so please consider [supporting the development ❤️](${packageJson.funding.url})`,
+            "",
             "Powered by [ReturnYoutubeDislike](https://returnyoutubedislike.com/), [SponsorBlock](https://sponsor.ajay.app/), and [DeArrow](https://dearrow.ajay.app/)",
           ].join("\n"))
             .setTitle("Information:")
