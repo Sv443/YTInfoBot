@@ -1,6 +1,6 @@
 {
   "name": "@sv443/ytinfobot",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Free Discord bot that replies to YouTube links with information from Return YouTube Dislike (approximate likes and dislikes), SponsorBlock (timestamps to skip certain segments) and DeArrow (crowdsourced thumbnails and titles).",
   "license": "AGPL-3.0-or-later",
   "main": "src/main.ts",
