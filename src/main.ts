@@ -9,37 +9,34 @@ import { getEnvVar } from "@lib/env.ts";
 const requiredEnvVars = ["BOT_TOKEN", "APPLICATION_ID", "DB_URL", "BOT_INVITE_URL", "SUPPORT_SERVER_INVITE_URL"];
 
 /** Called before the client is ready to check for environment variables and to initialize the client and database */
-async function preInit() {
+async function init() {
   const missingEnvVars = requiredEnvVars.filter((envVar) => !getEnvVar(envVar, "stringNoEmpty"));
 
   if(missingEnvVars.length > 0) {
-    console.error(`Missing required environment ${autoPlural("variable", missingEnvVars)}:\n- ${missingEnvVars.join("\n- ")}`);
+    console.error(`${k.red(`Missing required environment ${autoPlural("variable", missingEnvVars)}:`)}\n- ${missingEnvVars.join("\n- ")}`);
     setImmediate(() => process.exit(1));
     return;
   }
 
-  console.log(k.gray("\nLogging in..."));
+  console.log(k.gray("\nInitializing and logging in..."));
+
+  await new Promise((resolve) => {
+    client.once("ready", resolve);
+    client.login(botToken);
+  });
+
   await Promise.all([
     initDatabase(),
     initRegistry(),
-    new Promise((resolve) => {
-      client.once("ready", resolve);
-      client.login(botToken);
-    }),
   ]);
 
   client.on(Events.Error, (err) => console.error(k.red("Client error:"), err));
 
   process.on("unhandledRejection", (reason, promise) => {
-    console.error(k.red("Unhandled Rejection at:"), promise, k.red("\nRejection reason:"), reason);
+    console.error(k.red("Unhandled rejection at:"), promise, k.red("\nRejection reason:"), reason);
   });
 
-  init();
-}
-
-/** Initializes the bot after the client is ready */
-async function init() {
   console.log(k.blue(`${client.user?.displayName ?? client.user?.username} is ready.\n`));
 }
 
-preInit();
+init();
