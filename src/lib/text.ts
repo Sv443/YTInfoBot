@@ -84,7 +84,7 @@ export function generateEmojiProgressBar(percentage: number, maxLength: number) 
   /**
    * Figures out which amount of the bar is filled at the given position of the bar, which has the absolute float value from`percentage` from 0.0 to 100.0  
    * The bar is of integer length `maxLength` and `pos` is an integer index within that range.  
-   * Has to return one of 0.0, 0.25, 0.5, 0.75 or 1.0
+   * @returns one of 0.0, 0.25, 0.5, 0.75 or 1.0
    */
   const getFractionAtPos = (pos: number): 0.0 | 0.25 | 0.5 | 0.75 | 1.0 => {
     const filledLength = (percentage / 100) * maxLength;
@@ -93,13 +93,7 @@ export function generateEmojiProgressBar(percentage: number, maxLength: number) 
     if(pos <= filledLength - 1)
       return 1.0;
     else if(remainingFraction >= 0 && remainingFraction < 1)
-      return remainingFraction >= 0.75
-        ? 0.75
-        : remainingFraction >= 0.5
-          ? 0.5
-          : remainingFraction >= 0.25
-            ? 0.25
-            : 0.0;
+      return ([0.75, 0.5, 0.25].find(v => remainingFraction >= v) as 0.75 | 0.5 | 0.25) ?? 0.0;
     else
       return 0.0;
   };
@@ -117,8 +111,8 @@ export function generateEmojiProgressBar(percentage: number, maxLength: number) 
 }
 
 /** Returns the emoji string for the given emoji name or ID */
-export function emoji(emojiNameOrId: keyof typeof emojis | (string & {})) {
-  const em = Object.entries(emojis).find(([name, id]) => id === emojiNameOrId || name === emojiNameOrId);
+export function emoji(emojiNameOrId: keyof typeof emojis | (string & {}) | (number & {})) {
+  const em = Object.entries(emojis).find(([name, id]) => id === String(emojiNameOrId) || name === String(emojiNameOrId));
   if(em)
     return `<:${em[0]}:${em[1]}>`;
   return `:${emojiNameOrId}:`;

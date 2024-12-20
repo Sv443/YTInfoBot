@@ -15,18 +15,18 @@ import { SettingsCmd } from "@cmd/Settings.ts";
 
 const allowedHosts = ["www.youtube.com", "youtube.com", "music.youtube.com", "youtu.be"];
 
-export const videoInfoTypeChoices: APIApplicationCommandOptionChoice<VideoInfoType>[] = [
+export const videoInfoTypeChoices = [
   { name: "Reduced", value: "reduced" }, // (default)
   { name: "Everything", value: "everything" },
   { name: "Votes only", value: "votes_only" },
   { name: "DeArrow only", value: "dearrow_only" },
-  { name: "Timestamps only", value: "timestamps_only" }
-] as const;
+  { name: "Timestamps only", value: "timestamps_only" },
+] as const satisfies APIApplicationCommandOptionChoice<VideoInfoType>[];
 
-export const numberFormatChoices: APIApplicationCommandOptionChoice<NumberFormat>[] = [
+export const numberFormatChoices = [
   { name: "Long", value: "long" }, // (default)
   { name: "Short", value: "short" },
-] as const;
+] as const satisfies APIApplicationCommandOptionChoice<NumberFormat>[];
 
 export const sponsorBlockCategoryMap = {
   sponsor: "Sponsored ad",
@@ -284,15 +284,15 @@ export class VideoInfoCmd extends SlashCommand {
 
   /** Fetches all necessary data for a video given its ID and the info type - parallelizes the XHRs */
   public static async fetchAllData(videoId: string, type: VideoInfoType) {
-    const getNullPromise = async () => null;
+    const noop = () => Promise.resolve(null);
 
     // only fetch the data that is needed - the rest immediately resolves null
     const [ytData, deArrowData, returnYTDislikeData, sponsorBlockData] = (
       await Promise.allSettled([
         VideoInfoCmd.fetchYouTubeData(videoId),
-        ["dearrow_only", "everything"].includes(type) ? VideoInfoCmd.fetchDeArrowData(videoId) : getNullPromise(),
-        ["votes_only", "everything", "reduced"].includes(type) ? VideoInfoCmd.fetchReturnYouTubeDislikeData(videoId) : getNullPromise(),
-        ["timestamps_only", "everything"].includes(type) ? VideoInfoCmd.fetchSponsorBlockData(videoId) : getNullPromise(),
+        ["dearrow_only", "everything"].includes(type) ? VideoInfoCmd.fetchDeArrowData(videoId) : noop(),
+        ["votes_only", "everything", "reduced"].includes(type) ? VideoInfoCmd.fetchReturnYouTubeDislikeData(videoId) : noop(),
+        ["timestamps_only", "everything"].includes(type) ? VideoInfoCmd.fetchSponsorBlockData(videoId) : noop(),
       ])
     ).map((res) => res.status === "fulfilled" ? res.value : null);
 
