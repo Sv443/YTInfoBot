@@ -12,6 +12,8 @@ import type { ContextCommand, SlashCommand } from "@lib/Command.ts";
 import type { Event } from "@lib/Event.ts";
 import { client, clientId, rest } from "@lib/client.ts";
 
+const reregisterCmds = Boolean(process.argv.find((arg) => ["--reregister", "-r"].includes(arg.toLowerCase())));
+
 const cmdInstances = new Collection<string, SlashCommand | ContextCommand>();
 const evtInstances = new Collection<string, Event>();
 
@@ -69,7 +71,7 @@ async function registerGuildCommands() {
   const cmdJsons = [...cmdInstances.values()].map(cmd => cmd.builderJson);
   const newCmdHash = getHash(JSON.stringify(cmdJsons));
 
-  if(lastCmdHash !== newCmdHash) {
+  if(lastCmdHash !== newCmdHash || reregisterCmds) {
     await writeFile(cmdHashFile, newCmdHash);
 
     const guilds = client.guilds.cache.map((g) => g.id);
@@ -85,11 +87,15 @@ async function registerGuildCommands() {
 }
 
 /** Registers all commands for the specified guild in the Discord API - can also be called at runtime to add commands to new guilds */
-export function registerCommandsForGuild(guildId: string) {
-  return rest.put(
-    Routes.applicationGuildCommands(clientId, guildId),
-    { body: getCommandsJson() },
-  );
+export async function registerCommandsForGuild(guildId: string) {
+  const { signal, abort } = new AbortController(),
+    timeout = setTimeout(() => abort(), 10_000),
+    data = await rest.put(
+      Routes.applicationGuildCommands(clientId, guildId),
+      { body: getCommandsJson(), signal },
+    );
+  clearTimeout(timeout);
+  return data;
 }
 
 /** Registers all client events and their listeners */
