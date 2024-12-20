@@ -39,7 +39,7 @@ async function preInit() {
 
 /** Initializes the bot after the client is ready */
 async function init() {
-  console.log(`${k.blue("Bot is ready")}`);
+  console.log(k.blue(`${client.user?.displayName ?? client.user?.username} is ready.\n`));
 }
 
 preInit();
