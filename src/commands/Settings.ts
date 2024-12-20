@@ -1,5 +1,5 @@
 import { ButtonBuilder, ButtonStyle, SlashCommandBuilder, type CommandInteraction, type CommandInteractionOption, type SlashCommandSubcommandBuilder } from "discord.js";
-import { EbdColors, embedify, useEmbedify } from "@lib/embedify.ts";
+import { Col, embedify, useEmbedify } from "@lib/embedify.ts";
 import { CmdBase, SlashCommand } from "@lib/Command.ts";
 import { em } from "@lib/db.ts";
 import { UserSettings } from "@models/UserSettings.model.ts";
@@ -96,7 +96,7 @@ export class SettingsCmd extends SlashCommand {
 
       return int.editReply({
         embeds: [
-          embedify(cfgList, EbdColors.Info)
+          embedify(cfgList, Col.Info)
             .setTitle("User settings values:")
             .setFooter({ text: "Use /settings set <name> to edit a setting" }),
         ],
@@ -104,7 +104,7 @@ export class SettingsCmd extends SlashCommand {
     }
     case "delete_data": {
       if(!await em.findOne(UserSettings, { id: int.user.id }))
-        return int.editReply(useEmbedify("No user settings found - there is nothing to delete", EbdColors.Info));
+        return int.editReply(useEmbedify("No user settings found - there is nothing to delete", Col.Info));
 
       const confirmBtns = [
         new ButtonBuilder()
@@ -121,7 +121,7 @@ export class SettingsCmd extends SlashCommand {
 
       await int.editReply({
         embeds: [
-          embedify("**Are you sure you want to delete all data associated with your user account?**\nNote: if you manually use a command, your user ID might be recorded again.\nFor enhanced privacy you can also block the bot to prevent it from reading your message content.\nNo persistent data will be saved for automatic replies.", EbdColors.Warning)
+          embedify("**Are you sure you want to delete all data associated with your user account?**\nNote: if you manually use a command, your user ID might be recorded again.\nFor enhanced privacy you can also block the bot to prevent it from reading your message content.\nNo persistent data will be saved for automatic replies.", Col.Warning)
             .setFooter({ text: "This prompt will expire in 60s" }),
         ],
         ...useButtons([confirmBtns]),
@@ -140,20 +140,20 @@ export class SettingsCmd extends SlashCommand {
         if(conf.customId === "confirm-delete-data") {
           await em.removeAndFlush(await em.find(UserSettings, { id: int.user.id }));
           return conf.editReply({
-            ...useEmbedify("Data successfully deleted.", EbdColors.Success),
+            ...useEmbedify("Data successfully deleted.", Col.Success),
             components: [],
           });
         }
         else {
           return await conf.editReply({
-            ...useEmbedify("Deletion cancelled.", EbdColors.Secondary),
+            ...useEmbedify("Deletion cancelled.", Col.Secondary),
             components: [],
           });
         }
       }
       catch {
         return await (conf ?? int).editReply({
-          ...useEmbedify("Confirmation not received within 30s, cancelling deletion.", EbdColors.Secondary),
+          ...useEmbedify("Confirmation not received within 30s, cancelling deletion.", Col.Secondary),
           components: [],
         });
       }
@@ -174,7 +174,7 @@ export class SettingsCmd extends SlashCommand {
 
       await int.editReply({
         embeds: [
-          embedify("**Are you sure you want to reset your settings?**", EbdColors.Warning)
+          embedify("**Are you sure you want to reset your settings?**", Col.Warning)
             .setFooter({ text: "This prompt will expire in 60s" }),
         ],
         ...useButtons([confirmBtns]),
@@ -195,20 +195,20 @@ export class SettingsCmd extends SlashCommand {
           sett && await em.removeAndFlush(sett);
           await em.persistAndFlush(new UserSettings(int.user.id));
           return conf.editReply({
-            ...useEmbedify("Settings successfully reset to the default values.", EbdColors.Success),
+            ...useEmbedify("Settings successfully reset to the default values.", Col.Success),
             components: [],
           });
         }
         else {
           await conf.editReply({
-            ...useEmbedify("Reset cancelled.", EbdColors.Secondary),
+            ...useEmbedify("Reset cancelled.", Col.Secondary),
             components: [],
           });
         }
       }
       catch {
         await (conf ?? int).editReply({
-          ...useEmbedify("Confirmation not received within 30s, cancelling reset.", EbdColors.Secondary),
+          ...useEmbedify("Confirmation not received within 30s, cancelling reset.", Col.Secondary),
           components: [],
         });
       }
@@ -219,7 +219,7 @@ export class SettingsCmd extends SlashCommand {
   //#region s:utils
 
   static noSettingsFound(int: CommandInteraction) {
-    int[int.deferred || int.replied ? "editReply" : "reply"](useEmbedify("No user settings found - please run `/settings reset`", EbdColors.Error));
+    int[int.deferred || int.replied ? "editReply" : "reply"](useEmbedify("No user settings found - please run `/settings reset`", Col.Error));
   }
 
   /** Call to make sure that the settings exist for the user - returns either the current settings or the newly created ones */
@@ -270,15 +270,15 @@ export class SettingsCmd extends SlashCommand {
       }
 
       if(typeof validateValue === "function" && !validateValue(newValue))
-        return int.editReply(useEmbedify(`Invalid ${settingName} specified: \`${newValue}\`${invalidHint ? `\n${invalidHint}` : ""}`, EbdColors.Error));
+        return int.editReply(useEmbedify(`Invalid ${settingName} specified: \`${newValue}\`${invalidHint ? `\n${invalidHint}` : ""}`, Col.Error));
 
       cfg[settProp] = newValue;
       await em.flush();
 
-      return int.editReply(useEmbedify(`Successfully set the ${settingName} to \`${getValueLabel(newValue) ?? newValue}\``, EbdColors.Success));
+      return int.editReply(useEmbedify(`Successfully set the ${settingName} to \`${getValueLabel(newValue) ?? newValue}\``, Col.Success));
     }
     catch(err) {
-      return int.editReply(useEmbedify(`Couldn't set the ${settingName} due to an error: ${err}`, EbdColors.Error));
+      return int.editReply(useEmbedify(`Couldn't set the ${settingName} due to an error: ${err}`, Col.Error));
     }
   }
 }

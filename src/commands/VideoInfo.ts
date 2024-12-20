@@ -1,7 +1,7 @@
 import { EmbedBuilder, SlashCommandBuilder, type APIApplicationCommandOptionChoice, type CommandInteraction } from "discord.js";
 import { AxiosError } from "axios";
 import qs from "qs";
-import { EbdColors, useEmbedify } from "@lib/embedify.ts";
+import { Col, useEmbedify } from "@lib/embedify.ts";
 import { CmdBase, SlashCommand } from "@lib/Command.ts";
 import { axios } from "@lib/axios.ts";
 import type { DeArrowObj, ReturnYouTubeDislikeObj, SponsorBlockActionType, SponsorBlockCategory, SponsorBlockSegmentObj, YTVidDataObj } from "@/types.ts";
@@ -97,12 +97,12 @@ export class VideoInfoCmd extends SlashCommand {
 
   public async run(int: CommandInteraction) {
     if(!int.inGuild())
-      return int.reply(useEmbedify("This command can only be used in a server", EbdColors.Error));
+      return int.reply(useEmbedify("This command can only be used in a server", Col.Error));
 
     const videoId = VideoInfoCmd.parseVideoId(int.options.get("video", true).value as string);
 
     if(!videoId)
-      return int.reply(useEmbedify("Invalid video URL or ID", EbdColors.Error));
+      return int.reply(useEmbedify("Invalid video URL or ID", Col.Error));
 
     const type = (int.options.get("type")?.value ?? "reduced") as VideoInfoType;
 
@@ -158,7 +158,7 @@ export class VideoInfoCmd extends SlashCommand {
   }: VideoInfoFetchData): Promise<EmbedBuilder | null> {
     const embed = new EmbedBuilder()
       .setURL(url)
-      .setColor(EbdColors.Secondary);
+      .setColor(Col.Secondary);
 
     let hasRYDData = false,
       hasDeArrowData = false,
@@ -169,36 +169,37 @@ export class VideoInfoCmd extends SlashCommand {
     if(!ytData)
       return null;
 
-    embed.setAuthor({ name: ytData.author_name, url: ytData.author_url });
-
     //#SECTION title & thumbnail
-
-    embed.setTitle(ytData.title ?? url);
 
     const bestDeArrowThumb = deArrowData?.thumbnails?.find(t => !t.original && (t.locked || t.votes > 0))
       ?? deArrowData?.thumbnails.find(t => !t.original)
       ?? null;
 
-    if(bestDeArrowThumb && bestDeArrowThumb.timestamp)
-      embed.setThumbnail(await VideoInfoCmd.getDeArrowThumbUrl(videoId, bestDeArrowThumb.timestamp) ?? ytData.thumbnail_url);
-    else
-      embed.setThumbnail(await getBestThumbnailUrl(videoId) ?? ytData.thumbnail_url);
-
     const bestDeArrowTitle = deArrowData?.titles?.find(t => !t.original && (t.locked || t.votes > 0))
       ?? deArrowData?.titles.find(t => !t.original)
       ?? null;
 
-    if(type === "dearrow_only" && !bestDeArrowTitle)
+    if(bestDeArrowThumb || bestDeArrowTitle)
+      hasDeArrowData = true;
+
+    if(hasDeArrowData) {
+      if(bestDeArrowThumb && bestDeArrowThumb.timestamp)
+        embed.setThumbnail(await VideoInfoCmd.getDeArrowThumbUrl(videoId, bestDeArrowThumb.timestamp) ?? ytData.thumbnail_url);
+      else
+        embed.setThumbnail(await getBestThumbnailUrl(videoId) ?? ytData.thumbnail_url);
+    }
+
+    if(type === "dearrow_only" && !hasDeArrowData)
       return null;
+
+    if(hasDeArrowData && bestDeArrowTitle)
+      embed.setTitle(ytData.title ?? url);
 
     bestDeArrowTitle && embed.addFields({
       name: "Alternative title:",
       value: bestDeArrowTitle.title,
       inline: false,
     });
-
-    if(bestDeArrowThumb || bestDeArrowTitle)
-      hasDeArrowData = true;
 
     //#SECTION votes
 

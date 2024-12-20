@@ -46,15 +46,18 @@ export function joinArrayReadable(array: unknown[], separators = ", ", lastSepar
 }
 
 /** Generates an ASCII progress bar with the given percentage and max length - uses opaque characters for extra detail */
-export function generateAsciiProgressBar(percentage: number, maxLength: number) {
+export function generateAsciiProgressBar(percentage: number, barLength: number) {
   const fullBlock = "█";
   const threeQuarterBlock = "▓";
   const halfBlock = "▒";
   const quarterBlock = "░";
   const emptyBlock = "─";
+  
+  if(percentage === 100)
+    return fullBlock.repeat(barLength);
 
-  const filledLength = Math.floor((percentage / 100) * maxLength);
-  const remainingPercentage = (percentage / 100) * maxLength - filledLength;
+  const filledLength = Math.floor((percentage / 100) * barLength);
+  const remainingPercentage = percentage / 10 * barLength - filledLength;
 
   let lastBlock = "";
   if(remainingPercentage >= 0.75)
@@ -65,7 +68,7 @@ export function generateAsciiProgressBar(percentage: number, maxLength: number) 
     lastBlock = quarterBlock;
 
   const filledBar = fullBlock.repeat(filledLength);
-  const emptyBar = emptyBlock.repeat(maxLength - filledLength - (lastBlock ? 1 : 0));
+  const emptyBar = emptyBlock.repeat(barLength - filledLength - (lastBlock ? 1 : 0));
 
   return `${filledBar}${lastBlock}${emptyBar}`;
 }
@@ -76,7 +79,7 @@ export function generateAsciiProgressBar(percentage: number, maxLength: number) 
  * Each piece is divided into quarters and an empty space, in total ranging from 0 to 4.
  */
 export function generateEmojiProgressBar(percentage: number, maxLength: number) {
-  const getEmoji = (part: "L" | "M" | "R", fillIdx: 0 | 1 | 2 | 3 | 4) => getEmojiStr(emojis[`PB_${part}_${fillIdx}`]);
+  const getEmoji = (part: "L" | "M" | "R", fillIdx: 0 | 1 | 2 | 3 | 4) => emoji(emojis[`PB_${part}_${fillIdx}`]);
 
   /**
    * Figures out which amount of the bar is filled at the given position of the bar, which has the absolute float value from`percentage` from 0.0 to 100.0  
@@ -102,6 +105,7 @@ export function generateEmojiProgressBar(percentage: number, maxLength: number) 
   };
 
   const idxArr = Array.from({ length: maxLength }, (_, i) => i);
+  // get fraction at each emoji index and convert it to a number from 0 to 4
   const pbNumbers = idxArr.map(v => getFractionAtPos(v) / 0.25);
   const pbEmojis = [
     getEmoji("L", pbNumbers[0] as 0),
@@ -113,11 +117,11 @@ export function generateEmojiProgressBar(percentage: number, maxLength: number) 
 }
 
 /** Returns the emoji string for the given emoji name or ID */
-export function getEmojiStr(emojiNameOrId: keyof typeof emojis | (string & {})) {
+export function emoji(emojiNameOrId: keyof typeof emojis | (string & {})) {
   const em = Object.entries(emojis).find(([name, id]) => id === emojiNameOrId || name === emojiNameOrId);
   if(em)
     return `<:${em[0]}:${em[1]}>`;
-  return emojiNameOrId;
+  return `:${emojiNameOrId}:`;
 }
 
 /** Converts seconds into the YT timestamp format `(hh:)mm:ss` */

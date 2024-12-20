@@ -2,7 +2,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { Collection, Events, Routes } from "discord.js";
 import k from "kleur";
-import { EbdColors, useEmbedify } from "@lib/embedify.ts";
+import { Col, useEmbedify } from "@lib/embedify.ts";
 import { getHash } from "@lib/crypto.ts";
 import { exists } from "@lib/fs.ts";
 import { commands } from "@cmd/_commands.ts";
@@ -15,6 +15,7 @@ import { client, clientId, rest } from "@lib/client.ts";
 const cmdInstances = new Collection<string, SlashCommand | ContextCommand>();
 const evtInstances = new Collection<string, Event>();
 
+/** Returns the JSON data of each command builder instance */
 const getCommandsJson = () => [...cmdInstances.entries()].map(([, cmd]) => cmd.builderJson);
 
 /** The path to the command hash file - it is used to reduce the amount of API calls to Discord (and the resulting rate limits) */
@@ -39,7 +40,7 @@ async function registerGuildCommands() {
       }
       catch(err) {
         try {
-          int[int.deferred || int.replied ? "editReply" : "reply"](useEmbedify(`An error occurred while executing the command: ${err}`, EbdColors.Error));
+          int[int.deferred || int.replied ? "editReply" : "reply"](useEmbedify(`An error occurred while executing the command: ${err}`, Col.Error));
         }
         catch(err) {
           console.error(`Error while executing command "${int.commandName}":`, err);

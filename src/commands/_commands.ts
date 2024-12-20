@@ -9,6 +9,6 @@ export const commands = [
   new ConfigCmd(),
   new HelpCmd(),
   new InviteCmd(),
-  new VideoInfoCmd(),
   new SettingsCmd(),
+  new VideoInfoCmd(),
 ];

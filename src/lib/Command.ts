@@ -5,6 +5,7 @@ const cmdPrefix = getEnvVar("CMD_PREFIX", "stringNoEmpty");
 
 //#region CmdBase
 
+/** Abstract base class for all types of commands */
 export abstract class CmdBase {
   /** Name of the command */
   public readonly name: string;
@@ -29,7 +30,7 @@ export interface SlashCommand {
   autocomplete?(int: AutocompleteInteraction, opt?: CommandInteractionOption): Promise<void | unknown>;
 }
 
-/** Abstract class for creating slash commands */
+/** Abstract base class for creating slash commands */
 export abstract class SlashCommand extends CmdBase {
   public readonly builder: SharedSlashCommand;
   public readonly builderJson: RESTPostAPIChatInputApplicationCommandsJSONBody;
@@ -47,7 +48,7 @@ export abstract class SlashCommand extends CmdBase {
 
 //#region CtxCommand
 
-/** Abstract class for creating commands that can be used in the context menu */
+/** Abstract base class for creating commands that can be used in the context menu */
 export abstract class ContextCommand extends CmdBase {
   public readonly builder: ContextMenuCommandBuilder;
   public readonly builderJson: RESTPostAPIContextMenuApplicationCommandsJSONBody;

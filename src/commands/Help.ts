@@ -4,7 +4,7 @@ import { CmdBase, SlashCommand } from "@lib/Command.ts";
 import { commands } from "@cmd/_commands.ts";
 import packageJson from "@root/package.json" with { type: "json" };
 import { getEnvVar } from "@lib/env.ts";
-import { bitFieldContains } from "@lib/math.ts";
+import { bitSetHas } from "@lib/math.ts";
 
 //#region constructor
 
@@ -28,6 +28,7 @@ export class HelpCmd extends SlashCommand {
           .setName("info")
           .setDescription("Get information about the bot")
       )
+      .addSubcommand(sc => sc.setName("test").setDescription("Test command"))
     );
   }
 
@@ -50,7 +51,7 @@ export class HelpCmd extends SlashCommand {
           const permNum = BigInt(cmd.builderJson.default_member_permissions as string);
           if(typeof int.member?.permissions === "undefined")
             return false;
-          const hasPerms = bitFieldContains(BigInt(int.member.permissions as string), permNum);
+          const hasPerms = bitSetHas(BigInt(int.member.permissions as string), permNum);
           if(hasPerms) {
             ephemeral = true;
             if(showHidden)

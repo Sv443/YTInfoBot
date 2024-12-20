@@ -22,6 +22,11 @@
       "color": "#000",
       "overviewRulerColor": "#5df",
     },
+    "((//\\s*|/\\*\\s*)?#(SECTION|section) ([^\\S\\r\\n]*[\\(\\)\\w,.\\-_&+#*'\"/:]+)*)": { //#SECTION test: (abc):
+      "backgroundColor": "#35f",
+      "overviewRulerColor": "#35f",
+      "color": "white",
+    },
     "((<!--\\s*)?</?\\{\\{[A-Z_-]+\\}\\}>(\\s*-->)?)": { // <!-- <{{FOO}}> --> and <!-- </{{FOO}}> --> or <{{BAR}}> and </{{BAR}}>
       "backgroundColor": "#9af",
       "overviewRulerColor": "#9af",

@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, type CommandInteraction } from "discord.js";
-import { EbdColors, useEmbedify } from "@lib/embedify.ts";
+import { Col, useEmbedify } from "@lib/embedify.ts";
 import { getEnvVar } from "@lib/env.ts";
 import { CmdBase, SlashCommand } from "@lib/Command.ts";
 
@@ -17,7 +17,7 @@ export class InviteCmd extends SlashCommand {
 
   public async run(int: CommandInteraction) {
     return int.reply({
-      ...useEmbedify(`You can invite YTInfoBot to your server by [clicking this link.](${getEnvVar("BOT_INVITE_URL")})`, EbdColors.Info),
+      ...useEmbedify(`You can invite YTInfoBot to your server by [clicking this link.](${getEnvVar("BOT_INVITE_URL")})`, Col.Info),
       ephemeral: true,
     });
   }

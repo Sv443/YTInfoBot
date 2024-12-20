@@ -1,5 +1,5 @@
 import { ButtonBuilder, ButtonStyle, PermissionFlagsBits, SlashCommandBuilder, type AutocompleteInteraction, type CommandInteraction, type CommandInteractionOption, type SlashCommandSubcommandBuilder } from "discord.js";
-import { EbdColors, embedify, useEmbedify } from "@lib/embedify.ts";
+import { Col, embedify, useEmbedify } from "@lib/embedify.ts";
 import { CmdBase, SlashCommand } from "@lib/Command.ts";
 import { numberFormatChoices, videoInfoTypeChoices } from "@cmd/VideoInfo.ts";
 import { em } from "@lib/db.ts";
@@ -121,7 +121,7 @@ export class ConfigCmd extends SlashCommand {
 
   public async run(int: CommandInteraction, opt: CommandInteractionOption) {
     if(!int.inGuild())
-      return int.reply(useEmbedify("This command can only be used in a server", EbdColors.Error));
+      return int.reply(useEmbedify("This command can only be used in a server", Col.Error));
 
     const reply = await int.deferReply({ ephemeral: true });
 
@@ -148,7 +148,7 @@ export class ConfigCmd extends SlashCommand {
 
       return int.editReply({
         embeds: [
-          embedify(cfgList, EbdColors.Info)
+          embedify(cfgList, Col.Info)
             .setTitle("Server configuration values:")
         ],
       });
@@ -169,7 +169,7 @@ export class ConfigCmd extends SlashCommand {
 
       await int.editReply({
         embeds: [
-          embedify("**Are you sure you want to reset the configuration?**", EbdColors.Warning)
+          embedify("**Are you sure you want to reset the configuration?**", Col.Warning)
             .setFooter({ text: "This prompt will expire in 60s" }),
         ],
         ...useButtons([confirmBtns]),
@@ -190,20 +190,20 @@ export class ConfigCmd extends SlashCommand {
           cfg && await em.removeAndFlush(cfg);
           await em.persistAndFlush(new GuildConfig(int.guildId));
           return conf.editReply({
-            ...useEmbedify("Configuration successfully reset to default settings.", EbdColors.Success),
+            ...useEmbedify("Configuration successfully reset to default settings.", Col.Success),
             components: [],
           });
         }
         else {
           await conf.editReply({
-            ...useEmbedify("Reset cancelled.", EbdColors.Secondary),
+            ...useEmbedify("Reset cancelled.", Col.Secondary),
             components: [],
           });
         }
       }
       catch {
         await (conf ?? int).editReply({
-          ...useEmbedify("Confirmation not received within 30s, cancelling reset.", EbdColors.Secondary),
+          ...useEmbedify("Confirmation not received within 30s, cancelling reset.", Col.Secondary),
           components: [],
         });
       }
@@ -225,7 +225,7 @@ export class ConfigCmd extends SlashCommand {
   //#region s:utils
 
   static noConfigFound(int: CommandInteraction) {
-    int[int.deferred || int.replied ? "editReply" : "reply"](useEmbedify("No server configuration found - please run `/config reset`", EbdColors.Error));
+    int[int.deferred || int.replied ? "editReply" : "reply"](useEmbedify("No server configuration found - please run `/config reset`", Col.Error));
   }
 
   /** Call to edit or view the passed configuration setting */
@@ -264,15 +264,15 @@ export class ConfigCmd extends SlashCommand {
       }
 
       if(typeof validateValue === "function" && !validateValue(newValue))
-        return int.editReply(useEmbedify(`Invalid ${settingName} specified: \`${newValue}\`${invalidHint ? `\n${invalidHint}` : ""}`, EbdColors.Error));
+        return int.editReply(useEmbedify(`Invalid ${settingName} specified: \`${newValue}\`${invalidHint ? `\n${invalidHint}` : ""}`, Col.Error));
 
       cfg[cfgProp] = newValue;
       await em.flush();
 
-      return int.editReply(useEmbedify(`Successfully set the ${settingName} to \`${getValueLabel(newValue) ?? newValue}\``, EbdColors.Success));
+      return int.editReply(useEmbedify(`Successfully set the ${settingName} to \`${getValueLabel(newValue) ?? newValue}\``, Col.Success));
     }
     catch(err) {
-      return int.editReply(useEmbedify(`Couldn't set the ${settingName} due to an error: ${err}`, EbdColors.Error));
+      return int.editReply(useEmbedify(`Couldn't set the ${settingName} due to an error: ${err}`, Col.Error));
     }
   }
 }

@@ -6,7 +6,7 @@ import { registerCommandsForGuild } from "@lib/registry.ts";
 import { GuildConfig } from "@models/GuildConfig.model.ts";
 import { getEnvVar } from "@lib/env.ts";
 import { getHash } from "@lib/crypto.ts";
-import { EbdColors } from "@lib/embedify.ts";
+import { Col } from "@lib/embedify.ts";
 
 //#region types
 
@@ -145,7 +145,7 @@ export class ReadyEvt extends Event {
       .setFields([
         { name: "Guilds", value: String(metrics.guilds), inline: true },
       ])
-      .setColor(EbdColors.Info);
+      .setColor(Col.Info);
 
     return {
       embeds: [ebd],
