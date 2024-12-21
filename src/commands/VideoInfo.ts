@@ -197,7 +197,7 @@ export class VideoInfoCmd extends SlashCommand {
     if(bestDeArrowThumb || bestDeArrowTitle)
       hasDeArrowData = true;
 
-    if(!omitTitleAndThumb) {
+    if(!omitTitleAndThumb || type === "everything") {
       if(hasDeArrowData && bestDeArrowThumb && bestDeArrowThumb.timestamp)
         embed.setThumbnail(await VideoInfoCmd.getDeArrowThumbUrl(videoId, bestDeArrowThumb.timestamp) ?? ytData.thumbnail_url);
       else

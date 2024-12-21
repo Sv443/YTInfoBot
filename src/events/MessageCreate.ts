@@ -30,9 +30,14 @@ export class MessageCreateEvt extends Event {
   //#region s:handleLnkMsg
 
   /** Handles a message that contains at least one YT video link - if no links are found, replies with an error */
-  public static async handleYtLinkMsg(msg: Pick<Message, "content" | "guildId" | "author" | "reply">, int?: CommandInteraction | ContextMenuCommandInteraction, typeOverride?: VideoInfoType, isAutoReply = false) {
-    const noLinkFound = () => {
-      const ebd = embedify("No YouTube video links were found in the message.", Col.Error);
+  public static async handleYtLinkMsg(
+    msg: Pick<Message, "content" | "guildId" | "author" | "reply">,
+    int?: CommandInteraction | ContextMenuCommandInteraction,
+    typeOverride?: VideoInfoType,
+    isAutoReply = false
+  ) {
+    const notFound = (txt: string) => {
+      const ebd = embedify(txt, Col.Error);
 
       if(int)
         return int[int.deferred || int.replied ? "editReply" : "reply"]({
@@ -56,18 +61,23 @@ export class MessageCreateEvt extends Event {
     const allVidsDeduped = allVids?.filter((vid, idx, self) => self.findIndex((v) => v.videoId === vid.videoId) === idx);
 
     if(!allVidsDeduped || allVidsDeduped.length === 0)
-      return noLinkFound();
+      return notFound("No YouTube video links were found in the message.");
 
     const guildCfg = await em.findOne(GuildConfig, { id: msg.guildId });
     const embeds = [] as EmbedBuilder[];
 
-    if(!guildCfg || !guildCfg.autoReplyEnabled)
-      return;
+    if(!guildCfg)
+      return int?.deferred || !isAutoReply ? int?.editReply({ content: "The guild configuration could not be accessed." }) : msg.reply("The guild configuration could not be accessed.");
 
-    const usrSett = await em.findOne(UserSettings, { id: msg.author.id });
+    if(isAutoReply) {
+      if(!guildCfg.autoReplyEnabled)
+        return;
 
-    if(usrSett && !usrSett.autoReplyEnabled)
-      return;
+      const usrSett = await em.findOne(UserSettings, { id: msg.author.id });
+
+      if(usrSett && !usrSett.autoReplyEnabled)
+        return;
+    }
 
     let checked = 0;
 
@@ -75,7 +85,7 @@ export class MessageCreateEvt extends Event {
       checked++;
       if(!videoId)
         if(allVidsDeduped.length === checked)
-          return noLinkFound();
+          return notFound("No YouTube video links were found in the message.");
         else
           continue;
 
@@ -84,7 +94,7 @@ export class MessageCreateEvt extends Event {
         videoId,
         guildCfg,
         type: typeOverride ?? guildCfg?.defaultVideoInfoType ?? "reduced",
-        omitTitleAndThumb: true,
+        omitTitleAndThumb: isAutoReply,
       });
 
       if(!embed)
@@ -93,8 +103,8 @@ export class MessageCreateEvt extends Event {
       embeds.push(embed);
     }
 
-    if(isAutoReply && embeds.length === 0)
-      return;
+    if(embeds.length === 0)
+      return isAutoReply ? undefined : notFound("No video information could be retrieved.");
 
     if(int)
       return int[int.deferred || int.replied ? "editReply" : "reply"]({
