@@ -115,7 +115,7 @@ export class SettingsCmd extends SlashCommand {
       await int.editReply({
         embeds: [
           embedify("**Are you sure you want to reset your settings?**", Col.Warning)
-            .setFooter({ text: "This prompt will expire in 60s" }),
+            .setFooter({ text: "This prompt will expire in 30s" }),
         ],
         ...useButtons([confirmBtns]),
       });
@@ -125,7 +125,7 @@ export class SettingsCmd extends SlashCommand {
       try {
         conf = await reply.awaitMessageComponent({
           filter: ({ user }) => user.id === int.user.id,
-          time: 60_000,
+          time: 30_000,
         });
 
         await conf.deferUpdate();

@@ -100,7 +100,7 @@ export class PrivacyCmd extends SlashCommand {
       }
       catch {
         return await (conf ?? int).editReply({
-          ...useEmbedify("Confirmation not received within 30s, cancelling deletion.", Col.Secondary),
+          ...useEmbedify("Confirmation not received within 60s, cancelling deletion.", Col.Secondary),
           components: [],
         });
       }
