@@ -38,7 +38,7 @@ export class PrivacyCmd extends SlashCommand {
           "  After you kick it from your server, it also deletes all server data.",
           "- When editing your user settings, it stores your user ID and the settings you've changed.  ",
           "  You can delete your user data by using the `/privacy delete` command.",
-        ].join("\n")),
+        ]),
         ephemeral: true,
       });
 
@@ -68,7 +68,7 @@ export class PrivacyCmd extends SlashCommand {
             "If you run certain commands, your user ID and default settings will be stored again.",
             "You can also block the bot to prevent it from reading your messages again.",
             "No data will be saved when the bot automatically replies to you.",
-          ].join("\n"), Col.Warning)
+          ], Col.Warning)
             .setFooter({ text: "This prompt will expire in 60s" }),
         ],
         ...useButtons([confirmBtns]),

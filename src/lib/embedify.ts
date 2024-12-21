@@ -1,3 +1,4 @@
+import type { Stringifiable } from "@root/src/types.ts";
 import { ColorResolvable, Colors, EmbedBuilder } from "discord.js";
 
 export enum Col {
@@ -9,9 +10,10 @@ export enum Col {
 }
 
 /** Creates a simple EmbedBuilder with the given text and color */
-export function embedify(text: string, color: ColorResolvable = Col.Info): EmbedBuilder {
+export function embedify(text: Stringifiable | Stringifiable[], color: ColorResolvable = Col.Info): EmbedBuilder {
+  const t = Array.isArray(text) ? text.map(String).join("\n") : text;
   return new EmbedBuilder()
-    .setDescription(text).setColor(color);
+    .setDescription(String(t)).setColor(color);
 }
 
 /**
@@ -21,6 +23,6 @@ export function embedify(text: string, color: ColorResolvable = Col.Info): Embed
  * await int.reply({ ...useEmbedify("waddup"), ...Command.useButtons(btns), attachments: [...] });
  * ```
  */
-export function useEmbedify(text: string, color?: ColorResolvable) {
+export function useEmbedify(text: Stringifiable | Stringifiable[], color?: ColorResolvable) {
   return { embeds: [ embedify(text, color) ]};
 }

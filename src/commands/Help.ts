@@ -87,7 +87,7 @@ export class HelpCmd extends SlashCommand {
             `- This bot is completely free so please consider [supporting the development ❤️](${packageJson.funding.url})`,
             "",
             "Powered by [ReturnYoutubeDislike](https://returnyoutubedislike.com/), [SponsorBlock](https://sponsor.ajay.app/), and [DeArrow](https://dearrow.ajay.app/)",
-          ].join("\n"))
+          ])
             .setTitle("Information:")
         ],
       });
