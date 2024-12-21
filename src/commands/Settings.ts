@@ -51,10 +51,6 @@ export class SettingsCmd extends SlashCommand {
         .setName("list")
         .setDescription("List all configurable settings and their current values")
       )
-      .addSubcommand(option => option
-        .setName("delete_data")
-        .setDescription("Delete all data associated with your user account")
-      )
       .addSubcommandGroup(grpOpt => {
         grpOpt
           .setName("set")
@@ -101,62 +97,6 @@ export class SettingsCmd extends SlashCommand {
             .setFooter({ text: "Use /settings set <name> to edit a setting" }),
         ],
       });
-    }
-    case "delete_data": {
-      if(!await em.findOne(UserSettings, { id: int.user.id }))
-        return int.editReply(useEmbedify("No user settings found - there is nothing to delete", Col.Info));
-
-      const confirmBtns = [
-        new ButtonBuilder()
-          .setCustomId("confirm-delete-data")
-          .setStyle(ButtonStyle.Danger)
-          .setLabel("Delete")
-          .setEmoji("🗑️"),
-        new ButtonBuilder()
-          .setCustomId("cancel-delete-data")
-          .setStyle(ButtonStyle.Secondary)
-          .setLabel("Cancel")
-          .setEmoji("❌"),
-      ];
-
-      await int.editReply({
-        embeds: [
-          embedify("**Are you sure you want to delete all data associated with your user account?**\nNote: if you manually use a command, your user ID might be recorded again.\nFor enhanced privacy you can also block the bot to prevent it from reading your message content.\nNo persistent data will be saved for automatic replies.", Col.Warning)
-            .setFooter({ text: "This prompt will expire in 60s" }),
-        ],
-        ...useButtons([confirmBtns]),
-      });
-
-      let conf;
-
-      try {
-        conf = await reply.awaitMessageComponent({
-          filter: ({ user }) => user.id === int.user.id,
-          time: 60_000,
-        });
-
-        await conf.deferUpdate();
-
-        if(conf.customId === "confirm-delete-data") {
-          await em.removeAndFlush(await em.find(UserSettings, { id: int.user.id }));
-          return conf.editReply({
-            ...useEmbedify("Data successfully deleted.", Col.Success),
-            components: [],
-          });
-        }
-        else {
-          return await conf.editReply({
-            ...useEmbedify("Deletion cancelled.", Col.Secondary),
-            components: [],
-          });
-        }
-      }
-      catch {
-        return await (conf ?? int).editReply({
-          ...useEmbedify("Confirmation not received within 30s, cancelling deletion.", Col.Secondary),
-          components: [],
-        });
-      }
     }
     case "reset": {
       const confirmBtns = [
