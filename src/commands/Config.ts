@@ -36,7 +36,7 @@ const configurableOptions: Record<
     settingName: "default video info type",
     getValueLabel: (val) => videoInfoTypeChoices.find(c => c.value === val)?.name,
     builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
-      .setDescription("View or change the default video_info type, used when a link is sent or no type argument is given")
+      .setDescription("The default video_info type, used when a link is sent or no type argument is given")
       .addStringOption(opt =>
         opt.setName("new_value")
           .setDescription("The new default video_info type")
@@ -49,7 +49,7 @@ const configurableOptions: Record<
     settingName: "number format",
     getValueLabel: (val) => numberFormatChoices.find(c => c.value === val)?.name,
     builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
-      .setDescription("View or change number format for this server, for example when displaying likes and dislikes")
+      .setDescription("The number format for this server, used for example when displaying likes and dislikes")
       .addStringOption(opt =>
         opt.setName("new_value")
           .setDescription("The new number format")
@@ -62,9 +62,9 @@ const configurableOptions: Record<
     settingName: "locale",
     getValueLabel: (val) => localesJson.find(({ code }) => code === val)?.name,
     validateValue: (val) => localesJson.some(({ code }) => code === val),
-    invalidHint: "It must be in the format `language-COUNTRY` (case sensitive), like `en-US`.\nAlso, not all locales are supported - look up `BCP 47` for more info.",
+    invalidHint: "Must be in the BCP 47 format: language-COUNTRY (case sensitive), like `en-US`. Not all combinations are supported.",
     builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
-      .setDescription("View or change the locale for the server, used for formatting dates, numbers and more")
+      .setDescription("The locale (language and country) for the server, used for formatting dates, numbers and more")
       .addStringOption(opt =>
         opt.setName("new_value")
           .setDescription("The new locale")
@@ -79,7 +79,7 @@ const configurableOptions: Record<
     settingName: "auto reply state",
     getValueLabel: (val) => autoReplyValues.find(c => c.value === Boolean(val))?.name,
     builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
-      .setDescription("Change whether the bot will automatically reply to all messages containing a video link")
+      .setDescription("Whether the bot will automatically reply to all messages containing a video link")
       .addBooleanOption(opt =>
         opt.setName("new_value")
           .setDescription("Whether auto-reply should be enabled")
