@@ -11,11 +11,9 @@ export class GuildConfig {
   @PrimaryKey({ type: "string", length: 24 })
     id!: string;
 
-  // TODO: convert to bitfield
   @Property({ type: "string", length: 24 })
     defaultVideoInfoType: VideoInfoType = "reduced";
 
-  // TODO: convert to bitfield
   @Property({ type: "string", length: 12 })
     numberFormat: NumberFormat = "long";
 
