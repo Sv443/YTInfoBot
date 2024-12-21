@@ -66,10 +66,7 @@ If you want to opt out of automatic replies across every server, you can use the
     Otherwise, that setting is changed to the given value.
   - `/settings reset`  
     Resets the settings to the default values.  
-    (Shows a confirmation before actually resetting.)
-  - `/settings delete_data`  
-    Deletes all data stored about your user.  
-    (Shows a confirmation before actually deleting.)
+    Shows a confirmation before actually resetting.
 - **Server configuration:**
   - 🔒 `/config list`  
     Shows a list of all available server configuration settings and their current values.  
@@ -80,8 +77,15 @@ If you want to opt out of automatic replies across every server, you can use the
     Requires the `Manage Server` permission to use.
   - 🔒 `/config reset`  
     Resets the configuration to the default values.  
-    (Shows a confirmation before actually resetting.)  
+    Shows a confirmation before actually resetting.  
     Requires the `Manage Server` permission to use.
+- **Privacy:**
+  - `/privacy info`  
+    Shows information about the data the bot stores and why it is stored in the first place.
+  - `/privacy delete_data`  
+    Deletes all data stored about your user.  
+    Shows a confirmation before actually deleting the data.  
+    If you want to delete your server's data, simply kick the bot from the server.
 
 > [!NOTE]  
 > Commands prefixed with 🔒 require special permissions, while others can be used by any member.  
