@@ -292,6 +292,9 @@ export class VideoInfoCmd extends SlashCommand {
       ...(hasSponsorBlockData ? ["DeArrow"] : []),
     ];
 
+    if(poweredByStr.length === 0)
+      return null;
+
     embed.setFooter({ text: `Powered by ${joinArrayReadable(poweredByStr)}` });
 
     return embed;
