@@ -207,12 +207,11 @@ export class VideoInfoCmd extends SlashCommand {
     if(type === "dearrow_only" && !hasDeArrowData)
       return null;
 
-    if(hasDeArrowData && bestDeArrowTitle)
-      embed.setTitle(ytData.title ?? url);
+    embed.setTitle((hasDeArrowData ? bestDeArrowTitle?.title : ytData?.title) ?? url);
 
-    bestDeArrowTitle && embed.addFields({
-      name: "Alternative title:",
-      value: bestDeArrowTitle.title,
+    hasDeArrowData && ytData.title && embed.addFields({
+      name: "Original title:",
+      value: ytData.title,
       inline: false,
     });
 
