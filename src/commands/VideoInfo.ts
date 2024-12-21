@@ -72,7 +72,7 @@ export type VideoInfoFetchData = {
   videoId: string;
   guildCfg: GuildConfig;
   type: VideoInfoType;
-  noTitle?: boolean;
+  omitTitleAndThumb?: boolean;
 }
 
 //#region constructor
@@ -169,7 +169,7 @@ export class VideoInfoCmd extends SlashCommand {
     videoId,
     guildCfg,
     type = "reduced",
-    noTitle = false,
+    omitTitleAndThumb = false,
   }: VideoInfoFetchData): Promise<EmbedBuilder | null> {
     const embed = new EmbedBuilder()
       .setURL(url)
@@ -197,10 +197,12 @@ export class VideoInfoCmd extends SlashCommand {
     if(bestDeArrowThumb || bestDeArrowTitle)
       hasDeArrowData = true;
 
-    if(hasDeArrowData && bestDeArrowThumb && bestDeArrowThumb.timestamp)
-      embed.setThumbnail(await VideoInfoCmd.getDeArrowThumbUrl(videoId, bestDeArrowThumb.timestamp) ?? ytData.thumbnail_url);
-    else
-      embed.setThumbnail(await getBestThumbnailUrl(videoId) ?? ytData.thumbnail_url);
+    if(!omitTitleAndThumb) {
+      if(hasDeArrowData && bestDeArrowThumb && bestDeArrowThumb.timestamp)
+        embed.setThumbnail(await VideoInfoCmd.getDeArrowThumbUrl(videoId, bestDeArrowThumb.timestamp) ?? ytData.thumbnail_url);
+      else
+        embed.setThumbnail(await getBestThumbnailUrl(videoId) ?? ytData.thumbnail_url);
+    }
 
     if(type === "dearrow_only" && !hasDeArrowData)
       return null;
@@ -280,7 +282,7 @@ export class VideoInfoCmd extends SlashCommand {
       });
     }
 
-    !noTitle && !embed.data.title && embed.setTitle(ytData.title ?? `https://youtu.be/${videoId}`);
+    !omitTitleAndThumb && !embed.data.title && embed.setTitle(ytData.title ?? `https://youtu.be/${videoId}`);
 
     //#SECTION footer
 

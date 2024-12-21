@@ -83,7 +83,7 @@ export class MessageCreateEvt extends Event {
         videoId,
         guildCfg,
         type: typeOverride ?? guildCfg?.defaultVideoInfoType ?? "reduced",
-        noTitle: true,
+        omitTitleAndThumb: true,
       });
 
       if(!embed)
