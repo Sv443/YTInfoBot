@@ -47,10 +47,10 @@ export class HelpCmd extends SlashCommand {
         .filter(cmd => {
           if(typeof cmd.builderJson.default_member_permissions === "undefined" || cmd.builderJson.default_member_permissions === "0")
             return true;
-          const permNum = BigInt(cmd.builderJson.default_member_permissions as string);
           if(typeof int.member?.permissions === "undefined")
             return false;
-          const hasPerms = bitSetHas(BigInt(int.member.permissions as string), permNum);
+
+          const hasPerms = bitSetHas(BigInt(int.member.permissions as string), BigInt(cmd.builderJson.default_member_permissions as string));
           if(hasPerms) {
             ephemeral = true;
             if(showHidden)

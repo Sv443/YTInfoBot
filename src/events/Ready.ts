@@ -10,12 +10,12 @@ import { Col } from "@lib/embedify.ts";
 
 //#region types
 
-type MetricsDataObj = {
+type MetricsManifest = {
   msgId: string | null;
   metricsHash: string | null;
 };
 
-type Metrics = {
+type MetricsData = {
   guilds: number;
 };
 
@@ -24,8 +24,8 @@ type Metrics = {
 const metGuildId = getEnvVar("METRICS_GUILD", "stringNoEmpty");
 const metChanId = getEnvVar("METRICS_CHANNEL", "stringNoEmpty");
 
-const metricsDataFile = ".metrics.json";
-let metricsData: MetricsDataObj | undefined;
+const metricsManifFile = ".metrics.json";
+let metricsData: MetricsManifest | undefined;
 let firstMetricRun = true;
 
 //#region constructor
@@ -85,61 +85,67 @@ export class ReadyEvt extends Event {
 
   /** Update metrics */
   private static async updateMetrics(client: Client) {
-    if(!metGuildId || !metChanId)
-      return;
+    try {
+      if(!metGuildId || !metChanId)
+        return;
 
-    const latestMetrics: Metrics = {
-      guilds: client.guilds.cache.size,
-    };
+      const latestMetrics = {
+        guilds: client.guilds.cache.size,
+      } as const satisfies MetricsData;
 
-    const metricsChan = client.guilds.cache.find(g => g.id === metGuildId)?.channels.cache.find(c => c.id === metChanId);
-    let metricsMsg: Message | undefined;
+      const metricsChan = client.guilds.cache.find(g => g.id === metGuildId)?.channels.cache.find(c => c.id === metChanId);
+      let metricsMsg: Message | undefined;
 
-    if(!metricsData) {
       try {
-        metricsData = JSON.parse(String(await readFile(metricsDataFile, "utf8")));
+        metricsData = metricsData ?? JSON.parse(String(await readFile(metricsManifFile, "utf8")));
       }
       catch {
-        metricsData = { msgId: null, metricsHash: null };
+        metricsData = metricsData ?? { msgId: null, metricsHash: null };
+      }
+
+      if(metricsData && metricsChan && metricsChan.isTextBased()) {
+        const metricsChanged = firstMetricRun || metricsData.metricsHash !== getHash(JSON.stringify(latestMetrics));
+        if(metricsChanged)
+          metricsData.metricsHash = getHash(JSON.stringify(latestMetrics));
+
+        if(metricsChanged && metricsData.msgId && metricsData.msgId.length > 0) {
+          metricsMsg = (await metricsChan.messages.fetch({ limit: 1, around: metricsData.msgId })).first();
+
+          const recreateMsg = async () => {
+            await metricsMsg?.delete();
+            metricsMsg = await metricsChan?.send(ReadyEvt.useMetricsEmbed(latestMetrics));
+            metricsData!.msgId = metricsMsg?.id;
+            await writeFile(metricsManifFile, JSON.stringify(metricsData));
+          };
+
+          try {
+            if(!metricsMsg)
+              recreateMsg();
+            else
+              await metricsMsg?.edit(ReadyEvt.useMetricsEmbed(latestMetrics));
+          }
+          catch {
+            recreateMsg();
+          }
+        }
+        else if(!metricsData.msgId || metricsData.msgId.length === 0) {
+          metricsMsg = await metricsChan?.send(ReadyEvt.useMetricsEmbed(latestMetrics));
+          metricsData.msgId = metricsMsg?.id;
+          await writeFile(metricsManifFile, JSON.stringify(metricsData));
+        }
+
+        firstMetricRun = false;
       }
     }
-
-    if(metricsData && metricsChan && metricsChan.isTextBased()) {
-      const metricsChanged = firstMetricRun || metricsData.metricsHash !== getHash(JSON.stringify(latestMetrics));
-      if(metricsChanged)
-        metricsData.metricsHash = getHash(JSON.stringify(latestMetrics));
-
-      if(metricsChanged && metricsData.msgId && metricsData.msgId.length > 0) {
-        metricsMsg = (await metricsChan.messages.fetch({ limit: 1, around: metricsData.msgId })).first();
-        const recreateMsg = async () => {
-          await metricsMsg?.delete();
-          metricsMsg = await metricsChan?.send(ReadyEvt.useMetricsEmbed(latestMetrics));
-          metricsData!.msgId = metricsMsg?.id;
-          await writeFile(metricsDataFile, JSON.stringify(metricsData));
-        };
-        try {
-          if(!metricsMsg)
-            recreateMsg();
-          else
-            await metricsMsg?.edit(ReadyEvt.useMetricsEmbed(latestMetrics));
-        }
-        catch {
-          recreateMsg();
-        }
-      }
-      else if(!metricsData.msgId || metricsData.msgId.length === 0) {
-        metricsMsg = await metricsChan?.send(ReadyEvt.useMetricsEmbed(latestMetrics));
-        metricsData.msgId = metricsMsg?.id;
-        await writeFile(metricsDataFile, JSON.stringify(metricsData));
-      }
-      firstMetricRun = false;
+    catch(e) {
+      console.error("Couldn't update metrics:", e);
     }
   }
 
   //#region s:metricsEmbed
 
-  /** Get the metrics content */
-  private static useMetricsEmbed(metrics: Metrics) {
+  /** Get the metrics / stats embed */
+  private static useMetricsEmbed(metrics: MetricsData) {
     const ebd = new EmbedBuilder()
       .setTitle("Metrics")
       .setFields([
