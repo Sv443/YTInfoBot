@@ -27,10 +27,10 @@ Please consider [donating](https://github.com/sponsors/Sv443) to support develop
 
 ## Features:
 - **[Return YouTube Dislike](https://returnyoutubedislike.com/):**  
-  Shows the approximate like and dislike count, as well as ratio between them.  
-  These numbers are crowdsourced and extrapolated, so they might not be 100% accurate.
+  Shows the approximate like and dislike count, as well as ratio bar graph with percentage to quickly visualize it.  
+  These numbers are crowdsourced and extrapolated. While inaccurate, they're enough to give you a good idea.
 - **[SponsorBlock](https://sponsor.ajay.app/):**  
-  Shows timestamps for segments that can be skipped, such as sponsor segments, intros, non-music parts, etc.  
+  Shows openable timestamps for segments that can be skipped, such as sponsor segments, intros, non-music parts, etc.  
   These timestamps are crowdsourced and might not be 100% accurate.
 - **[DeArrow](https://dearrow.ajay.app/):**  
   Shows a crowdsourced thumbnail and title for the video.  
