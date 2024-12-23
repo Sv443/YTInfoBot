@@ -37,8 +37,8 @@
       "@evt/*": ["src/events/*"],
       "@lib/*": ["src/lib/*"],
       "@models/*": ["src/models/*"],
+      "@src/*": ["src/*"],
       "@root/*": ["./*"],
-      "@/*": ["src/*"],
     },
   },
   "include": [

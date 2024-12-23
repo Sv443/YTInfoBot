@@ -1,4 +1,4 @@
-import type { Stringifiable } from "@/types.ts";
+import type { Stringifiable } from "@src/types.ts";
 import "dotenv/config";
 
 /**

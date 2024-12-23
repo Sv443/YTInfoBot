@@ -5,7 +5,7 @@ import { em } from "@lib/db.ts";
 import { UserSettings } from "@models/UserSettings.model.ts";
 import { useButtons } from "@lib/components.ts";
 import { capitalize } from "@lib/text.ts";
-import type { Stringifiable } from "@/types.ts";
+import type { Stringifiable } from "@src/types.ts";
 import { autoReplyValues } from "@cmd/Config.ts";
 
 //#region constants

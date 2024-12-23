@@ -7,7 +7,7 @@ import { GuildConfig } from "@models/GuildConfig.model.ts";
 import { useButtons } from "@lib/components.ts";
 import { capitalize } from "@lib/text.ts";
 import localesJson from "@assets/locales.json" with { type: "json" };
-import type { Stringifiable } from "@/types.ts";
+import type { Stringifiable } from "@src/types.ts";
 
 //#region constants
 
