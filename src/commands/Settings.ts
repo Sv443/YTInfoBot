@@ -8,6 +8,8 @@ import { capitalize } from "@lib/text.ts";
 import type { Stringifiable } from "@src/types.ts";
 import { autoReplyValues } from "@cmd/Config.ts";
 
+// TODO: translate
+
 //#region constants
 
 /** Configuration setting name mapping - value has to adhere to Discord slash command naming rules (lowercase and underscores only!) */

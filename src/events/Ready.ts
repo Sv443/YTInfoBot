@@ -147,9 +147,9 @@ export class ReadyEvt extends Event {
   /** Get the metrics / stats embed */
   private static useMetricsEmbed(metrics: MetricsData) {
     const ebd = new EmbedBuilder()
-      .setTitle("Metrics")
+      .setTitle("Developer metrics:")
       .setFields([
-        { name: "Guilds", value: String(metrics.guilds), inline: true },
+        { name: "Joined guilds", value: String(metrics.guilds), inline: true },
       ])
       .setColor(Col.Info);
 

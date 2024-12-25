@@ -4,8 +4,9 @@ import { VideoInfoCmd, type VideoInfoType } from "@cmd/VideoInfo.ts";
 import { em } from "@lib/db.ts";
 import { GuildConfig } from "@models/GuildConfig.model.ts";
 import { UserSettings } from "@models/UserSettings.model.ts";
-import { Col, embedify } from "@lib/embedify.ts";
+import { Col, embedify, useEmbedify } from "@lib/embedify.ts";
 import { useButtons } from "@lib/components.ts";
+import { tr } from "@lib/translate.ts";
 
 /** Regex that detects youtube.com, music.youtube.com, and youtu.be links */
 const ytVideoRegexStr = "(?:https?:\\/\\/)?(?:www\\.)?(?:youtube\\.com\\/watch\\?v=|music\\.youtube\\.com\\/watch\\?v=|youtu\\.be\\/)([a-zA-Z0-9_-]+)";
@@ -61,13 +62,15 @@ export class MessageCreateEvt extends Event {
     const allVidsDeduped = allVids?.filter((vid, idx, self) => self.findIndex((v) => v.videoId === vid.videoId) === idx);
 
     if(!allVidsDeduped || allVidsDeduped.length === 0)
-      return notFound("No YouTube video links were found in the message.");
+      return notFound(tr("errors.noYtVidLinksFound"));
 
     const guildCfg = await em.findOne(GuildConfig, { id: msg.guildId });
     const embeds = [] as EmbedBuilder[];
 
     if(!guildCfg)
-      return int?.deferred || !isAutoReply ? int?.editReply({ content: "The guild configuration could not be accessed." }) : msg.reply("The guild configuration could not be accessed.");
+      return int?.deferred || !isAutoReply
+        ? int?.editReply(useEmbedify(tr("errors.guildCfgInaccessible"), Col.Error))
+        : msg.reply(useEmbedify(tr("errors.guildCfgInaccessible"), Col.Error));
 
     if(isAutoReply) {
       if(!guildCfg.autoReplyEnabled)
@@ -85,7 +88,7 @@ export class MessageCreateEvt extends Event {
       checked++;
       if(!videoId)
         if(allVidsDeduped.length === checked)
-          return notFound("No YouTube video links were found in the message.");
+          return notFound(tr("errors.noYtVidLinksFound"));
         else
           continue;
 
@@ -104,7 +107,7 @@ export class MessageCreateEvt extends Event {
     }
 
     if(embeds.length === 0)
-      return isAutoReply ? undefined : notFound("No video information could be retrieved.");
+      return isAutoReply ? undefined : notFound(tr("errors.noVidInfoFound"));
 
     if(int)
       return int[int.deferred || int.replied ? "editReply" : "reply"]({
@@ -116,7 +119,7 @@ export class MessageCreateEvt extends Event {
       embeds,
       allowedMentions: { repliedUser: false },
       ...(isAutoReply
-        ? useButtons(new ButtonBuilder().setStyle(ButtonStyle.Danger).setLabel("Delete").setCustomId("delete_auto_reply").setEmoji("🗑️"))
+        ? useButtons(new ButtonBuilder().setStyle(ButtonStyle.Danger).setLabel(tr("buttons.delete")).setCustomId("delete_auto_reply").setEmoji("🗑️"))
         : {}
       ),
     });

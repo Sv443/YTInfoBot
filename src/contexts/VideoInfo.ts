@@ -1,5 +1,7 @@
 import { MessageCreateEvt } from "@evt/MessageCreate.ts";
 import { ContextCommand } from "@lib/Command.ts";
+import { Col, useEmbedify } from "@lib/embedify.ts";
+import { tr } from "@lib/translate.ts";
 import { ApplicationCommandType, ContextMenuCommandBuilder, InteractionContextType, type ContextMenuCommandInteraction } from "discord.js";
 
 //#region c:basic
@@ -8,7 +10,7 @@ import { ApplicationCommandType, ContextMenuCommandBuilder, InteractionContextTy
 export class VideoInfoCtx extends ContextCommand {
   constructor() {
     super(new ContextMenuCommandBuilder()
-      .setName("Video Info (default)") // @ts-ignore
+      .setName(tr("commands.video_info_ctx.nameReduced")) // @ts-ignore
       .setType(ApplicationCommandType.Message)
       .setContexts([
         InteractionContextType.Guild,
@@ -27,7 +29,7 @@ export class VideoInfoCtx extends ContextCommand {
 
     if(!targetMsg)
       return int.editReply({
-        content: "The targeted message could not be accessed.",
+        ...useEmbedify(tr("errors.messageInaccessible"), Col.Error),
       });
 
     return await MessageCreateEvt.handleYtLinkMsg(targetMsg, int);
@@ -40,7 +42,7 @@ export class VideoInfoCtx extends ContextCommand {
 export class VideoInfoExtendedCtx extends ContextCommand {
   constructor() {
     super(new ContextMenuCommandBuilder()
-      .setName("Video Info (extended)") // @ts-ignore
+      .setName(tr("commands.video_info_ctx.nameExtended")) // @ts-ignore
       .setType(ApplicationCommandType.Message)
       .setContexts([
         InteractionContextType.Guild,
@@ -59,7 +61,7 @@ export class VideoInfoExtendedCtx extends ContextCommand {
 
     if(!targetMsg)
       return int.editReply({
-        content: "The targeted message could not be accessed.",
+        ...useEmbedify(tr("errors.messageInaccessible"), Col.Error),
       });
 
     return await MessageCreateEvt.handleYtLinkMsg(targetMsg, int, "everything");

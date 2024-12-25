@@ -4,6 +4,7 @@ import { CmdBase, SlashCommand } from "@lib/Command.ts";
 import { em } from "@lib/db.ts";
 import { UserSettings } from "@models/UserSettings.model.ts";
 import { useButtons } from "@lib/components.ts";
+import { getLocMap, tr } from "@lib/translate.ts";
 
 //#region constructor
 
@@ -11,16 +12,16 @@ export class PrivacyCmd extends SlashCommand {
   constructor() {
     super(new SlashCommandBuilder()
       .setName(CmdBase.getCmdName("privacy"))
-      .setDescription("Get information about the bot's privacy or delete your data.")
+      .setDescriptionLocalizations(getLocMap("commands.privacy.descriptions.command"))
       .addSubcommand((sub) =>
         sub
           .setName("info")
-          .setDescription("Get information about the bot's privacy.")
+          .setDescriptionLocalizations(getLocMap("commands.privacy.descriptions.subcmd.info"))
       )
       .addSubcommand((sub) =>
         sub
           .setName("delete_data")
-          .setDescription("Delete all data the bot stored about you.")
+          .setDescriptionLocalizations(getLocMap("commands.privacy.descriptions.subcmd.delete_data"))
       )
     );
   }
@@ -32,13 +33,7 @@ export class PrivacyCmd extends SlashCommand {
 
     if(sub === "info")
       return int.reply({
-        ...useEmbedify([
-          "**YTInfoBot stores the following data:**",
-          "- When you invite it to your server, it stores the server's ID and the server configuration data (locale, number format, etc.).  ",
-          "  After you kick it from your server, it also deletes all server data.",
-          "- When editing your user settings, it stores your user ID and the settings you've changed.  ",
-          "  You can delete your user data by using the `/privacy delete` command.",
-        ]),
+        ...useEmbedify(Array.from({ length: 5 }).map((_, i) => tr(`commands.privacy.info.line${i + 1}`))),
         ephemeral: true,
       });
 
@@ -46,30 +41,27 @@ export class PrivacyCmd extends SlashCommand {
       await int.deferReply({ ephemeral: true });
 
       if(!await em.findOne(UserSettings, { id: int.user.id }))
-        return int.editReply(useEmbedify("No user data found to delete.", Col.Info));
+        return int.editReply(useEmbedify(tr("errors.noDataFoundToDelete"), Col.Info));
 
       const confirmBtns = [
         new ButtonBuilder()
           .setCustomId("confirm-delete-data")
           .setStyle(ButtonStyle.Danger)
-          .setLabel("Delete")
+          .setLabel(tr("buttons.delete"))
           .setEmoji("🗑️"),
         new ButtonBuilder()
           .setCustomId("cancel-delete-data")
           .setStyle(ButtonStyle.Secondary)
-          .setLabel("Cancel")
+          .setLabel(tr("buttons.cancel"))
           .setEmoji("❌"),
       ];
 
+      const promptSec = 60;
+
       const reply = await int.editReply({
         embeds: [
-          embedify([
-            "**Are you sure you want to delete all data associated with your account?**",
-            "If you run certain commands, your user ID and default settings will be stored again.",
-            "You can also block the bot to prevent it from reading your messages again.",
-            "No data will be saved when the bot automatically replies to you.",
-          ], Col.Warning)
-            .setFooter({ text: "This prompt will expire in 60s" }),
+          embedify(Array.from({ length: 4 }).map((_, i) => tr(`commands.privacy.confirmLine${i + 1}`)), Col.Warning)
+            .setFooter({ text: tr("general.promptExpiryNotice", promptSec) }),
         ],
         ...useButtons([confirmBtns]),
       });
@@ -79,7 +71,7 @@ export class PrivacyCmd extends SlashCommand {
       try {
         conf = await reply.awaitMessageComponent({
           filter: ({ user }) => user.id === int.user.id,
-          time: 60_000,
+          time: promptSec * 1000,
         });
 
         await conf.deferUpdate();
@@ -87,20 +79,20 @@ export class PrivacyCmd extends SlashCommand {
         if(conf.customId === "confirm-delete-data") {
           await em.removeAndFlush(await em.find(UserSettings, { id: int.user.id }));
           return conf.editReply({
-            ...useEmbedify("Data successfully deleted.", Col.Success),
+            ...useEmbedify(tr("commands.privacy.deletionSuccess"), Col.Success),
             components: [],
           });
         }
         else {
           return await conf.editReply({
-            ...useEmbedify("Deletion cancelled.", Col.Secondary),
+            ...useEmbedify(tr("commands.privacy.deletionCancelled"), Col.Secondary),
             components: [],
           });
         }
       }
       catch {
         return await (conf ?? int).editReply({
-          ...useEmbedify("Confirmation not received within 60s, cancelling deletion.", Col.Secondary),
+          ...useEmbedify(tr("commands.privacy.deletionNoConfirmation"), Col.Secondary),
           components: [],
         });
       }

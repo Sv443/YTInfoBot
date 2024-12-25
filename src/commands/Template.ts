@@ -1,6 +1,7 @@
 import { SlashCommandBuilder, type CommandInteraction } from "discord.js";
 import { useEmbedify } from "@lib/embedify.ts";
 import { CmdBase, SlashCommand } from "@lib/Command.ts";
+import { getLocMap, tr } from "@lib/translate.ts";
 
 //#region constructor
 
@@ -8,7 +9,7 @@ export class TemplateCommand extends SlashCommand {
   constructor() {
     super(new SlashCommandBuilder()
       .setName(CmdBase.getCmdName("template_command"))
-      .setDescription("TEMPLATE_COMMAND")
+      .setDescriptionLocalizations(getLocMap("commands.template_command.description"))
     );
   }
 
@@ -16,7 +17,7 @@ export class TemplateCommand extends SlashCommand {
 
   public async run(int: CommandInteraction) {
     return int.reply({
-      ...useEmbedify("TEMPLATE"),
+      ...useEmbedify(tr("TEMPLATE")),
       ephemeral: true,
     });
   }

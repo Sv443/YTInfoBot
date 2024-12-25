@@ -1,4 +1,5 @@
 import type { Stringifiable } from "@src/types.ts";
+import type { LocalizationMap } from "discord.js";
 
 /**
  * Translation object to pass to {@linkcode tr.addTranslations()}  
@@ -41,7 +42,7 @@ const valTransforms: Array<{
 let curLang = "";
 
 /** Common function to resolve the translation text in a specific language. */
-function translate(language: string, key: string, ...args: Stringifiable[]): string {
+function translate(language: string, key: string, ...args: (Stringifiable | Record<string, Stringifiable>)[]): string {
   if(typeof language !== "string")
     language = curLang ?? "";
 
@@ -84,7 +85,7 @@ function translate(language: string, key: string, ...args: Stringifiable[]): str
  * @param input The string to insert the values into
  * @param values The values to insert, in order, starting at `%1`
  */
-function insertValues(input: string, ...values: Stringifiable[]): string {
+function insertValues(input: string, ...values: (Stringifiable | Record<string, Stringifiable>)[]): string {
   return input.replace(/%\d/gm, (match) => {
     const argIndex = Number(match.substring(1)) - 1;
     return (values[argIndex] ?? match)?.toString();
@@ -100,7 +101,7 @@ function insertValues(input: string, ...values: Stringifiable[]): string {
  * @param key Key of the translation to return
  * @param args Optional arguments to be passed to the translated text. They will replace placeholders in the format `%n`, where `n` is the 1-indexed argument number
  */
-const tr = (key: string, ...args: Stringifiable[]): string => translate(curLang, key, ...args);
+const tr = (key: string, ...args: (Stringifiable | Record<string, Stringifiable>)[]): string => translate(curLang, key, ...args);
 
 /**
  * Returns the translated text for the specified key in the specified language.  
@@ -234,3 +235,54 @@ tr.deleteTransform = (patternOrFn: RegExp | string | TransformFn): void => {
 };
 
 export { tr };
+
+/** Returns the localization map for all locales, given the common translation key */
+export function getLocMap(trKey: string): LocalizationMap {
+  const locMap = {} as LocalizationMap;
+
+  for(const [locale, trObj] of Object.entries(trans)) {
+    const transform = (value: string): string => {
+      const tf = valTransforms.find((t) => t.regex.test(value));
+  
+      return tf
+        ? value.replace(tf.regex, (...matches) => String(tf.fn(matches, locale)))
+        : value;
+    };
+
+    // try to resolve via traversal (e.g. `trObj["key"]["parts"]`)
+    const keyParts = trKey.split(".");
+    let value: string | TrObject | undefined = trObj;
+    for(const part of keyParts) {
+      if(typeof value !== "object" || value === null)
+        break;
+      value = value?.[part];
+    }
+    if(typeof value === "string")
+      locMap[locale as keyof LocalizationMap] = transform(value);
+
+    // try falling back to `trObj["key.parts"]`
+    value = trObj?.[trKey];
+    if(typeof value === "string")
+      locMap[locale as keyof LocalizationMap] = transform(value);
+  }
+
+  return Object.keys(locMap).length === 0
+    ? { "en-US": trKey }
+    : locMap;
+}
+
+
+// #DEBUG example
+
+const transExample = {
+  foo: {
+    bar: "Bar {{test}}",
+    baz: "Baz {{1}} {{two}} {{thr3}}",
+  },
+};
+
+tr.addTranslations("en", transExample);
+tr.setLanguage("en");
+
+tr("foo.bar", { test: "value" });     // "Bar value"
+tr("foo.baz", "one", "two", "three"); // "Baz one two three"

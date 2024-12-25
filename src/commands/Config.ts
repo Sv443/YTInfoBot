@@ -214,9 +214,9 @@ export class ConfigCmd extends SlashCommand {
   //#region pb:autocompl.
 
   public async autocomplete(int: AutocompleteInteraction) {
-    const searchVal = int.options.getFocused().toLowerCase();
+    const searchVal = int.options.getFocused().toLowerCase().trim();
     const locales = localesJson
-      .filter(({ code, name }) => code.toLowerCase().includes(searchVal) || name.toLowerCase().includes(searchVal))
+      .filter(({ code, name, nativeName }) => code.toLowerCase().includes(searchVal) || name.toLowerCase().includes(searchVal) || nativeName.toLowerCase().includes(searchVal))
       .slice(0, 25);
 
     await int.respond(locales.map(({ code, name }) => ({ value: code, name })));
@@ -225,7 +225,7 @@ export class ConfigCmd extends SlashCommand {
   //#region s:utils
 
   static noConfigFound(int: CommandInteraction) {
-    int[int.deferred || int.replied ? "editReply" : "reply"](useEmbedify("No server configuration found - please run `/config reset`", Col.Error));
+    int[int.deferred || int.replied ? "editReply" : "reply"](useEmbedify("errors.guildCfgInaccessible", Col.Error));
   }
 
   /** Call to edit or view the passed configuration setting */

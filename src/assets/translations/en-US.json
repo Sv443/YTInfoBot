@@ -1,0 +1,95 @@
+{
+  "buttons": {
+    "cancel": "Cancel",
+    "delete": "Delete"
+  },
+  "errors": {
+    "noYtVidLinksFound": "No YouTube video links were found in the message.",
+    "noVidInfoFound": "No video information could be found.",
+    "noDataFoundToDelete": "No data found to delete.",
+    "guildCfgInaccessible": "No server configuration found - please run `/config reset`",
+    "messageInaccessible": "The targeted message could not be accessed."
+  },
+  "general": {
+    "promptExpiryNotice": "This prompt will expire in <$sec>s",
+    "commandOnlyUsableInServers": "This command can only be used in a server"
+  },
+  "commands": {
+    "help": {
+      "descriptions": {
+        "command": "List all commands or get information about the bot",
+        "subcmd": {
+          "commands": "List all commands",
+          "info": "Show commands that need higher permissions, as long as you can use them - reply is only shown to you"
+        },
+        "args": {
+          "show_hidden": "Show hidden commands"
+        }
+      },
+      "embedTitles": {
+        "commands": "Commands:",
+        "info": "Information:"
+      },
+      "info": {
+        "version": "Version: <$version>",
+        "createdBy": "Created by [<authorName>](<$authorUrl>)",
+        "globalOptOut": "Opt out of automatic replies across every server by using the command `/settings set auto_reply new_value:false`",
+        "bugsLink": "- Submit bugs or feature requests on [GitHub](<$bugsUrl>)",
+        "supportServerLink": "- Join the [support server](<$supportServerInviteUrl>) if you have any questions or need help",
+        "donationLink": "- This bot is completely free so please consider [supporting the development ❤️](<$fundingUrl>)",
+        "poweredBy": "Powered by [ReturnYoutubeDislike](https://returnyoutubedislike.com/), [SponsorBlock](https://sponsor.ajay.app/), and [DeArrow](https://dearrow.ajay.app/)"
+      }
+    },
+    "invite": {
+      "description": "Invite YTInfoBot to your own server",
+      "embedContent": "You can invite YTInfoBot to your server by [clicking this link.](<$inviteUrl>)"
+    },
+    "privacy": {
+      "descriptions": {
+        "command": "Get information about the bot's privacy or delete your data.",
+        "subcmd": {
+          "info": "Get information about the bot's privacy.",
+          "delete_data": "Delete all data the bot stored about you."
+        }
+      },
+      "info": {
+        "line1": "**YTInfoBot stores the following data:**",
+        "line2": "- When you invite it to your server, it stores the server's ID and the server configuration data (locale, number format, etc.).  ",
+        "line3": "  After you kick it from your server, it also deletes all server data.",
+        "line4": "- When editing your user settings, it stores your user ID and the settings you've changed.  ",
+        "line5": "  You can delete your user data by using the `/privacy delete` command."
+      },
+      "delete": {
+        "confirmLine1": "**Are you sure you want to delete all data associated with your account?**",
+        "confirmLine2": "If you run certain commands, your user ID and default settings will be stored again.",
+        "confirmLine3": "You can also block the bot to prevent it from reading your messages again.",
+        "confirmLine4": "No data will be saved when the bot automatically replies to you.",
+        "deletionSuccess": "Data successfully deleted.",
+        "deletionCancelled": "Deletion of data cancelled.",
+        "deletionNoConfirmation": "No confirmation received, cancelling deletion of data."
+      }
+    },
+    "video_info": {
+      "descriptions": {
+        "command": "Show information about a video, given its URL",
+        "options": {
+          "video": "URL to the video or video ID - supports music.youtube.com, youtube.com and youtu.be URLs",
+          "type": "Type of information to show - defaults to reduced"
+        }
+      },
+      "errors": {
+        "invalidUrlOrId": "Invalid video URL or ID",
+        "foundNoVidInfo": "Found no data for this video - please try again later"
+      },
+      "embedFields": {
+        "originalTitle": "Original title:",
+        "votes": "Votes (estimated):",
+        "timestamps": "Timestamps:"
+      }
+    },
+    "video_info_ctx": {
+      "nameReduced": "Video Info (default)",
+      "nameExtended": "Video Info (extended)"
+    }
+  }
+}

@@ -11,10 +11,13 @@ import { GuildConfig } from "@models/GuildConfig.model.ts";
 import { formatNumber } from "@lib/math.ts";
 import { SettingsCmd } from "@cmd/Settings.ts";
 import { em } from "@lib/db.ts";
+import { getLocMap, tr } from "@lib/translate.ts";
 
 //#region constants
 
 const allowedHosts = ["www.youtube.com", "youtube.com", "music.youtube.com", "youtu.be"];
+
+// TODO: translate
 
 export const videoInfoTypeChoices = [
   { name: "Reduced", value: "reduced" }, // (default)
@@ -81,15 +84,15 @@ export class VideoInfoCmd extends SlashCommand {
   constructor() {
     super(new SlashCommandBuilder()
       .setName(CmdBase.getCmdName("video_info"))
-      .setDescription("Show information about a video, given its URL")
+      .setDescriptionLocalizations(getLocMap("commands.video_info.descriptions.command"))
       .addStringOption(opt =>
         opt.setName("video")
-          .setDescription("URL to the video or video ID - supports music.youtube.com, youtube.com and youtu.be URLs")
+          .setDescriptionLocalizations(getLocMap("commands.video_info.descriptions.options.video"))
           .setRequired(true)
       )
       .addStringOption(opt =>
         opt.setName("type")
-          .setDescription("Type of information to show - defaults to reduced")
+          .setDescriptionLocalizations(getLocMap("commands.video_info.descriptions.options.type"))
           .addChoices(videoInfoTypeChoices)
       )
     );
@@ -99,12 +102,12 @@ export class VideoInfoCmd extends SlashCommand {
 
   public async run(int: CommandInteraction) {
     if(!int.inGuild())
-      return int.reply(useEmbedify("This command can only be used in a server", Col.Error));
+      return int.reply(useEmbedify(tr("general.commandOnlyUsableInServers"), Col.Error));
 
     const videoId = VideoInfoCmd.parseVideoId(int.options.get("video", true).value as string);
 
     if(!videoId)
-      return int.reply(useEmbedify("Invalid video URL or ID", Col.Error));
+      return int.reply(useEmbedify("commands.video_info.errors.invalidUrlOrId", Col.Error));
 
     const type = (int.options.get("type")?.value ?? "reduced") as VideoInfoType;
 
@@ -122,7 +125,7 @@ export class VideoInfoCmd extends SlashCommand {
     });
 
     if(!embed)
-      return int.editReply(useEmbedify("Found no data for this video - please try again later", Col.Error));
+      return int.editReply(useEmbedify(tr("commands.video_info.errors.foundNoVidInfo"), Col.Error));
 
     return int.editReply({ embeds: [embed] });
   }
@@ -210,7 +213,7 @@ export class VideoInfoCmd extends SlashCommand {
     embed.setTitle((hasDeArrowData ? bestDeArrowTitle?.title : ytData?.title) ?? url);
 
     hasDeArrowData && ytData.title && embed.addFields({
-      name: "Original title:",
+      name: tr("commands.video_info.embedFields.originalTitle"),
       value: ytData.title,
       inline: false,
     });
@@ -229,7 +232,7 @@ export class VideoInfoCmd extends SlashCommand {
       const ratioPercent = ratioPerc.toFixed(1);
 
       embed.addFields({
-        name: "Votes (estimated):",
+        name: tr("commands.video_info.embedFields.votes"),
         value: `${fmt(likes)} 👍  •  ${fmt(dislikes)} 👎\n${generateEmojiProgressBar(ratioPerc, 7)} ${ratioPercent}%`,
         inline: true,
       });
@@ -268,6 +271,7 @@ export class VideoInfoCmd extends SlashCommand {
         const endUrl = new URL(url);
         endUrl.searchParams.set("t", String(Math.floor(segment[1])));
 
+        // TODO: translate
         if(actionType === "poi")
           timestampList += `${sponsorBlockCategoryColorEmojiMap[category]} [${secsToYtTime(segment[0])}](${startUrl}) (${sponsorBlockCategoryMap[category]})\n`;
         else
@@ -275,7 +279,7 @@ export class VideoInfoCmd extends SlashCommand {
       }
 
       embed.addFields({
-        name: "Timestamps:",
+        name: tr("commands.video_info.embedFields.timestamps"),
         value: timestampList,
         inline: false,
       });
@@ -294,6 +298,7 @@ export class VideoInfoCmd extends SlashCommand {
     if(poweredByStr.length === 0)
       return null;
 
+    // TODO: translate
     embed.setFooter({ text: `Powered by ${joinArrayReadable(poweredByStr)}` });
 
     return embed;
