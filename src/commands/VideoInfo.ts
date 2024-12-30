@@ -84,14 +84,17 @@ export class VideoInfoCmd extends SlashCommand {
   constructor() {
     super(new SlashCommandBuilder()
       .setName(CmdBase.getCmdName("video_info"))
+      .setDescription(tr.forLang("en-US", "commands.video_info.descriptions.command"))
       .setDescriptionLocalizations(getLocMap("commands.video_info.descriptions.command"))
       .addStringOption(opt =>
         opt.setName("video")
+          .setDescription(tr.forLang("en-US", "commands.video_info.descriptions.options.video"))
           .setDescriptionLocalizations(getLocMap("commands.video_info.descriptions.options.video"))
           .setRequired(true)
       )
       .addStringOption(opt =>
         opt.setName("type")
+          .setDescription(tr.forLang("en-US", "commands.video_info.descriptions.options.type"))
           .setDescriptionLocalizations(getLocMap("commands.video_info.descriptions.options.type"))
           .addChoices(videoInfoTypeChoices)
       )

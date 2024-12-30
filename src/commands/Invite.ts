@@ -10,7 +10,8 @@ export class InviteCmd extends SlashCommand {
   constructor() {
     super(new SlashCommandBuilder()
       .setName(CmdBase.getCmdName("invite"))
-      .setNameLocalizations(getLocMap("commands.invite.description"))
+      .setDescription(tr.forLang("en-US", "commands.invite.description"))
+      .setDescriptionLocalizations(getLocMap("commands.invite.description"))
     );
   }
 

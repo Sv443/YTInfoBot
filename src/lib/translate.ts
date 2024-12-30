@@ -1,5 +1,9 @@
 import type { Stringifiable } from "@src/types.ts";
 import type { LocalizationMap } from "discord.js";
+import k from "kleur";
+import { readdir, readFile } from "node:fs/promises";
+
+//#region tr system
 
 /**
  * Translation object to pass to {@linkcode tr.addTranslations()}  
@@ -25,7 +29,7 @@ export interface TrObject {
 }
 
 /** Function that transforms a matched translation string into something else */
-export type TransformFn = (matches: RegExpMatchArray, language: string) => Stringifiable;
+export type TransformFn = (matches: RegExpMatchArray, language: string, ...args: (Stringifiable | Record<string, Stringifiable>)[]) => Stringifiable;
 
 /** All translations loaded into memory */
 const trans: {
@@ -204,7 +208,7 @@ tr.hasKey = (key: string, language = curLang): boolean => {
  * });
  * 
  * // replace <c=red>...</c> with <span class="color red">...</span>
- * tr.addTransform(/<c=([a-z]+)>(.*?)<\/c>/g, (matches: RegExpMatchArray, language: string) => {
+ * tr.addTransform(/<c=([a-z]+)>(.*?)<\/c>/g, (matches: RegExpMatchArray, language: string, ...args: (Stringifiable | Record<string, Stringifiable>)[]) => {
  *   const color = matches?.[1];
  *   const content = matches?.[2];
  * 
@@ -236,6 +240,72 @@ tr.deleteTransform = (patternOrFn: RegExp | string | TransformFn): void => {
 
 export { tr };
 
+//#region custom stuff
+
+const defaultLanguage = "en-US";
+
+/** Array of tuples containing the regular expression and the transformation function */
+const transforms = [
+  [
+    /<\$([a-zA-Z0-9$_-]+)>/gm,
+    // TODO: verify
+    (matches, _lang, ...args) => {
+      let str = matches[1];
+    
+      const eachKeyInTrString = (keys: string[]) => keys.every((key) => matches[1].includes(`<$${key}>`));
+    
+      const namedMapping = () => {
+        if(!str.includes("<$") || !args[0] || typeof args[0] !== "object" || !eachKeyInTrString(Object.keys(args[0])))
+          return;
+        for(const key in args[0]) {
+          const regex = new RegExp(`<\\$${key}>`, "gm");
+          str = str.replace(regex, String((args[0] as Record<string, string>)[key]));
+        }
+      };
+    
+      const positionalMapping = () => {
+        if(!str.includes("<$"))
+          return;
+        for(const arg of args)
+          str = str.replace(/<\$[a-zA-Z0-9$_-]+>/, String(arg));
+      };
+    
+      if(args[0] && typeof args[0] === "object" && !("toString" in args[0]))
+        if(eachKeyInTrString(Object.keys(args[0])))
+          namedMapping();
+      positionalMapping();
+    
+      return str;
+    },
+  ],
+] as const satisfies [RegExp, TransformFn][];
+
+/** Loads all translations from files in the folder at `src/assets/translations` and applies transformation functions */
+export async function initTranslations(): Promise<void> {
+  const files = await readdir("src/assets/translations");
+  let enName = "";
+
+  for(const file of files) {
+    try {
+      const langCode = file.split(".")[0];
+      const data = JSON.parse(await readFile(`src/assets/translations/${file}`, "utf-8")) as TrObject;
+      tr.addTranslations(langCode, data);
+      if(langCode.startsWith("en") && enName !== defaultLanguage)
+        enName = langCode;
+    }
+    catch(err) {
+      console.error(k.red(`Error while loading translations from '${file}':\n`), err);
+    }
+  }
+
+  for(const [regex, fn] of transforms)
+    tr.addTransform(regex, fn);
+
+  tr.setLanguage(enName ?? defaultLanguage);
+}
+
+//#region utils
+
 /** Returns the localization map for all locales, given the common translation key */
 export function getLocMap(trKey: string): LocalizationMap {
   const locMap = {} as LocalizationMap;
@@ -243,7 +313,7 @@ export function getLocMap(trKey: string): LocalizationMap {
   for(const [locale, trObj] of Object.entries(trans)) {
     const transform = (value: string): string => {
       const tf = valTransforms.find((t) => t.regex.test(value));
-  
+
       return tf
         ? value.replace(tf.regex, (...matches) => String(tf.fn(matches, locale)))
         : value;
@@ -272,17 +342,17 @@ export function getLocMap(trKey: string): LocalizationMap {
 }
 
 
-// #DEBUG example
+//#region #DBG example
 
-const transExample = {
-  foo: {
-    bar: "Bar {{test}}",
-    baz: "Baz {{1}} {{two}} {{thr3}}",
-  },
-};
+// const transExample = {
+//   foo: {
+//     bar: "Bar {{test}}",
+//     baz: "Baz {{1}} {{two}} {{thr3}}",
+//   },
+// };
 
-tr.addTranslations("en", transExample);
-tr.setLanguage("en");
+// tr.addTranslations("en", transExample);
+// tr.setLanguage("en");
 
-tr("foo.bar", { test: "value" });     // "Bar value"
-tr("foo.baz", "one", "two", "three"); // "Baz one two three"
+// tr("foo.bar", { test: "value" });     // "Bar value"
+// tr("foo.baz", "one", "two", "three"); // "Baz one two three"

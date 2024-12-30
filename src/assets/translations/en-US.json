@@ -90,6 +90,9 @@
     "video_info_ctx": {
       "nameReduced": "Video Info (default)",
       "nameExtended": "Video Info (extended)"
+    },
+    "delete_reply_ctx": {
+      "name": "Delete Reply"
     }
   }
 }

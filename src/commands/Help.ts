@@ -1,7 +1,7 @@
 import { SlashCommandBuilder, type CommandInteraction, type CommandInteractionOption } from "discord.js";
 import { embedify } from "@lib/embedify.ts";
 import { CmdBase, SlashCommand } from "@lib/Command.ts";
-import { commands } from "@cmd/_commands.ts";
+import { getCommands } from "@cmd/_commands.ts";
 import packageJson from "@root/package.json" with { type: "json" };
 import { getEnvVar } from "@lib/env.ts";
 import { bitSetHas } from "@lib/math.ts";
@@ -13,20 +13,24 @@ export class HelpCmd extends SlashCommand {
   constructor() {
     super(new SlashCommandBuilder()
       .setName(CmdBase.getCmdName("help"))
+      .setDescription(tr.forLang("en-US", "commands.help.descriptions.command"))
       .setDescriptionLocalizations(getLocMap("commands.help.descriptions.command"))
       .addSubcommand(subcommand =>
         subcommand
           .setName("commands")
+          .setDescription(tr.forLang("en-US", "commands.help.descriptions.subcmd.commands"))
           .setDescriptionLocalizations(getLocMap("commands.help.descriptions.subcmd.commands"))
           .addBooleanOption(option =>
             option
               .setName("show_hidden")
+              .setDescription(tr.forLang("en-US", "commands.help.descriptions.args.show_hidden"))
               .setDescriptionLocalizations(getLocMap("commands.help.descriptions.args.show_hidden"))
           )
       )
       .addSubcommand(subcommand =>
         subcommand
           .setName("info")
+          .setDescription(tr.forLang("en-US", "commands.help.descriptions.subcmd.info"))
           .setDescriptionLocalizations(getLocMap("commands.help.descriptions.subcmd.info"))
       )
     );
@@ -43,7 +47,7 @@ export class HelpCmd extends SlashCommand {
       const showHidden = int.options.get("show_hidden")?.value as boolean ?? true;
       let ephemeral = false;
 
-      const allowedCmds = [...commands]
+      const allowedCmds = [...getCommands()]
         .sort((a, b) => a.builderJson.name.localeCompare(b.builderJson.name))
         .filter(cmd => {
           if(typeof cmd.builderJson.default_member_permissions === "undefined" || cmd.builderJson.default_member_permissions === "0")

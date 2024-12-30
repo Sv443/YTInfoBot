@@ -12,15 +12,18 @@ export class PrivacyCmd extends SlashCommand {
   constructor() {
     super(new SlashCommandBuilder()
       .setName(CmdBase.getCmdName("privacy"))
+      .setDescription(tr.forLang("en-US", "commands.privacy.descriptions.command"))
       .setDescriptionLocalizations(getLocMap("commands.privacy.descriptions.command"))
       .addSubcommand((sub) =>
         sub
           .setName("info")
+          .setDescription(tr.forLang("en-US", "commands.privacy.descriptions.subcmd.info"))
           .setDescriptionLocalizations(getLocMap("commands.privacy.descriptions.subcmd.info"))
       )
       .addSubcommand((sub) =>
         sub
           .setName("delete_data")
+          .setDescription(tr.forLang("en-US", "commands.privacy.descriptions.subcmd.delete_data"))
           .setDescriptionLocalizations(getLocMap("commands.privacy.descriptions.subcmd.delete_data"))
       )
     );

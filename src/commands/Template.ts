@@ -5,10 +5,11 @@ import { getLocMap, tr } from "@lib/translate.ts";
 
 //#region constructor
 
-export class TemplateCommand extends SlashCommand {
+export class TemplateCmd extends SlashCommand {
   constructor() {
     super(new SlashCommandBuilder()
       .setName(CmdBase.getCmdName("template_command"))
+      .setDescription(tr.forLang("en-US", "commands.template_command.description"))
       .setDescriptionLocalizations(getLocMap("commands.template_command.description"))
     );
   }

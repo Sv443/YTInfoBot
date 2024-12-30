@@ -119,7 +119,7 @@ export class MessageCreateEvt extends Event {
       embeds,
       allowedMentions: { repliedUser: false },
       ...(isAutoReply
-        ? useButtons(new ButtonBuilder().setStyle(ButtonStyle.Danger).setLabel(tr("buttons.delete")).setCustomId("delete_auto_reply").setEmoji("🗑️"))
+        ? useButtons(new ButtonBuilder().setStyle(ButtonStyle.Secondary).setLabel(tr("buttons.delete")).setCustomId("delete_auto_reply").setEmoji("🗑️"))
         : {}
       ),
     });

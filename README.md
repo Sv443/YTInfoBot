@@ -79,6 +79,16 @@ If you want to opt out of automatic replies across every server, you can use the
     Resets the configuration to the default values.  
     Shows a confirmation before actually resetting.  
     Requires the `Manage Server` permission to use.
+- **Help:**
+  - `/help info`  
+    Shows some information about the bot.
+  - `/help commands [show_hidden:<true|false>]`  
+    Shows a list of commands and their descriptions.  
+    If `show_hidden:true` is specified, commands with elevated permissions will also be shown.  
+    This also makes the reply only visible to you.
+- **Invite:**
+  - `/invite`  
+    Shows a link that you can use to invite YTInfoBot to your own server.
 - **Privacy:**
   - `/privacy info`  
     Shows information about the data the bot stores and why it is stored in the first place.

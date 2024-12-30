@@ -4,9 +4,9 @@ import { MessageCreateEvt } from "@evt/MessageCreate.ts";
 import { ReadyEvt } from "@evt/Ready.ts";
 
 /** All events that the bot listens for on the client instance */
-export const events = [
+export const getEvents = () => [
   new GuildCreateEvt(),
   new GuildDeleteEvt(),
   new MessageCreateEvt(),
   new ReadyEvt(),
-];
+] as const;

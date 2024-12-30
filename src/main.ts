@@ -5,6 +5,7 @@ import { initDatabase } from "@lib/db.ts";
 import { initRegistry } from "@lib/registry.ts";
 import { autoPlural } from "@lib/text.ts";
 import { getEnvVar } from "@lib/env.ts";
+import { initTranslations } from "@lib/translate.ts";
 
 const requiredEnvVars = ["BOT_TOKEN", "APPLICATION_ID", "DB_URL", "BOT_INVITE_URL", "SUPPORT_SERVER_INVITE_URL"];
 
@@ -20,14 +21,17 @@ async function init() {
 
   console.log(k.gray("\nInitializing and logging in..."));
 
-  await new Promise((resolve) => {
-    client.once("ready", resolve);
-    client.login(botToken);
-  });
+  await Promise.all([
+    initTranslations(),
+    new Promise((resolve) => {
+      client.once("ready", resolve);
+      client.login(botToken);
+    }),
+  ]);
 
   await Promise.all([
-    initDatabase(),
     initRegistry(),
+    initDatabase(),
   ]);
 
   client.on(Events.Error, (err) => console.error(k.red("Client error:"), err));
