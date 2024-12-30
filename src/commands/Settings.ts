@@ -82,6 +82,7 @@ export class SettingsCmd extends SlashCommand {
         ...configurableOptions[opt.options[0].name as keyof typeof configurableOptions],
       });
     case "list": {
+      await UserSettings.ensureExists(int.user.id);
       const sett = await em.findOne(UserSettings, { id: int.user.id });
 
       if(!sett)
@@ -133,7 +134,7 @@ export class SettingsCmd extends SlashCommand {
         await conf.deferUpdate();
 
         if(conf.customId === "confirm-reset-settings") {
-          const sett = await em.findOne(UserSettings, { id: int.guildId });
+          const sett = await em.findOne(UserSettings, { id: int.user.id });
           sett && await em.removeAndFlush(sett);
           await em.persistAndFlush(new UserSettings(int.user.id));
           return conf.editReply({
@@ -164,18 +165,6 @@ export class SettingsCmd extends SlashCommand {
     int[int.deferred || int.replied ? "editReply" : "reply"](useEmbedify("No user settings found - please run `/settings reset`", Col.Error));
   }
 
-  /** Call to make sure that the settings exist for the user - returns either the current settings or the newly created ones */
-  public static async ensureSettingsExist(userId: string) {
-    const foundSett = await em.findOne(UserSettings, { id: userId });
-    if(!foundSett) {
-      const sett = new UserSettings(userId);
-      await em.persistAndFlush(sett);
-      return sett;
-    }
-    else
-      return foundSett;
-  }
-
   /** Call to edit or view the passed configuration setting */
   public static async editSetting<
     TSettKey extends keyof UserSettings,
@@ -198,6 +187,7 @@ export class SettingsCmd extends SlashCommand {
     invalidHint?: string;
   }) {
     try {
+      await UserSettings.ensureExists(int.user.id);
       const cfg = await em.findOne(UserSettings, { id: int.user.id });
 
       if(!cfg)

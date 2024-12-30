@@ -8,7 +8,8 @@
     "noVidInfoFound": "No video information could be found.",
     "noDataFoundToDelete": "No data found to delete.",
     "guildCfgInaccessible": "No server configuration found - please run `/config reset`",
-    "messageInaccessible": "The targeted message could not be accessed."
+    "messageInaccessible": "The targeted message could not be accessed.",
+    "onlyRunInGuild": "This command can only be run in a server."
   },
   "general": {
     "promptExpiryNotice": "This prompt will expire in <$sec>s",

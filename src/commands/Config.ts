@@ -8,6 +8,7 @@ import { useButtons } from "@lib/components.ts";
 import { capitalize } from "@lib/text.ts";
 import localesJson from "@assets/locales.json" with { type: "json" };
 import type { Stringifiable } from "@src/types.ts";
+import { tr } from "@lib/translate.ts";
 
 //#region constants
 
@@ -130,12 +131,14 @@ export class ConfigCmd extends SlashCommand {
       if(!opt.options?.[0])
         throw new Error("No subcommand provided in /config set");
 
+      await GuildConfig.ensureExists(int.guildId);
       return await ConfigCmd.editConfigSetting({
         int,
         opt,
         ...configurableOptions[opt.options[0].name as keyof typeof configurableOptions],
       });
     case "list": {
+      await GuildConfig.ensureExists(int.guildId);
       const cfg = await em.findOne(GuildConfig, { id: int.guildId });
 
       if(!cfg)
@@ -250,6 +253,10 @@ export class ConfigCmd extends SlashCommand {
     invalidHint?: string;
   }) {
     try {
+      if(!int.inGuild())
+        return int.reply(useEmbedify(tr("errors.onlyRunInGuild"), Col.Error));
+
+      await GuildConfig.ensureExists(int.guildId);
       const cfg = await em.findOne(GuildConfig, { id: int.guildId });
 
       if(!cfg)

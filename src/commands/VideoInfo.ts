@@ -9,9 +9,9 @@ import { generateEmojiProgressBar, joinArrayReadable, secsToYtTime } from "@lib/
 import { getBestThumbnailUrl } from "@lib/thumbnail.ts";
 import { GuildConfig } from "@models/GuildConfig.model.ts";
 import { formatNumber } from "@lib/math.ts";
-import { SettingsCmd } from "@cmd/Settings.ts";
 import { em } from "@lib/db.ts";
 import { getLocMap, tr } from "@lib/translate.ts";
+import { UserSettings } from "@models/UserSettings.model.ts";
 
 //#region constants
 
@@ -116,7 +116,7 @@ export class VideoInfoCmd extends SlashCommand {
 
     await int.deferReply();
 
-    await SettingsCmd.ensureSettingsExist(int.user.id);
+    await UserSettings.ensureExists(int.user.id);
 
     const guildCfg = await em.findOneOrFail(GuildConfig, { id: int.guildId });
 

@@ -1,4 +1,4 @@
-import { ButtonBuilder, ButtonStyle, type ButtonInteraction, type CommandInteraction, type ContextMenuCommandInteraction, type EmbedBuilder, type Message } from "discord.js";
+import { ButtonBuilder, ButtonStyle, PermissionFlagsBits, type ButtonInteraction, type CommandInteraction, type ContextMenuCommandInteraction, type EmbedBuilder, type Message } from "discord.js";
 import { Event } from "@lib/Event.ts";
 import { VideoInfoCmd, type VideoInfoType } from "@cmd/VideoInfo.ts";
 import { em } from "@lib/db.ts";
@@ -76,6 +76,7 @@ export class MessageCreateEvt extends Event {
       if(!guildCfg.autoReplyEnabled)
         return;
 
+      await UserSettings.ensureExists(msg.author.id);
       const usrSett = await em.findOne(UserSettings, { id: msg.author.id });
 
       if(usrSett && !usrSett.autoReplyEnabled)
@@ -129,7 +130,8 @@ export class MessageCreateEvt extends Event {
 
     try {
       conf = await rep.awaitMessageComponent({
-        filter: ({ user }) => user.id === userId,
+        filter: ({ user, memberPermissions }) =>
+          user.id === userId || (memberPermissions?.has(PermissionFlagsBits.ManageMessages) ?? false),
         time: 60_000,
       }) as ButtonInteraction;
 
