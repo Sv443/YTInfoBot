@@ -76,7 +76,6 @@ export class MessageCreateEvt extends Event {
       if(!guildCfg.autoReplyEnabled)
         return;
 
-      await UserSettings.ensureExists(msg.author.id);
       const usrSett = await em.findOne(UserSettings, { id: msg.author.id });
 
       if(usrSett && !usrSett.autoReplyEnabled)

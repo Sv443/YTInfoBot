@@ -63,7 +63,7 @@ export class PrivacyCmd extends SlashCommand {
 
       const reply = await int.editReply({
         embeds: [
-          embedify(Array.from({ length: 4 }).map((_, i) => tr(`commands.privacy.confirmLine${i + 1}`)), Col.Warning)
+          embedify(Array.from({ length: 4 }).map((_, i) => tr(`commands.privacy.delete.confirmLine${i + 1}`)), Col.Warning)
             .setFooter({ text: tr("general.promptExpiryNotice", promptSec) }),
         ],
         ...useButtons([confirmBtns]),
@@ -82,20 +82,20 @@ export class PrivacyCmd extends SlashCommand {
         if(conf.customId === "confirm-delete-data") {
           await em.removeAndFlush(await em.find(UserSettings, { id: int.user.id }));
           return conf.editReply({
-            ...useEmbedify(tr("commands.privacy.deletionSuccess"), Col.Success),
+            ...useEmbedify(tr("commands.privacy.delete.success"), Col.Success),
             components: [],
           });
         }
         else {
           return await conf.editReply({
-            ...useEmbedify(tr("commands.privacy.deletionCancelled"), Col.Secondary),
+            ...useEmbedify(tr("commands.privacy.delete.cancelled"), Col.Secondary),
             components: [],
           });
         }
       }
       catch {
         return await (conf ?? int).editReply({
-          ...useEmbedify(tr("commands.privacy.deletionNoConfirmation"), Col.Secondary),
+          ...useEmbedify(tr("commands.privacy.delete.noConfirmation"), Col.Secondary),
           components: [],
         });
       }

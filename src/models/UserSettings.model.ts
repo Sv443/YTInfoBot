@@ -18,4 +18,7 @@ export class UserSettings {
 
   @Property({ type: "bool" })
     autoReplyEnabled: boolean = true;
+
+  @Property({ type: "datetime", nullable: true })
+    lastAccessed: Date = new Date();
 }

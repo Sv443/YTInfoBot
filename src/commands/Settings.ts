@@ -205,6 +205,7 @@ export class SettingsCmd extends SlashCommand {
         return int.editReply(useEmbedify(`Invalid ${settingName} specified: \`${newValue}\`${invalidHint ? `\n${invalidHint}` : ""}`, Col.Error));
 
       cfg[settProp] = newValue;
+      cfg.lastAccessed = new Date();
       await em.flush();
 
       return int.editReply(useEmbedify(`Successfully set the ${settingName} to \`${getValueLabel(newValue) ?? newValue}\``, Col.Success));
