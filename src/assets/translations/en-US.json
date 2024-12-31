@@ -17,35 +17,56 @@
   },
   "commands": {
     "help": {
+      "names": {
+        "command": "help",
+        "subcmd": {
+          "commands": "commands",
+          "info": "info"
+        }
+      },
       "descriptions": {
         "command": "List all commands or get information about the bot",
         "subcmd": {
           "commands": "List all commands",
-          "info": "Show commands that need higher permissions, as long as you can use them - reply is only shown to you"
+          "info": "Show information about the bot"
         },
         "args": {
-          "show_hidden": "Show hidden commands"
+          "show_hidden": "Show commands that need higher permissions, as long as you can use them - reply is only shown to you"
         }
       },
-      "embedTitles": {
-        "commands": "Commands:",
-        "info": "Information:"
+      "commands": {
+        "name": "commands"
       },
       "info": {
+        "name": "info",
         "version": "Version: <$version>",
         "createdBy": "Created by [<authorName>](<$authorUrl>)",
         "globalOptOut": "Opt out of automatic replies across every server by using the command `/settings set auto_reply new_value:false`",
         "bugsLink": "- Submit bugs or feature requests on [GitHub](<$bugsUrl>)",
         "supportServerLink": "- Join the [support server](<$supportServerInviteUrl>) if you have any questions or need help",
-        "donationLink": "- This bot is completely free so please consider [supporting the development ❤️](<$fundingUrl>)",
+        "donationLink": "- This bot is completely free so if you are able to, please consider [supporting the development ❤️](<$fundingUrl>)",
         "poweredBy": "Powered by [ReturnYoutubeDislike](https://returnyoutubedislike.com/), [SponsorBlock](https://sponsor.ajay.app/), and [DeArrow](https://dearrow.ajay.app/)"
+      },
+      "embedTitles": {
+        "commands": "Commands:",
+        "info": "Information:"
       }
     },
     "invite": {
+      "names": {
+        "command": "invite"
+      },
       "description": "Invite YTInfoBot to your own server",
       "embedContent": "You can invite YTInfoBot to your server by [clicking this link.](<$inviteUrl>)"
     },
     "privacy": {
+      "names": {
+        "command": "privacy",
+        "subcmd": {
+          "info": "info",
+          "delete_data": "delete_data"
+        }
+      },
       "descriptions": {
         "command": "Get information about the bot's privacy or delete your data.",
         "subcmd": {
@@ -54,7 +75,7 @@
         }
       },
       "info": {
-        "line1": "**YTInfoBot stores the following data:**",
+        "line1": "**YTInfoBot stores the following data about you and your server:**",
         "line2": "- When you invite it to your server, it stores the server's ID and the server configuration data (locale, number format, etc.).  ",
         "line3": "  After you kick it from your server, it also deletes all server data.",
         "line4": "- When editing your user settings, it stores your user ID and the settings you've changed.  ",
@@ -64,13 +85,16 @@
         "confirmLine1": "**Are you sure you want to delete all data associated with your account?**",
         "confirmLine2": "If you run certain commands, your user ID and default settings will be stored again.",
         "confirmLine3": "You can also block the bot to prevent it from reading your messages again.",
-        "confirmLine4": "No data will be saved when the bot automatically replies to you.",
-        "deletionSuccess": "Data successfully deleted.",
-        "deletionCancelled": "Deletion of data cancelled.",
-        "deletionNoConfirmation": "No confirmation received, cancelling deletion of data."
+        "confirmLine4": "No data will be saved when the bot automatically replies to you, only when you run a command manually.",
+        "success": "Data successfully deleted.",
+        "cancelled": "Deletion of data cancelled.",
+        "noConfirmation": "No confirmation received, cancelling deletion of data."
       }
     },
     "video_info": {
+      "names": {
+        "command": "video_info"
+      },
       "descriptions": {
         "command": "Show information about a video, given its URL",
         "options": {
@@ -93,7 +117,7 @@
       "nameExtended": "Video Info (extended)"
     },
     "delete_reply_ctx": {
-      "name": "Delete Reply"
+      "name": "Admin: Delete Reply"
     }
   }
 }
