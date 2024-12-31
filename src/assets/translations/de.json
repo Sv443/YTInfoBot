@@ -1,5 +1,123 @@
 {
   "buttons": {
+    "cancel": "Abbrechen",
     "delete": "Löschen"
+  },
+  "errors": {
+    "noYtVidLinksFound": "Keine YouTube Links in der Nachricht gefunden.",
+    "noVidInfoFound": "Keine Informationen über das Video gefunden.",
+    "noDataFoundToDelete": "Keine Daten zum Löschen gefunden.",
+    "guildCfgInaccessible": "Keine Serverkonfiguration gefunden - bitte `/konfiguration zuruecksetzen` ausführen.",
+    "messageInaccessible": "Die angepeilte Nachricht konnte nicht abgerufen werden.",
+    "onlyRunInGuild": "Dieser Befehl kann nur in einem Server ausgeführt werden."
+  },
+  "general": {
+    "promptExpiryNotice": "Dieses Fenster läuft in <$sec>s ab.",
+    "commandOnlyUsableInServers": "Dieser Befehl kann nur in einem Server benutzt werden."
+  },
+  "commands": {
+    "help": {
+      "names": {
+        "command": "hilfe",
+        "subcmd": {
+          "commands": "kommandos",
+          "info": "info"
+        }
+      },
+      "args": {
+        "show_hidden": "versteckte_anzeigen"
+      },
+      "descriptions": {
+        "command": "Zeigt alle Kommandos oder Infos über den Bot an.",
+        "subcmd": {
+          "commands": "Listet alle Kommandos auf.",
+          "info": "Zeige informationen über den Bot an."
+        },
+        "args": {
+          "show_hidden": "Zeige alle versteckten Kommandos, auf die du Zugriff hast - die Antwort wird nur dir angezeigt."
+        }
+      },
+      "info": {
+        "name": "info",
+        "version": "Version: <$version>",
+        "createdBy": "Erstellt von [<authorName>](<$authorUrl>)",
+        "globalOptOut": "Deaktiviere automatische Antworten mit `/einstellungen setze auto_antwort`.",
+        "bugsLink": "- Fehler oder Wünsche bitte auf [GitHub](<$bugsUrl>) melden.",
+        "supportServerLink": "- Tritt dem [Support-Server](<$supportServerInviteUrl>) bei, wenn du Fragen hast.",
+        "donationLink": "- Der Bot ist gratis. Wenn du kannst, bitte unterstütze die Entwicklung [hier ❤️](<$fundingUrl>).",
+        "poweredBy": "Verwendet die APIs [ReturnYoutubeDislike](https://returnyoutubedislike.com/), [SponsorBlock](https://sponsor.ajay.app/) und [DeArrow](https://dearrow.ajay.app/)."
+      },
+      "embedTitles": {
+        "commands": "Befehle:",
+        "info": "Informationen:"
+      }
+    },
+    "invite": {
+      "names": {
+        "command": "invite"
+      },
+      "description": "Lade YTInfoBot in deinen Server ein.",
+      "embedContent": "Lade YTInfoBot zu einem deiner Server ein, indem du [hier klickst.](<$inviteUrl>)"
+    },
+    "privacy": {
+      "names": {
+        "command": "datenschutz",
+        "subcmd": {
+          "info": "info",
+          "delete_data": "daten_loeschen"
+        }
+      },
+      "descriptions": {
+        "command": "Infos zum Datenschutz, oder alle Daten löschen.",
+        "subcmd": {
+          "info": "Zeigt Infos zum Datenschutz des Bots.",
+          "delete_data": "Löscht alle Daten, die der Bot über dich gespeichert hat."
+        }
+      },
+      "info": {
+        "line1": "**YTInfoBot speichert folgende Daten über dich und deinen Server:**",
+        "line2": "- Beim Einladen wird die Server-ID und Konfiguration gespeichert.",
+        "line3": "  Wenn der Bot gekickt wird, wird alles gelöscht.",
+        "line4": "- Beim Bearbeiten von Benutzereinstellungen wird die Benutzer-ID gespeichert.",
+        "line5": "  Lösche deine Daten mit `/privacy delete`."
+      },
+      "delete": {
+        "confirmLine1": "**Willst du wirklich alle dir zugehörigen Daten löschen?**",
+        "confirmLine2": "Beim Nutzen mancher Befehlen werden deine Benutzer-ID und Einstellungen erneut gespeichert.",
+        "confirmLine3": "Du kannst den Bot blockieren, damit er deine Nachrichten nie wieder liest.",
+        "confirmLine4": "Bei allen automatischen Antworten werden keine Daten gespeichert, nur beim manuellen Benutzen von Kommandos.",
+        "success": "Daten wurden erfolgreich gelöscht.",
+        "cancelled": "Löschen der Daten wurde abgebrochen.",
+        "noConfirmation": "Keine Bestätigung erhalten, Löschen wurde abgebrochen."
+      }
+    },
+    "video_info": {
+      "names": {
+        "command": "video_info"
+      },
+      "descriptions": {
+        "command": "Zeigt Infos zu einem Video anhand seiner URL oder ID.",
+        "options": {
+          "video": "URL oder ID des Videos - unterstützt music.youtube.com, youtube.com und youtu.be links.",
+          "type": "Art der Infos - Standardwert ist \"reduziert\"."
+        }
+      },
+      "errors": {
+        "invalidUrlOrId": "Ungültige Video-URL oder ID.",
+        "foundNoVidInfo": "Keine Infos zum Video gefunden - versuche es später erneut."
+      },
+      "embedFields": {
+        "originalTitle": "Originaltitel:",
+        "votes": "Likes & Dislikes (zirka):",
+        "timestamps": "Zeitmarken:"
+      }
+    },
+    "video_info_ctx": {
+      "nameReduced": "Video-Infos (Standard)",
+      "nameExtended": "Video-Infos (Erweitert)"
+    },
+    "delete_reply_ctx": {
+      "name": "Admin: Antwort löschen"
+    }
   }
 }
