@@ -39,7 +39,7 @@ const trans: {
 /** All registered value transformers */
 const valTransforms: Array<{
  regex: RegExp;
- fn: (matches: RegExpMatchArray, language: string) => Stringifiable;
+ fn: (matches: RegExpMatchArray, language: string, ...args: (Stringifiable | Record<string, Stringifiable>)[]) => Stringifiable;
 }> = [];
 
 /** Currently set language */
@@ -59,7 +59,7 @@ function translate(language: string, key: string, ...args: (Stringifiable | Reco
     const tf = valTransforms.find((t) => t.regex.test(value));
 
     return tf
-      ? value.replace(tf.regex, (...matches) => String(tf.fn(matches, language)))
+      ? value.replace(tf.regex, (...matches) => String(tf.fn(matches, language, ...args)))
       : value;
   };
 
@@ -279,9 +279,9 @@ const transforms = [
     /<\$([a-zA-Z0-9$_-]+)>/gm,
     // TODO: verify
     (matches, _lang, ...args) => {
-      let str = matches[1];
+      let str = matches[0];
     
-      const eachKeyInTrString = (keys: string[]) => keys.every((key) => matches[1].includes(`<$${key}>`));
+      const eachKeyInTrString = (keys: string[]) => keys.every((key) => matches.at(-1)!.includes(`<$${key}>`));
     
       const namedMapping = () => {
         if(!str.includes("<$") || !args[0] || typeof args[0] !== "object" || !eachKeyInTrString(Object.keys(args[0])))
@@ -299,10 +299,10 @@ const transforms = [
           str = str.replace(/<\$[a-zA-Z0-9$_-]+>/, String(arg));
       };
     
-      if(args[0] && typeof args[0] === "object" && !("toString" in args[0]))
-        if(eachKeyInTrString(Object.keys(args[0])))
-          namedMapping();
-      positionalMapping();
+      if(args[0] && typeof args[0] === "object" && eachKeyInTrString(Object.keys(args[0])) && String(args[0]).startsWith("[object"))
+        namedMapping();
+      else
+        positionalMapping();
     
       return str;
     },
