@@ -1,9 +1,11 @@
 {
   "buttons": {
     "cancel": "Cancel",
-    "delete": "Delete"
+    "delete": "Delete",
+    "reset": "Reset"
   },
   "errors": {
+    "unknown": "Unknown Error",
     "noYtVidLinksFound": "No YouTube video links were found in the message.",
     "noVidInfoFound": "No video information could be found.",
     "noDataFoundToDelete": "No data found to delete.",
@@ -13,9 +15,42 @@
   },
   "general": {
     "promptExpiryNotice": "This prompt will expire in <$sec>s",
+    "confirmationTimeoutNotice": "Confirmation not received within <$sec>s, cancelling.",
     "commandOnlyUsableInServers": "This command can only be used in a server"
   },
   "commands": {
+    "config": {
+      "names": {
+        "command": "config",
+        "subcmd": {
+          "reset": "reset",
+          "list": "list",
+          "set": "set"
+        }
+      },
+      "descriptions": {
+        "command": "View or edit the bot configuration for your server",
+        "subcmd": {
+          "reset": "Reset the configuration to the default settings",
+          "list": "List all configurable settings and their current values",
+          "set": "Set a specific setting to a new value"
+        }
+      },
+      "embedTitles": {
+        "list": "Server configuration values:"
+      },
+      "set": {
+        "currentValue": "The current <$settingName> is `<$newValue>`",
+        "invalidValue": "Invalid <$settingName> specified: `<$newValue>`<$invalidHint>",
+        "success": "Successfully set the <$settingName> to `<$newValue>`",
+        "error": "Couldn't set the <$settingName> due to an error: <$err>"
+      },
+      "reset": {
+        "confirm": "Are you sure you want to reset the configuration?",
+        "success": "Configuration successfully reset to default settings.",
+        "cancelled": "Reset cancelled."
+      }
+    },
     "help": {
       "names": {
         "command": "help",
@@ -36,9 +71,6 @@
         "args": {
           "show_hidden": "Show commands that need higher permissions, as long as you can use them - reply is only shown to you"
         }
-      },
-      "commands": {
-        "name": "commands"
       },
       "info": {
         "name": "info",

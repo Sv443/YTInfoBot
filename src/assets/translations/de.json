@@ -1,21 +1,56 @@
 {
   "buttons": {
     "cancel": "Abbrechen",
-    "delete": "Löschen"
+    "delete": "Löschen",
+    "reset": "Zurücksetzen"
   },
   "errors": {
+    "unknown": "Unbekannter Error",
     "noYtVidLinksFound": "Keine YouTube Links in der Nachricht gefunden.",
     "noVidInfoFound": "Keine Informationen über das Video gefunden.",
     "noDataFoundToDelete": "Keine Daten zum Löschen gefunden.",
-    "guildCfgInaccessible": "Keine Serverkonfiguration gefunden - bitte `/konfiguration zuruecksetzen` ausführen.",
+    "guildCfgInaccessible": "Keine Serverkonfiguration gefunden - bitte `/konfiguration zurücksetzen` ausführen.",
     "messageInaccessible": "Die angepeilte Nachricht konnte nicht abgerufen werden.",
     "onlyRunInGuild": "Dieser Befehl kann nur in einem Server ausgeführt werden."
   },
   "general": {
     "promptExpiryNotice": "Dieses Fenster läuft in <$sec>s ab.",
+    "confirmationTimeoutNotice": "Abgebrochen, da keine Bestätigung innerhalb von <$sec>s erhalten wurde.",
     "commandOnlyUsableInServers": "Dieser Befehl kann nur in einem Server benutzt werden."
   },
   "commands": {
+    "config": {
+      "names": {
+        "command": "konfiguration",
+        "subcmd": {
+          "reset": "zurücksetzen",
+          "list": "liste",
+          "set": "setzen"
+        }
+      },
+      "descriptions": {
+        "command": "Zeige oder bearbeite die Bot-Konfiguration für deinen Server",
+        "subcmd": {
+          "reset": "Setze die Konfiguration auf die Standardeinstellungen zurück",
+          "list": "Liste alle konfigurierbaren Einstellungen und ihre aktuellen Werte",
+          "set": "Setze eine spezifische Einstellung auf einen neuen Wert"
+        }
+      },
+      "embedTitles": {
+        "list": "Serverkonfiguration:"
+      },
+      "set": {
+        "currentValue": "Der Wert von \"<$settingName>\" ist momentan `<$newValue>`",
+        "invalidValue": "Ungültiger Wert für \"<$settingName>\": `<$newValue>`<$invalidHint>",
+        "success": "Der Wert von \"<$settingName>\" wurde erfolgreich auf `<$newValue>` gesetzt",
+        "error": "Der Wert von \"<$settingName>\" konnte nicht gesetzt werden: <$err>"
+      },
+      "reset": {
+        "confirm": "Bist du sicher, dass du die Konfiguration zurücksetzen möchtest?",
+        "success": "Konfiguration erfolgreich auf Standardeinstellungen zurückgesetzt.",
+        "cancelled": "Zurücksetzen abgebrochen."
+      }
+    },
     "help": {
       "names": {
         "command": "hilfe",
@@ -67,7 +102,7 @@
         "command": "datenschutz",
         "subcmd": {
           "info": "info",
-          "delete_data": "daten_loeschen"
+          "delete_data": "daten_löschen"
         }
       },
       "descriptions": {

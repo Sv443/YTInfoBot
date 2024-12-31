@@ -9,8 +9,11 @@ import { capitalize } from "@lib/text.ts";
 import localesJson from "@assets/locales.json" with { type: "json" };
 import type { Stringifiable } from "@src/types.ts";
 import { registerCommandsForGuild } from "@lib/registry.ts";
+import { getLocMap, tr } from "@lib/translate.ts";
 
 //#region constants
+
+// TODO: translate somehow
 
 /** Configuration setting name mapping - value has to adhere to Discord slash command naming rules (lowercase and underscores only!) */
 const scNames = {
@@ -93,21 +96,29 @@ const configurableOptions: Record<
 export class ConfigCmd extends SlashCommand {
   constructor() {
     super(new SlashCommandBuilder()
-      .setName(CmdBase.getCmdName("config"))
-      .setDescription("View or edit the bot configuration for your server")
+      .setName(CmdBase.getCmdName(tr.forLang("en-US", "commands.config.names.command")))
+      .setNameLocalizations(getLocMap("commands.config.names.command", ConfigCmd.cmdPrefix))
+      .setDescription(tr.forLang("en-US", "commands.config.descriptions.command"))
+      .setDescriptionLocalizations(getLocMap("config", ConfigCmd.cmdPrefix))
       .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
       .addSubcommand(option => option
-        .setName("reset")
-        .setDescription("Reset the configuration to the default settings")
+        .setName(tr.forLang("en-US", "commands.config.names.subcmd.reset"))
+        .setNameLocalizations(getLocMap("commands.config.names.subcmd.reset"))
+        .setDescription(tr.forLang("en-US", "commands.config.descriptions.subcmd.reset"))
+        .setDescriptionLocalizations(getLocMap("commands.config.descriptions.subcmd.reset"))
       )
       .addSubcommand(option => option
-        .setName("list")
-        .setDescription("List all configurable settings and their current values")
+        .setName(tr.forLang("en-US", "commands.config.names.subcmd.list"))
+        .setNameLocalizations(getLocMap("commands.config.names.subcmd.list"))
+        .setDescription(tr.forLang("en-US", "commands.config.descriptions.subcmd.list"))
+        .setDescriptionLocalizations(getLocMap("commands.config.descriptions.subcmd.list"))
       )
       .addSubcommandGroup(grpOpt => {
         grpOpt
-          .setName("set")
-          .setDescription("Set a specific setting to a new value");
+          .setName(tr.forLang("en-US", "commands.config.names.subcmd.set"))
+          .setNameLocalizations(getLocMap("commands.config.names.subcmd.set"))
+          .setDescription(tr.forLang("en-US", "commands.config.descriptions.subcmd.set"))
+          .setDescriptionLocalizations(getLocMap("commands.config.descriptions.subcmd.set"));
 
         for(const [name, { builder }] of Object.entries(configurableOptions))
           grpOpt.addSubcommand(option => builder(option).setName(name));
@@ -124,11 +135,12 @@ export class ConfigCmd extends SlashCommand {
       return;
 
     const reply = await int.deferReply({ ephemeral: true });
+    const locale = await ConfigCmd.getGuildLocale(int);
 
     switch(opt.name) {
     case "set":
       if(!opt.options?.[0])
-        throw new Error("No subcommand provided in /config set");
+        throw new Error("No subcommand received for `/config set` by user " + int.user.id + " in guild " + int.guildId);
 
       await GuildConfig.ensureExists(int.guildId);
       return await ConfigCmd.editConfigSetting({
@@ -141,7 +153,7 @@ export class ConfigCmd extends SlashCommand {
       const cfg = await em.findOne(GuildConfig, { id: int.guildId });
 
       if(!cfg)
-        return ConfigCmd.noConfigFound(int);
+        return await ConfigCmd.noConfigFound(int);
 
       const cfgList = Object.entries(configurableOptions).reduce((acc, [, { cfgProp, settingName, getValueLabel: getLabel }], i) => {
         const val = getLabel ? getLabel(cfg[cfgProp]) : cfg[cfgProp];
@@ -151,7 +163,7 @@ export class ConfigCmd extends SlashCommand {
       return int.editReply({
         embeds: [
           embedify(cfgList, Col.Info)
-            .setTitle("Server configuration values:")
+            .setTitle(tr.forLang(locale, "commands.config.embedTitles.list"))
         ],
       });
     }
@@ -160,19 +172,19 @@ export class ConfigCmd extends SlashCommand {
         new ButtonBuilder()
           .setCustomId("confirm-reset-config")
           .setStyle(ButtonStyle.Danger)
-          .setLabel("Reset")
+          .setLabel(tr.forLang(locale, "buttons.reset"))
           .setEmoji("♻️"),
         new ButtonBuilder()
           .setCustomId("cancel-reset-config")
           .setStyle(ButtonStyle.Secondary)
-          .setLabel("Cancel")
+          .setLabel(tr.forLang(locale, "buttons.cancel"))
           .setEmoji("❌"),
       ];
 
       await int.editReply({
         embeds: [
-          embedify("**Are you sure you want to reset the configuration?**", Col.Warning)
-            .setFooter({ text: "This prompt will expire in 30s" }),
+          embedify(`**${tr.forLang(locale, "commands.config.reset.confirm")}**`, Col.Warning)
+            .setFooter({ text: tr.forLang(locale, "general.promptExpiryNotice", 30) }),
         ],
         ...useButtons([confirmBtns]),
       });
@@ -192,20 +204,20 @@ export class ConfigCmd extends SlashCommand {
           cfg && await em.removeAndFlush(cfg);
           await em.persistAndFlush(new GuildConfig(int.guildId));
           return conf.editReply({
-            ...useEmbedify("Configuration successfully reset to default settings.", Col.Success),
+            ...useEmbedify(tr.forLang(locale, "commands.config.reset.success"), Col.Success),
             components: [],
           });
         }
         else {
           await conf.editReply({
-            ...useEmbedify("Reset cancelled.", Col.Secondary),
+            ...useEmbedify(tr.forLang(locale, "commands.config.reset.cancelled"), Col.Secondary),
             components: [],
           });
         }
       }
       catch {
         await (conf ?? int).editReply({
-          ...useEmbedify("Confirmation not received within 30s, cancelling reset.", Col.Secondary),
+          ...useEmbedify(tr.forLang(locale, "general.confirmationTimeoutNotice", 30), Col.Secondary),
           components: [],
         });
       }
@@ -226,8 +238,8 @@ export class ConfigCmd extends SlashCommand {
 
   //#region s:utils
 
-  static noConfigFound(int: CommandInteraction) {
-    int[int.deferred || int.replied ? "editReply" : "reply"](useEmbedify("errors.guildCfgInaccessible", Col.Error));
+  static async noConfigFound(int: CommandInteraction) {
+    int[int.deferred || int.replied ? "editReply" : "reply"](useEmbedify(tr.forLang(await ConfigCmd.getGuildLocale(int), "errors.guildCfgInaccessible"), Col.Error));
   }
 
   /** Call to edit or view the passed configuration setting */
@@ -251,26 +263,32 @@ export class ConfigCmd extends SlashCommand {
     validateValue?: (value: TCfgValue) => boolean;
     invalidHint?: string;
   }) {
-    try {
-      if(!ConfigCmd.checkInGuild(int))
-        return;
+    if(!ConfigCmd.checkInGuild(int))
+      return;
 
+    if(!int.deferred && !int.replied)
+      await int.deferReply({ ephemeral: true });
+
+    const locale = await ConfigCmd.getGuildLocale(int);
+
+    try {
       await GuildConfig.ensureExists(int.guildId);
       const cfg = await em.findOne(GuildConfig, { id: int.guildId });
 
       if(!cfg)
-        return ConfigCmd.noConfigFound(int);
+        return await ConfigCmd.noConfigFound(int);
 
+      // TODO: check if new_value needs to be translated
       const newValue = opt.options?.[0]?.options?.find(o => o.name === "new_value")?.value as TCfgValue | undefined;
       if(typeof newValue === "undefined") {
         const cfg = await em.findOne(GuildConfig, { id: int.guildId });
         if(!cfg)
-          return ConfigCmd.noConfigFound(int);
-        return int.editReply(useEmbedify(`The current ${settingName} is \`${getValueLabel(cfg[cfgProp] as TCfgValue) ?? cfg[cfgProp]}\``));
+          return await ConfigCmd.noConfigFound(int);
+        return int.editReply(useEmbedify(tr.forLang(locale, "commands.config.set.currentValue", { settingName, newValue: getValueLabel(cfg[cfgProp] as TCfgValue) ?? cfg[cfgProp] })));
       }
 
       if(typeof validateValue === "function" && !validateValue(newValue))
-        return int.editReply(useEmbedify(`Invalid ${settingName} specified: \`${newValue}\`${invalidHint ? `\n${invalidHint}` : ""}`, Col.Error));
+        return int.editReply(useEmbedify(tr.forLang(locale, "commands.config.set.invalidValue", { settingName, newValue, invalidHint: invalidHint ? `\n${invalidHint}` : "" }), Col.Error));
 
       cfg[cfgProp] = newValue;
       cfg.lastAccessed = new Date();
@@ -279,10 +297,10 @@ export class ConfigCmd extends SlashCommand {
       if(cfgProp === "locale" && !this.global)
         await registerCommandsForGuild(int.guildId);
 
-      return int.editReply(useEmbedify(`Successfully set the ${settingName} to \`${getValueLabel(newValue) ?? newValue}\``, Col.Success));
+      return int.editReply(useEmbedify(tr.forLang(locale, "commands.config.set.success", { settingName, newValue: getValueLabel(newValue) ?? newValue }), Col.Success));
     }
     catch(err) {
-      return int.editReply(useEmbedify(`Couldn't set the ${settingName} due to an error: ${err}`, Col.Error));
+      return int.editReply(useEmbedify(tr.forLang(locale, "commands.config.set.error", { settingName, err: err instanceof Error ? err.message : tr.forLang(locale, "errors.unknown") }), Col.Error));
     }
   }
 }
