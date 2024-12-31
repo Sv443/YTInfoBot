@@ -4,7 +4,7 @@ import { client, botToken } from "@lib/client.ts";
 import { initDatabase } from "@lib/db.ts";
 import { initRegistry } from "@lib/registry.ts";
 import { autoPlural } from "@lib/text.ts";
-import { getEnvVar } from "@lib/env.ts";
+import { envVarEquals, getEnvVar } from "@lib/env.ts";
 import { initTranslations } from "@lib/translate.ts";
 
 const requiredEnvVars = ["BOT_TOKEN", "APPLICATION_ID", "DB_URL", "BOT_INVITE_URL", "SUPPORT_SERVER_INVITE_URL"];
@@ -41,6 +41,7 @@ async function init() {
   });
 
   console.log(k.blue(`${client.user?.displayName ?? client.user?.username} is ready.\n`));
+  envVarEquals("BELL_ON_READY", true) && process.stdout.write("\u0007");
 }
 
 init();
