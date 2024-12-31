@@ -54,8 +54,6 @@ export class MessageCreateEvt extends Event {
 
     const allVidsDeduped = allVids?.filter((vid, idx, self) => self.findIndex((v) => v.videoId === vid.videoId) === idx);
 
-    await int?.deferReply();
-
     const locale = (await em.findOne(GuildConfig, { id: guildId }))?.locale ?? defaultLocale;
 
     if(!allVidsDeduped || allVidsDeduped.length === 0)

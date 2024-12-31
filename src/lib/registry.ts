@@ -5,17 +5,19 @@ import k from "kleur";
 import { Col, useEmbedify } from "@lib/embedify.ts";
 import { getHash } from "@lib/crypto.ts";
 import { exists } from "@lib/fs.ts";
-import { getCommands } from "@cmd/_commands.ts";
-import { getCtxCommands } from "@ctx/_contexts.ts";
-import { getEvents } from "@evt/_events.ts";
 import type { ContextCommand, SlashCommand } from "@lib/Command.ts";
 import type { Event } from "@lib/Event.ts";
 import { client, clientId, rest } from "@lib/client.ts";
+import { commands } from "@cmd/_commands.ts";
+import { ctxCommands } from "@ctx/_contexts.ts";
+import { events } from "@evt/_events.ts";
 
 const reregisterCmds = Boolean(process.argv.find((arg) => ["--reregister", "-r"].includes(arg.toLowerCase())));
 
-const cmdInstances = new Collection<string, SlashCommand | ContextCommand>();
-const evtInstances = new Collection<string, Event>();
+/** All slash and ctx command instances registered in `src/commands/_commands.ts` and `src/contexts/_contexts.ts` */
+export const cmdInstances = new Collection<string, SlashCommand | ContextCommand>();
+/** All event instances registered in `src/events/_events.ts` */
+export const evtInstances = new Collection<string, Event>();
 
 /** Returns the JSON data of each command builder instance */
 const getCommandsJson = () => [...cmdInstances.entries()].map(([, cmd]) => cmd.builderJson);
@@ -25,8 +27,10 @@ const cmdHashFile = resolve(".cmd_hash");
 
 /** Registers all slash- and context-commands for all guilds (if they were changed), as well as registers listeners for them and for autocomplete */
 async function registerGuildCommands() {
-  for(const cmd of [...getCommands(), ...getCtxCommands()])
+  for(const CmdClass of [...commands, ...ctxCommands]) {
+    const cmd = new CmdClass();
     cmdInstances.set(cmd.name, cmd);
+  }
 
   client.on(Events.InteractionCreate, async (int) => {
     if(int.isCommand() || int.isContextMenuCommand()) {
@@ -100,15 +104,15 @@ export async function registerCommandsForGuild(guildId: string) {
 
 /** Registers all client events and their listeners */
 async function registerEvents() {
-  for(const evt of getEvents())
+  for(const EvtClass of events) {
+    const evt = new EvtClass();
     evtInstances.set(evt.name, evt);
 
-  for(const [evtName, evt] of evtInstances) {
     try {
-      client[evt.once ? "once" : "on"](evtName, evt.run);
+      client[evt.once ? "once" : "on"](evt.name as string, evt.run);
     }
     catch(err) {
-      console.error(`Error while executing event "${evtName}": ${err}`);
+      console.error(`Error while executing event "${evt.name}": ${err}`);
     }
   }
 }

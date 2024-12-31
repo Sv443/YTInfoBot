@@ -15,7 +15,7 @@ export abstract class CmdBase {
   public readonly name: string;
   /** Whether commands are global or guild commands */
   static readonly global = false;
-  /** Prefix for all commands */
+  /** Prefix for all commands - undefined if `CMD_PREFIX` env var is not set */
   static readonly cmdPrefix = cmdPrefix;
 
   constructor(name: string) {

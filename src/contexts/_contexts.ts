@@ -1,6 +1,6 @@
 import { VideoInfoCtx, VideoInfoExtendedCtx } from "@ctx/VideoInfo.ts";
 
-export const getCtxCommands = () => [
-  new VideoInfoCtx(),
-  new VideoInfoExtendedCtx(),
+export const ctxCommands = [
+  VideoInfoCtx,
+  VideoInfoExtendedCtx,
 ] as const;

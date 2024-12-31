@@ -1,11 +1,11 @@
 import { SlashCommandBuilder, type CommandInteraction, type CommandInteractionOption } from "discord.js";
 import { embedify } from "@lib/embedify.ts";
 import { CmdBase, SlashCommand } from "@lib/Command.ts";
-import { getCommands } from "@cmd/_commands.ts";
 import packageJson from "@root/package.json" with { type: "json" };
 import { getEnvVar } from "@lib/env.ts";
 import { bitSetHas } from "@lib/math.ts";
 import { getLocMap, tr } from "@lib/translate.ts";
+import { cmdInstances } from "@lib/registry.ts";
 
 //#region constructor
 
@@ -54,7 +54,7 @@ export class HelpCmd extends SlashCommand {
       const showHidden = int.options.get("show_hidden")?.value as boolean ?? true;
       let ephemeral = false;
 
-      const allowedCmds = [...getCommands()]
+      const allowedCmds = [...cmdInstances.values()]
         .sort((a, b) => a.builderJson.name.localeCompare(b.builderJson.name))
         .filter(cmd => {
           if(typeof cmd.builderJson.default_member_permissions === "undefined" || cmd.builderJson.default_member_permissions === "0")
@@ -74,8 +74,8 @@ export class HelpCmd extends SlashCommand {
       if(!showHidden)
         ephemeral = false;
 
-      for(const { builderJson: { name, description } } of allowedCmds)
-        cmdList += `- ${hiddenCmds.has(name) ? "🔒 " : ""}\`/${name}\`\n  ${description}\n`;
+      for(const { builderJson: cmdData } of allowedCmds)
+        cmdList += `- ${hiddenCmds.has(cmdData.name) ? "🔒 " : ""}\`/${cmdData.name}\`${"description" in cmdData ? `\n  ${cmdData.description}` : ""}\n`;
 
       return int.reply({
         embeds: [

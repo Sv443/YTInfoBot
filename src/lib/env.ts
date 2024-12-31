@@ -5,15 +5,15 @@ import "dotenv/config";
  * Grabs an environment variable's value, and casts it to a `string` (or what's passed in the TRetVal generic).  
  * However if the string is empty (or unset), undefined is returned.
  */
-export function getEnvVar<TRetVal extends string>(varName: string, asType?: "stringNoEmpty"): undefined | TRetVal
+export function getEnvVar<TRetVal extends string | undefined>(varName: string, asType?: "stringNoEmpty"): TRetVal
 /** Grabs an environment variable's value, and casts it to a `string` (or what's passed in the TRetVal generic) */
-export function getEnvVar<TRetVal extends string>(varName: string, asType?: "string"): undefined | TRetVal
+export function getEnvVar<TRetVal extends string>(varName: string, asType?: "string"): TRetVal
 /** Grabs an environment variable's value, and casts it to a `number` (or what's passed in the TRetVal generic) */
-export function getEnvVar<TRetVal extends number>(varName: string, asType: "number"): undefined | TRetVal
+export function getEnvVar<TRetVal extends number>(varName: string, asType: "number"): TRetVal
 /** Grabs an environment variable's value, and casts it to a `string[]` (or what's passed in the TRetVal generic) */
-export function getEnvVar<TRetVal extends string[]>(varName: string, asType: "stringArray"): undefined | TRetVal
+export function getEnvVar<TRetVal extends string[]>(varName: string, asType: "stringArray"): TRetVal
 /** Grabs an environment variable's value, and casts it to a `number[]` (or what's passed in the TRetVal generic) */
-export function getEnvVar<TRetVal extends number[]>(varName: string, asType: "numberArray"): undefined | TRetVal
+export function getEnvVar<TRetVal extends number[]>(varName: string, asType: "numberArray"): TRetVal
 /** Grabs an environment variable's value, and casts it to a specific type (stringNoEmpty by default) */
 export function getEnvVar<
   T extends ("string" | "number" | "stringArray" | "numberArray" | "stringNoEmpty")

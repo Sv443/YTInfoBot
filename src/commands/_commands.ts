@@ -6,11 +6,11 @@ import { SettingsCmd } from "@cmd/Settings.ts";
 import { VideoInfoCmd } from "@cmd/VideoInfo.ts";
 
 /** All slash commands to be registered */
-export const getCommands = () => [
-  new ConfigCmd(),
-  new HelpCmd(),
-  new InviteCmd(),
-  new PrivacyCmd(),
-  new SettingsCmd(),
-  new VideoInfoCmd(),
+export const commands = [
+  ConfigCmd,
+  HelpCmd,
+  InviteCmd,
+  PrivacyCmd,
+  SettingsCmd,
+  VideoInfoCmd,
 ] as const;
