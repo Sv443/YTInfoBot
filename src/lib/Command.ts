@@ -1,5 +1,9 @@
 import type { AutocompleteInteraction, CommandInteraction, CommandInteractionOption, ContextMenuCommandBuilder, RESTPostAPIChatInputApplicationCommandsJSONBody, RESTPostAPIContextMenuApplicationCommandsJSONBody, SharedSlashCommand } from "discord.js";
 import { getEnvVar } from "@lib/env.ts";
+import { Col, useEmbedify } from "@lib/embedify.ts";
+import { defaultLocale, tr } from "@lib/translate.ts";
+import { em } from "@lib/db.ts";
+import { GuildConfig } from "@models/GuildConfig.model.ts";
 
 const cmdPrefix = getEnvVar("CMD_PREFIX", "stringNoEmpty");
 
@@ -9,6 +13,10 @@ const cmdPrefix = getEnvVar("CMD_PREFIX", "stringNoEmpty");
 export abstract class CmdBase {
   /** Name of the command */
   public readonly name: string;
+  /** Whether commands are global or guild commands */
+  static readonly global = false;
+  /** Prefix for all commands */
+  static readonly cmdPrefix = cmdPrefix;
 
   constructor(name: string) {
     this.name = name;
@@ -21,11 +29,25 @@ export abstract class CmdBase {
   public static getCmdName(name?: string) {
     return `${cmdPrefix ?? ""}${name ?? ""}`;
   }
+
+  /** Checks whether the passed interaction is in a guild and replies or edits the reply with an error message if not */
+  public static checkInGuild(int: CommandInteraction): int is CommandInteraction<"raw" | "cached"> {
+    if(!int.inGuild()) {
+      int[int.deferred || int.replied ? "editReply" : "reply"](useEmbedify(tr.forLang("en-US", "errors.onlyRunInGuild"), Col.Error));
+      return false;
+    }
+    return true;
+  }
+
+  /** Returns the locale of the guild the interaction was run in */
+  public static async getGuildLocale(int: CommandInteraction): Promise<string> {
+    return (await em.findOne(GuildConfig, { id: int.guildId }))?.locale ?? defaultLocale;
+  }
 }
 
 //#region SlashCommand
 
-export interface SlashCommand {
+export interface SlashCommand extends CmdBase {
   /** Optional method used in autocomplete interactions */
   autocomplete?(int: AutocompleteInteraction, opt?: CommandInteractionOption): Promise<void | unknown>;
 }

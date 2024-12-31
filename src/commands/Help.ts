@@ -12,24 +12,28 @@ import { getLocMap, tr } from "@lib/translate.ts";
 export class HelpCmd extends SlashCommand {
   constructor() {
     super(new SlashCommandBuilder()
-      .setName(CmdBase.getCmdName("help"))
+      .setName(CmdBase.getCmdName(tr.forLang("en-US", "commands.help.names.command")))
+      .setNameLocalizations(getLocMap("commands.help.names.command", HelpCmd.cmdPrefix))
       .setDescription(tr.forLang("en-US", "commands.help.descriptions.command"))
       .setDescriptionLocalizations(getLocMap("commands.help.descriptions.command"))
       .addSubcommand(subcommand =>
         subcommand
-          .setName("commands")
+          .setName(CmdBase.getCmdName(tr.forLang("en-US", "commands.help.names.subcmd.commands")))
+          .setNameLocalizations(getLocMap("commands.help.names.subcmd.commands"))
           .setDescription(tr.forLang("en-US", "commands.help.descriptions.subcmd.commands"))
           .setDescriptionLocalizations(getLocMap("commands.help.descriptions.subcmd.commands"))
           .addBooleanOption(option =>
             option
-              .setName("show_hidden")
+              .setName(tr.forLang("en-US", "commands.help.names.args.show_hidden"))
+              .setNameLocalizations(getLocMap("commands.help.names.args.show_hidden"))
               .setDescription(tr.forLang("en-US", "commands.help.descriptions.args.show_hidden"))
               .setDescriptionLocalizations(getLocMap("commands.help.descriptions.args.show_hidden"))
           )
       )
       .addSubcommand(subcommand =>
         subcommand
-          .setName("info")
+          .setName(CmdBase.getCmdName(tr.forLang("en-US", "commands.help.names.subcmd.info")))
+          .setNameLocalizations(getLocMap("commands.help.names.subcmd.info"))
           .setDescription(tr.forLang("en-US", "commands.help.descriptions.subcmd.info"))
           .setDescriptionLocalizations(getLocMap("commands.help.descriptions.subcmd.info"))
       )
@@ -39,6 +43,9 @@ export class HelpCmd extends SlashCommand {
   //#region pb:run
 
   public async run(int: CommandInteraction, opt: CommandInteractionOption) {
+    if(!HelpCmd.checkInGuild(int))
+      return;
+    const locale = await HelpCmd.getGuildLocale(int);
     switch(opt.name) {
     case "commands": {
       let cmdList = "";
@@ -73,7 +80,8 @@ export class HelpCmd extends SlashCommand {
       return int.reply({
         embeds: [
           embedify(cmdList)
-            .setTitle("commands.help.embedTitles.commands"),
+            .setTitle(tr.forLang(locale, "commands.help.embedTitles.commands"))
+            .setFooter({ text: tr.forLang(locale, "commands.help.embedFooters.commands") }),
         ],
         ephemeral,
       });
@@ -82,16 +90,16 @@ export class HelpCmd extends SlashCommand {
       return int.reply({
         embeds: [
           embedify([
-            tr("commands.help.info.version", packageJson.version),
-            tr("commands.help.info.createdBy", packageJson.author.name, packageJson.author.url),
+            tr.forLang(locale, "commands.help.info.version", packageJson.version),
+            tr.forLang(locale, "commands.help.info.createdBy", packageJson.author.name, packageJson.author.url),
             "",
-            tr("commands.help.info.globalOptOut"),
+            tr.forLang(locale, "commands.help.info.globalOptOut"),
             "",
-            tr("commands.help.info.bugsLink", packageJson.bugs.url),
-            tr("commands.help.info.supportServerLink", getEnvVar("SUPPORT_SERVER_INVITE_URL")),
-            tr("commands.help.info.donationLink", packageJson.funding.url),
+            tr.forLang(locale, "commands.help.info.bugsLink", packageJson.bugs.url),
+            tr.forLang(locale, "commands.help.info.supportServerLink", getEnvVar("SUPPORT_SERVER_INVITE_URL")),
+            tr.forLang(locale, "commands.help.info.donationLink", packageJson.funding.url),
             "",
-            tr("commands.help.info.poweredBy"),
+            tr.forLang(locale, "commands.help.info.poweredBy"),
           ])
             .setTitle("commands.help.embedTitles.info"),
         ],

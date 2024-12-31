@@ -4,9 +4,9 @@ import { VideoInfoCmd, type VideoInfoType } from "@cmd/VideoInfo.ts";
 import { em } from "@lib/db.ts";
 import { GuildConfig } from "@models/GuildConfig.model.ts";
 import { UserSettings } from "@models/UserSettings.model.ts";
-import { Col, embedify, useEmbedify } from "@lib/embedify.ts";
+import { Col, useEmbedify } from "@lib/embedify.ts";
 import { useButtons } from "@lib/components.ts";
-import { tr } from "@lib/translate.ts";
+import { defaultLocale, tr } from "@lib/translate.ts";
 
 /** Regex that detects youtube.com, music.youtube.com, and youtu.be links */
 const ytVideoRegexStr = "(?:https?:\\/\\/)?(?:www\\.)?(?:youtube\\.com\\/watch\\?v=|music\\.youtube\\.com\\/watch\\?v=|youtu\\.be\\/)([a-zA-Z0-9_-]+)";
@@ -37,20 +37,13 @@ export class MessageCreateEvt extends Event {
     typeOverride?: VideoInfoType,
     isAutoReply = false
   ) {
-    const notFound = (txt: string) => {
-      const ebd = embedify(txt, Col.Error);
+    const userId = (int as CommandInteraction | undefined)?.user.id ?? msg.author.id;
+    const { guildId } = msg;
 
-      if(int)
-        return int[int.deferred || int.replied ? "editReply" : "reply"]({
-          embeds: [ebd],
-          allowedMentions: { repliedUser: false },
-        });
-  
-      return msg.reply({
-        embeds: [ebd],
-        allowedMentions: { repliedUser: false },
-      });
-    };
+    const notFound = (txt: string) => (int?.editReply ?? msg.reply)({
+      ...useEmbedify(txt, Col.Error),
+      allowedMentions: { repliedUser: false },
+    });
 
     int && !int.deferred && await int.deferReply();
 
@@ -61,16 +54,18 @@ export class MessageCreateEvt extends Event {
 
     const allVidsDeduped = allVids?.filter((vid, idx, self) => self.findIndex((v) => v.videoId === vid.videoId) === idx);
 
-    if(!allVidsDeduped || allVidsDeduped.length === 0)
-      return notFound(tr("errors.noYtVidLinksFound"));
+    await int?.deferReply();
 
-    const guildCfg = await em.findOne(GuildConfig, { id: msg.guildId });
+    const locale = (await em.findOne(GuildConfig, { id: guildId }))?.locale ?? defaultLocale;
+
+    if(!allVidsDeduped || allVidsDeduped.length === 0)
+      return notFound(tr.forLang(locale, "errors.noYtVidLinksFound"));
+
+    const guildCfg = await em.findOne(GuildConfig, { id: guildId });
     const embeds = [] as EmbedBuilder[];
 
     if(!guildCfg)
-      return int?.deferred || !isAutoReply
-        ? int?.editReply(useEmbedify(tr("errors.guildCfgInaccessible"), Col.Error))
-        : msg.reply(useEmbedify(tr("errors.guildCfgInaccessible"), Col.Error));
+      return (int?.editReply ?? msg.reply)(useEmbedify(tr.forLang(locale, "errors.guildCfgInaccessible"), Col.Error));
 
     if(isAutoReply) {
       if(!guildCfg.autoReplyEnabled)
@@ -88,7 +83,7 @@ export class MessageCreateEvt extends Event {
       checked++;
       if(!videoId)
         if(allVidsDeduped.length === checked)
-          return notFound(tr("errors.noYtVidLinksFound"));
+          return notFound(tr.forLang(locale, "errors.noYtVidLinksFound"));
         else
           continue;
 
@@ -98,6 +93,7 @@ export class MessageCreateEvt extends Event {
         guildCfg,
         type: typeOverride ?? guildCfg?.defaultVideoInfoType ?? "reduced",
         omitTitleAndThumb: isAutoReply,
+        locale,
       });
 
       if(!embed)
@@ -107,10 +103,10 @@ export class MessageCreateEvt extends Event {
     }
 
     if(embeds.length === 0)
-      return isAutoReply ? undefined : notFound(tr("errors.noVidInfoFound"));
+      return isAutoReply ? undefined : notFound(tr.forLang(locale, "errors.noVidInfoFound"));
 
     if(int)
-      return int[int.deferred || int.replied ? "editReply" : "reply"]({
+      return int.editReply({
         embeds,
         allowedMentions: { repliedUser: false },
       });
@@ -119,12 +115,11 @@ export class MessageCreateEvt extends Event {
       embeds,
       allowedMentions: { repliedUser: false },
       ...(isAutoReply
-        ? useButtons(new ButtonBuilder().setStyle(ButtonStyle.Secondary).setLabel(tr("buttons.delete")).setCustomId("delete_auto_reply").setEmoji("🗑️"))
+        ? useButtons(new ButtonBuilder().setStyle(ButtonStyle.Secondary).setLabel(tr.forLang(locale, "buttons.delete")).setCustomId("delete_auto_reply").setEmoji("🗑️"))
         : {}
       ),
     });
 
-    const userId = (int as CommandInteraction | undefined)?.user.id ?? msg.author.id;
     let conf: ButtonInteraction | undefined;
 
     try {

@@ -9,7 +9,8 @@ import { getLocMap, tr } from "@lib/translate.ts";
 export class InviteCmd extends SlashCommand {
   constructor() {
     super(new SlashCommandBuilder()
-      .setName(CmdBase.getCmdName("invite"))
+      .setName(CmdBase.getCmdName(tr.forLang("en-US", "commands.invite.names.command")))
+      .setNameLocalizations(getLocMap("commands.invite.names.command", InviteCmd.cmdPrefix))
       .setDescription(tr.forLang("en-US", "commands.invite.description"))
       .setDescriptionLocalizations(getLocMap("commands.invite.description"))
     );
@@ -18,9 +19,10 @@ export class InviteCmd extends SlashCommand {
   //#region pb:run
 
   public async run(int: CommandInteraction) {
-    return int.reply({
-      ...useEmbedify(tr("commands.invite.embedContent", getEnvVar("BOT_INVITE_URL")), Col.Info),
-      ephemeral: true,
-    });
+    await int.deferReply({ ephemeral: true });
+
+    const locale = await InviteCmd.getGuildLocale(int);
+
+    return int.editReply(useEmbedify(tr.forLang(locale, "commands.invite.embedContent", getEnvVar("BOT_INVITE_URL")), Col.Info));
   }
 }

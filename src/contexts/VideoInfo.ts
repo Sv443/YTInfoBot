@@ -11,8 +11,8 @@ export class VideoInfoCtx extends ContextCommand {
   constructor() {
     super(new ContextMenuCommandBuilder()
       .setName(tr.forLang("en-US", "commands.video_info_ctx.nameReduced"))
-      .setNameLocalizations(getLocMap("commands.video_info_ctx.nameReduced")) // @ts-ignore
-      .setType(ApplicationCommandType.Message)
+      .setNameLocalizations(getLocMap("commands.video_info_ctx.nameReduced"))
+      .setType(ApplicationCommandType.Message as number)
       .setContexts([
         InteractionContextType.Guild,
         InteractionContextType.PrivateChannel,
@@ -27,10 +27,11 @@ export class VideoInfoCtx extends ContextCommand {
 
     const fetchColl = await int.channel?.messages.fetch({ limit: 1, around: int.targetId });
     const targetMsg = fetchColl?.get(int.targetId);
+    const locale = await VideoInfoCtx.getGuildLocale(int);
 
     if(!targetMsg)
       return int.editReply({
-        ...useEmbedify(tr("errors.messageInaccessible"), Col.Error),
+        ...useEmbedify(tr.forLang(locale, "errors.messageInaccessible"), Col.Error),
       });
 
     return await MessageCreateEvt.handleYtLinkMsg(targetMsg, int);
@@ -44,8 +45,8 @@ export class VideoInfoExtendedCtx extends ContextCommand {
   constructor() {
     super(new ContextMenuCommandBuilder()
       .setName(tr.forLang("en-US", "commands.video_info_ctx.nameExtended"))
-      .setNameLocalizations(getLocMap("commands.video_info_ctx.nameExtended")) // @ts-ignore
-      .setType(ApplicationCommandType.Message)
+      .setNameLocalizations(getLocMap("commands.video_info_ctx.nameExtended"))
+      .setType(ApplicationCommandType.Message as number)
       .setContexts([
         InteractionContextType.Guild,
         InteractionContextType.PrivateChannel,
@@ -60,10 +61,11 @@ export class VideoInfoExtendedCtx extends ContextCommand {
 
     const fetchColl = await int.channel?.messages.fetch({ limit: 1, around: int.targetId });
     const targetMsg = fetchColl?.get(int.targetId);
+    const locale = await VideoInfoExtendedCtx.getGuildLocale(int);
 
     if(!targetMsg)
       return int.editReply({
-        ...useEmbedify(tr("errors.messageInaccessible"), Col.Error),
+        ...useEmbedify(tr.forLang(locale, "errors.messageInaccessible"), Col.Error),
       });
 
     return await MessageCreateEvt.handleYtLinkMsg(targetMsg, int, "everything");

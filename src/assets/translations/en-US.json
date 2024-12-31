@@ -22,6 +22,9 @@
         "subcmd": {
           "commands": "commands",
           "info": "info"
+        },
+        "args": {
+          "show_hidden": "show_hidden"
         }
       },
       "descriptions": {
@@ -50,6 +53,9 @@
       "embedTitles": {
         "commands": "Commands:",
         "info": "Information:"
+      },
+      "embedFooters": {
+        "commands": "You can also right click or tap and hold on a message and use commands under \"Apps\""
       }
     },
     "invite": {
@@ -93,7 +99,11 @@
     },
     "video_info": {
       "names": {
-        "command": "video_info"
+        "command": "video_info",
+        "args": {
+          "video": "video",
+          "type": "type"
+        }
       },
       "descriptions": {
         "command": "Show information about a video, given its URL",

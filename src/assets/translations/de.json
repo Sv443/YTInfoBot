@@ -22,10 +22,10 @@
         "subcmd": {
           "commands": "kommandos",
           "info": "info"
+        },
+        "args": {
+          "show_hidden": "versteckte_anzeigen"
         }
-      },
-      "args": {
-        "show_hidden": "versteckte_anzeigen"
       },
       "descriptions": {
         "command": "Zeigt alle Kommandos oder Infos über den Bot an.",
@@ -50,6 +50,9 @@
       "embedTitles": {
         "commands": "Befehle:",
         "info": "Informationen:"
+      },
+      "embedFooters": {
+        "commands": "Du kannst auch auf eine Nachricht rechtsklicken bzw. tippen und halten und unter \"Apps\" Kommandos ausführen."
       }
     },
     "invite": {
@@ -93,13 +96,17 @@
     },
     "video_info": {
       "names": {
-        "command": "video_info"
+        "command": "video_info",
+        "args": {
+          "video": "video",
+          "type": "typ"
+        }
       },
       "descriptions": {
         "command": "Zeigt Infos zu einem Video anhand seiner URL oder ID.",
         "options": {
           "video": "URL oder ID des Videos - unterstützt music.youtube.com, youtube.com und youtu.be links.",
-          "type": "Art der Infos - Standardwert ist \"reduziert\"."
+          "type": "Typ der Infos - Standardwert ist \"reduziert\"."
         }
       },
       "errors": {

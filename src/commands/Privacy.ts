@@ -11,18 +11,21 @@ import { getLocMap, tr } from "@lib/translate.ts";
 export class PrivacyCmd extends SlashCommand {
   constructor() {
     super(new SlashCommandBuilder()
-      .setName(CmdBase.getCmdName("privacy"))
+      .setName(CmdBase.getCmdName(tr.forLang("en-US", "commands.privacy.names.command")))
+      .setNameLocalizations(getLocMap("commands.privacy.names.command", PrivacyCmd.cmdPrefix))
       .setDescription(tr.forLang("en-US", "commands.privacy.descriptions.command"))
       .setDescriptionLocalizations(getLocMap("commands.privacy.descriptions.command"))
       .addSubcommand((sub) =>
         sub
-          .setName("info")
+          .setName(tr.forLang("en-US", "commands.privacy.names.subcmd.info"))
+          .setNameLocalizations(getLocMap("commands.privacy.names.subcmd.info"))
           .setDescription(tr.forLang("en-US", "commands.privacy.descriptions.subcmd.info"))
           .setDescriptionLocalizations(getLocMap("commands.privacy.descriptions.subcmd.info"))
       )
       .addSubcommand((sub) =>
         sub
-          .setName("delete_data")
+          .setName(tr.forLang("en-US", "commands.privacy.names.subcmd.delete_data"))
+          .setNameLocalizations(getLocMap("commands.privacy.names.subcmd.delete_data"))
           .setDescription(tr.forLang("en-US", "commands.privacy.descriptions.subcmd.delete_data"))
           .setDescriptionLocalizations(getLocMap("commands.privacy.descriptions.subcmd.delete_data"))
       )
@@ -32,30 +35,31 @@ export class PrivacyCmd extends SlashCommand {
   //#region pb:run
 
   public async run(int: CommandInteraction) {
+    if(!PrivacyCmd.checkInGuild(int))
+      return;
+
+    await int.deferReply({ ephemeral: true });
+
+    const locale = await PrivacyCmd.getGuildLocale(int);
     const sub = int.options.data[0].name;
 
     if(sub === "info")
-      return int.reply({
-        ...useEmbedify(Array.from({ length: 5 }).map((_, i) => tr(`commands.privacy.info.line${i + 1}`))),
-        ephemeral: true,
-      });
+      return int.editReply(useEmbedify(Array.from({ length: 5 }).map((_, i) => tr.forLang(locale, `commands.privacy.info.line${i + 1}`))));
 
     if(sub === "delete_data") {
-      await int.deferReply({ ephemeral: true });
-
       if(!await em.findOne(UserSettings, { id: int.user.id }))
-        return int.editReply(useEmbedify(tr("errors.noDataFoundToDelete"), Col.Info));
+        return int.editReply(useEmbedify(tr.forLang(locale, "errors.noDataFoundToDelete"), Col.Warning));
 
       const confirmBtns = [
         new ButtonBuilder()
           .setCustomId("confirm-delete-data")
           .setStyle(ButtonStyle.Danger)
-          .setLabel(tr("buttons.delete"))
+          .setLabel(tr.forLang(locale, "buttons.delete"))
           .setEmoji("🗑️"),
         new ButtonBuilder()
           .setCustomId("cancel-delete-data")
           .setStyle(ButtonStyle.Secondary)
-          .setLabel(tr("buttons.cancel"))
+          .setLabel(tr.forLang(locale, "buttons.cancel"))
           .setEmoji("❌"),
       ];
 
@@ -63,8 +67,8 @@ export class PrivacyCmd extends SlashCommand {
 
       const reply = await int.editReply({
         embeds: [
-          embedify(Array.from({ length: 4 }).map((_, i) => tr(`commands.privacy.delete.confirmLine${i + 1}`)), Col.Warning)
-            .setFooter({ text: tr("general.promptExpiryNotice", promptSec) }),
+          embedify(Array.from({ length: 4 }).map((_, i) => tr.forLang(locale, `commands.privacy.delete.confirmLine${i + 1}`)), Col.Warning)
+            .setFooter({ text: tr.forLang(locale, "general.promptExpiryNotice", promptSec) }),
         ],
         ...useButtons([confirmBtns]),
       });
@@ -82,20 +86,20 @@ export class PrivacyCmd extends SlashCommand {
         if(conf.customId === "confirm-delete-data") {
           await em.removeAndFlush(await em.find(UserSettings, { id: int.user.id }));
           return conf.editReply({
-            ...useEmbedify(tr("commands.privacy.delete.success"), Col.Success),
+            ...useEmbedify(tr.forLang(locale, "commands.privacy.delete.success"), Col.Success),
             components: [],
           });
         }
         else {
           return await conf.editReply({
-            ...useEmbedify(tr("commands.privacy.delete.cancelled"), Col.Secondary),
+            ...useEmbedify(tr.forLang(locale, "commands.privacy.delete.cancelled"), Col.Secondary),
             components: [],
           });
         }
       }
       catch {
         return await (conf ?? int).editReply({
-          ...useEmbedify(tr("commands.privacy.delete.noConfirmation"), Col.Secondary),
+          ...useEmbedify(tr.forLang(locale, "commands.privacy.delete.noConfirmation"), Col.Secondary),
           components: [],
         });
       }

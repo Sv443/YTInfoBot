@@ -8,7 +8,7 @@ import { useButtons } from "@lib/components.ts";
 import { capitalize } from "@lib/text.ts";
 import localesJson from "@assets/locales.json" with { type: "json" };
 import type { Stringifiable } from "@src/types.ts";
-import { tr } from "@lib/translate.ts";
+import { registerCommandsForGuild } from "@lib/registry.ts";
 
 //#region constants
 
@@ -70,8 +70,7 @@ const configurableOptions: Record<
         opt.setName("new_value")
           .setDescription("The new locale")
           .setAutocomplete(true)
-          .setMinLength(5)
-          .setMaxLength(5)
+          .setMinLength(2)
           .setRequired(true)
       )
   },
@@ -121,8 +120,8 @@ export class ConfigCmd extends SlashCommand {
   //#region pb:run
 
   public async run(int: CommandInteraction, opt: CommandInteractionOption) {
-    if(!int.inGuild())
-      return int.reply(useEmbedify("This command can only be used in a server", Col.Error));
+    if(!ConfigCmd.checkInGuild(int))
+      return;
 
     const reply = await int.deferReply({ ephemeral: true });
 
@@ -253,8 +252,8 @@ export class ConfigCmd extends SlashCommand {
     invalidHint?: string;
   }) {
     try {
-      if(!int.inGuild())
-        return int.reply(useEmbedify(tr("errors.onlyRunInGuild"), Col.Error));
+      if(!ConfigCmd.checkInGuild(int))
+        return;
 
       await GuildConfig.ensureExists(int.guildId);
       const cfg = await em.findOne(GuildConfig, { id: int.guildId });
@@ -276,6 +275,9 @@ export class ConfigCmd extends SlashCommand {
       cfg[cfgProp] = newValue;
       cfg.lastAccessed = new Date();
       await em.flush();
+
+      if(cfgProp === "locale" && !this.global)
+        await registerCommandsForGuild(int.guildId);
 
       return int.editReply(useEmbedify(`Successfully set the ${settingName} to \`${getValueLabel(newValue) ?? newValue}\``, Col.Success));
     }

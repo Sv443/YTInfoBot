@@ -76,6 +76,7 @@ export type VideoInfoFetchData = {
   guildCfg: GuildConfig;
   type: VideoInfoType;
   omitTitleAndThumb?: boolean;
+  locale: string;
 }
 
 //#region constructor
@@ -83,17 +84,20 @@ export type VideoInfoFetchData = {
 export class VideoInfoCmd extends SlashCommand {
   constructor() {
     super(new SlashCommandBuilder()
-      .setName(CmdBase.getCmdName("video_info"))
+      .setName(CmdBase.getCmdName(tr.forLang("en-US", "commands.video_info.names.command")))
+      .setNameLocalizations(getLocMap("commands.video_info.names.command", VideoInfoCmd.cmdPrefix))
       .setDescription(tr.forLang("en-US", "commands.video_info.descriptions.command"))
       .setDescriptionLocalizations(getLocMap("commands.video_info.descriptions.command"))
       .addStringOption(opt =>
-        opt.setName("video")
+        opt.setName(tr.forLang("en-US", "commands.video_info.names.args.video"))
+          .setNameLocalizations(getLocMap("commands.video_info.names.args.video"))
           .setDescription(tr.forLang("en-US", "commands.video_info.descriptions.options.video"))
           .setDescriptionLocalizations(getLocMap("commands.video_info.descriptions.options.video"))
           .setRequired(true)
       )
       .addStringOption(opt =>
-        opt.setName("type")
+        opt.setName(tr.forLang("en-US", "commands.video_info.names.args.type"))
+          .setNameLocalizations(getLocMap("commands.video_info.names.args.type"))
           .setDescription(tr.forLang("en-US", "commands.video_info.descriptions.options.type"))
           .setDescriptionLocalizations(getLocMap("commands.video_info.descriptions.options.type"))
           .addChoices(videoInfoTypeChoices)
@@ -104,8 +108,8 @@ export class VideoInfoCmd extends SlashCommand {
   //#region pb:run
 
   public async run(int: CommandInteraction) {
-    if(!int.inGuild())
-      return int.reply(useEmbedify(tr("general.commandOnlyUsableInServers"), Col.Error));
+    if(!VideoInfoCmd.checkInGuild(int))
+      return;
 
     const videoId = VideoInfoCmd.parseVideoId(int.options.get("video", true).value as string);
 
@@ -117,18 +121,20 @@ export class VideoInfoCmd extends SlashCommand {
     await int.deferReply();
 
     await UserSettings.ensureExists(int.user.id);
-
     const guildCfg = await em.findOneOrFail(GuildConfig, { id: int.guildId });
+
+    const locale = await VideoInfoCmd.getGuildLocale(int);
 
     const embed = await VideoInfoCmd.getVideoInfoEmbed({
       guildCfg,
       type,
       url: `https://youtu.be/${videoId}`,
       videoId,
+      locale,
     });
 
     if(!embed)
-      return int.editReply(useEmbedify(tr("commands.video_info.errors.foundNoVidInfo"), Col.Error));
+      return int.editReply(useEmbedify(tr.forLang(locale, "commands.video_info.errors.foundNoVidInfo"), Col.Error));
 
     return int.editReply({ embeds: [embed] });
   }
@@ -176,6 +182,7 @@ export class VideoInfoCmd extends SlashCommand {
     guildCfg,
     type = "reduced",
     omitTitleAndThumb = false,
+    locale,
   }: VideoInfoFetchData): Promise<EmbedBuilder | null> {
     const embed = new EmbedBuilder()
       .setURL(url)
@@ -216,7 +223,7 @@ export class VideoInfoCmd extends SlashCommand {
     embed.setTitle((hasDeArrowData ? bestDeArrowTitle?.title : ytData?.title) ?? url);
 
     hasDeArrowData && ytData.title && embed.addFields({
-      name: tr("commands.video_info.embedFields.originalTitle"),
+      name: tr.forLang(locale, "commands.video_info.embedFields.originalTitle"),
       value: ytData.title,
       inline: false,
     });
@@ -235,7 +242,7 @@ export class VideoInfoCmd extends SlashCommand {
       const ratioPercent = ratioPerc.toFixed(1);
 
       embed.addFields({
-        name: tr("commands.video_info.embedFields.votes"),
+        name: tr.forLang(locale, "commands.video_info.embedFields.votes"),
         value: `${fmt(likes)} 👍  •  ${fmt(dislikes)} 👎\n${generateEmojiProgressBar(ratioPerc, 7)} ${ratioPercent}%`,
         inline: true,
       });
@@ -282,7 +289,7 @@ export class VideoInfoCmd extends SlashCommand {
       }
 
       embed.addFields({
-        name: tr("commands.video_info.embedFields.timestamps"),
+        name: tr.forLang(locale, "commands.video_info.embedFields.timestamps"),
         value: timestampList,
         inline: false,
       });
