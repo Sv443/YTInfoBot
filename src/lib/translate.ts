@@ -312,13 +312,18 @@ const transforms = [
 /** Loads all translations from files in the folder at `src/assets/translations` and applies transformation functions */
 export async function initTranslations(): Promise<void> {
   const files = await readdir("src/assets/translations");
-  let enName = "";
+  let enName: string | undefined;
 
   for(const file of files) {
     try {
+      if(file.split(".").at(-1)! !== "json")
+        continue;
+
       const langCode = file.split(".")[0];
       const data = JSON.parse(await readFile(`src/assets/translations/${file}`, "utf-8")) as TrObject;
+
       tr.addTranslations(langCode, data);
+
       if(langCode.startsWith("en") && enName !== defaultLocale)
         enName = langCode;
     }

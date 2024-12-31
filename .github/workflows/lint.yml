@@ -54,10 +54,10 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm i
 
       - name: Prepare env
-        run: pnpm run prepare-env
+        run: pnpm prepare-env
 
       - name: Lint code
-        run: pnpm run lint
+        run: pnpm lint
