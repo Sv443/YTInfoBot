@@ -223,7 +223,7 @@ async function useMetricsMsg(metrics: MetricsData) {
       { name: "Users:", value: String(usersAmt), inline: true },
       { name: "Guilds:", value: String(guildsAmt), inline: true },
       { name: "Members:", value: String(membersAmt), inline: true },
-      { name: `${autoPlural("Command", cmdsTotal)}: (${cmdsTotal})`, value: `${slashCmdAmt} ${autoPlural("slash command", slashCmdAmt)}\n${ctxCmdAmt} ${autoPlural("context command", ctxCmdAmt)}`, inline: false },
+      { name: `${autoPlural("Command", cmdsTotal)} (${cmdsTotal}):`, value: `${slashCmdAmt} ${autoPlural("slash command", slashCmdAmt)}\n${ctxCmdAmt} ${autoPlural("context command", ctxCmdAmt)}`, inline: false },
     ])
     .setFooter({ text: `v${packageJson.version} - ${await getCommitHash(true)}` })
     .setColor(Col.Info);
