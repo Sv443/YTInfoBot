@@ -16,18 +16,16 @@ export function getThumbnailUrl(videoId: string, qualityOrIndex: ThumbQuality | 
 /** Returns the best available thumbnail URL for a video with the given video ID */
 export async function getBestThumbnailUrl(videoId: string) {
   try {
-    const priorityList = ["maxresdefault", "sddefault", "hqdefault", 0];
-
-    for(const quality of priorityList) {
-      let response: AxiosResponse | undefined;
-      const url = getThumbnailUrl(videoId, quality as ThumbQuality);
+    for(const qual of ["maxresdefault", "sddefault", "hqdefault", 0]) {
+      let resp: AxiosResponse | undefined;
+      const url = getThumbnailUrl(videoId, qual as ThumbQuality);
       try {
-        response = await axios.head(url);
+        resp = await axios.head(url);
       }
       catch {
         void 0;
       }
-      if(response && response.status < 300 && response.status >= 200)
+      if(resp && resp.status < 300 && resp.status >= 200)
         return url;
     }
     return null;

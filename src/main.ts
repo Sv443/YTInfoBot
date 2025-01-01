@@ -95,7 +95,7 @@ async function intervalChecks(client: Client, i: number) {
 
     if(i === 0 || i % 20 === 0) {
       tasks.push(updateMetrics(client));
-      tasks.push(checkGuildJoin(client));
+      tasks.push(checkGuilds(client));
     }
 
     tasks.length > 0 && await Promise.allSettled(tasks);
@@ -107,17 +107,26 @@ async function intervalChecks(client: Client, i: number) {
 
 //#region m:chkGuildJoin
 
-/** Checks if guilds were joined while the bot was offline and creates a GuildConfig for it and registers its slash commands */
-async function checkGuildJoin(client: Client) {
+/**
+ * Checks if guilds were joined while the bot was offline and creates a GuildConfig for them and registers slash commands.  
+ * Also clears the guilds that the bot was removed from.
+ */
+async function checkGuilds(client: Client) {
   const registeredGuilds = await em.findAll(GuildConfig);
-  const guilds = [...client.guilds.cache.values()];
+  const tasks: Promise<unknown | void>[] = [];
 
-  for(const guild of guilds)
-    if(!registeredGuilds.some(g => g.id === guild.id))
-      await Promise.allSettled([
+  for(const guild of [...client.guilds.cache.values()])
+    !registeredGuilds.some(g => g.id === guild.id)
+      && tasks.push(
         em.persistAndFlush(new GuildConfig(guild.id)),
         registerCommandsForGuild(guild.id),
-      ]);
+      );
+
+  for(const guild of registeredGuilds)
+    if(!client.guilds.cache.has(guild.id))
+      tasks.push(em.removeAndFlush(guild));
+
+  await Promise.allSettled(tasks);
 }
 
 //#region m:updateMetr
