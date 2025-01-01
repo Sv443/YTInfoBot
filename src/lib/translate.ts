@@ -55,11 +55,11 @@ function translate(language: string, key: string, ...args: (Stringifiable | Reco
   if(typeof language !== "string" || language.length === 0 || typeof trObj !== "object" || trObj === null)
     return key;
 
-  const transform = (value: string, trVal: string): string => {
+  const transform = (value: string): string => {
     const tf = valTransforms.find((t) => t.regex.test(value));
 
     return tf
-      ? value.replace(tf.regex, (...matches) => String(tf.fn(language, trVal, matches, ...args)))
+      ? value.replace(tf.regex, (...matches) => String(tf.fn(language, value, matches, ...args)))
       : value;
   };
 
@@ -72,28 +72,15 @@ function translate(language: string, key: string, ...args: (Stringifiable | Reco
     value = value?.[part];
   }
   if(typeof value === "string")
-    return transform(insertValues(value, args), value);
+    return transform(value);
 
   // try falling back to `trObj["key.parts"]`
   value = trObj?.[key];
   if(typeof value === "string")
-    return transform(insertValues(value, args), value);
+    return transform(value);
 
   // default to translation key
   return key;
-}
-
-/**
- * Inserts the passed values into a string at the respective placeholders.  
- * The placeholder format is `%n`, where `n` is the 1-indexed argument number.
- * @param input The string to insert the values into
- * @param values The values to insert, in order, starting at `%1`
- */
-function insertValues(input: string, ...values: (Stringifiable | Record<string, Stringifiable>)[]): string {
-  return input.replace(/%\d/gm, (match) => {
-    const argIndex = Number(match.substring(1)) - 1;
-    return (values[argIndex] ?? match)?.toString();
-  });
 }
 
 // /**
@@ -181,12 +168,12 @@ const hasKey = (key: string, language = curLang): boolean => {
  * ```ts
  * tr.addTranslations("en", {
  *    "greeting": {
- *      "with_username": "Hello, <$USERNAME>",
- *      "headline_html": "Hello, <$USERNAME><br><c=red>You have <$UNREAD_NOTIFS> unread notifications.</c>"
+ *      "with_username": "Hello, ${USERNAME}",
+ *      "headline_html": "Hello, ${USERNAME}<br><c=red>You have ${UNREAD_NOTIFS} unread notifications.</c>"
  *    }
  * });
  * 
- * // replace <$PATTERN>
+ * // replace ${PATTERN}
  * tr.addTransform(/<\$([A-Z_]+)>/g, (matches: RegExpMatchArray, language: string) => {
  *   switch(matches?.[1]) {
  *     default: return "<UNKNOWN_PATTERN>";
@@ -283,7 +270,7 @@ const transforms = [
       const eachKeyInTrString = (keys: string[]) => keys.every((key) => fullMatch.includes("${" + key + "}"));
     
       const namedMapping = () => {
-        if(!str.includes("<$") || !args[0] || typeof args[0] !== "object" || !eachKeyInTrString(Object.keys(args[0])))
+        if(!str.includes("${") || !args[0] || typeof args[0] !== "object" || !eachKeyInTrString(Object.keys(args[0])))
           return;
         for(const key in args[0]) {
           const regex = new RegExp("\\$" + `{${key}\\}`, "gm");

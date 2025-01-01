@@ -14,9 +14,11 @@
     "onlyRunInGuild": "This command can only be run in a server."
   },
   "general": {
-    "promptExpiryNotice": "This prompt will expire in <$sec>s",
-    "confirmationTimeoutNotice": "Confirmation not received within <$sec>s, cancelling.",
-    "commandOnlyUsableInServers": "This command can only be used in a server"
+    "promptExpiryNotice": "This prompt will expire in ${sec}s",
+    "confirmationTimeoutNotice": "Confirmation not received within ${sec}s, cancelling.",
+    "commandOnlyUsableInServers": "This command can only be used in a server",
+    "enabled": "Enabled",
+    "disabled": "Disabled"
   },
   "commands": {
     "config": {
@@ -25,7 +27,22 @@
         "subcmd": {
           "reset": "reset",
           "list": "list",
-          "set": "set"
+          "set": "set",
+          "settings": {
+            "defaultVideoInfoType": "default_video_info_type",
+            "numberFormat": "number_format",
+            "locale": "locale",
+            "autoReplyEnabled": "auto_reply"
+          },
+          "settingNames": {
+            "defaultVideoInfoType": "default video info type",
+            "numberFormat": "number format",
+            "locale": "locale",
+            "autoReplyEnabled": "auto reply state"
+          },
+          "args": {
+            "newValue": "new_value"
+          }
         }
       },
       "descriptions": {
@@ -34,21 +51,31 @@
           "reset": "Reset the configuration to the default settings",
           "list": "List all configurable settings and their current values",
           "set": "Set a specific setting to a new value"
+        },
+        "args": {
+          "newValue": "The new value"
+        },
+        "settings": {
+          "defaultVideoInfoType": "The default video_info type, used when a link is sent or no type argument is given",
+          "numberFormat": "The number format for this server, used for example when displaying likes and dislikes",
+          "locale": "The locale (language and country) for the server, used for formatting dates, numbers and more",
+          "autoReplyEnabled": "Whether the bot will automatically reply to all messages containing a video link"
         }
       },
-      "embedTitles": {
-        "list": "Server configuration values:"
-      },
       "set": {
-        "currentValue": "The current <$settingName> is `<$newValue>`",
-        "invalidValue": "Invalid <$settingName> specified: `<$newValue>`<$invalidHint>",
-        "success": "Successfully set the <$settingName> to `<$newValue>`",
-        "error": "Couldn't set the <$settingName> due to an error: <$err>"
+        "currentValue": "The current ${settingName} is `${newValue}`",
+        "invalidValue": "Invalid ${settingName} specified: `${newValue}`${invalidHint}",
+        "success": "Successfully set the ${settingName} to `${newValue}`",
+        "error": "Couldn't set the ${settingName} due to an error: ${err}",
+        "localeInvalidHint": "Must be in the BCP 47 format: language-COUNTRY (case sensitive), like `en-US`. Not all combinations are supported."
       },
       "reset": {
         "confirm": "Are you sure you want to reset the configuration?",
         "success": "Configuration successfully reset to default settings.",
         "cancelled": "Reset cancelled."
+      },
+      "embedTitles": {
+        "list": "Server configuration values:"
       }
     },
     "help": {
@@ -74,12 +101,12 @@
       },
       "info": {
         "name": "info",
-        "version": "Version: <$version>",
-        "createdBy": "Created by [<authorName>](<$authorUrl>)",
+        "version": "Version: ${version}",
+        "createdBy": "Created by [<authorName>](${authorUrl})",
         "globalOptOut": "Opt out of automatic replies across every server by using the command `/settings set auto_reply new_value:false`",
-        "bugsLink": "- Submit bugs or feature requests on [GitHub](<$bugsUrl>)",
-        "supportServerLink": "- Join the [support server](<$supportServerInviteUrl>) if you have any questions or need help",
-        "donationLink": "- This bot is completely free so if you are able to, please consider [supporting the development ❤️](<$fundingUrl>)",
+        "bugsLink": "- Submit bugs or feature requests on [GitHub](${bugsUrl})",
+        "supportServerLink": "- Join the [support server](${supportServerInviteUrl}) if you have any questions or need help",
+        "donationLink": "- This bot is completely free so if you are able to, please consider [supporting the development ❤️](${fundingUrl})",
         "poweredBy": "Powered by [ReturnYoutubeDislike](https://returnyoutubedislike.com/), [SponsorBlock](https://sponsor.ajay.app/), and [DeArrow](https://dearrow.ajay.app/)"
       },
       "embedTitles": {
@@ -95,7 +122,7 @@
         "command": "invite"
       },
       "description": "Invite YTInfoBot to your own server",
-      "embedContent": "You can invite YTInfoBot to your server by [clicking this link.](<$inviteUrl>)"
+      "embedContent": "You can invite YTInfoBot to your server by [clicking this link.](${inviteUrl})"
     },
     "privacy": {
       "names": {

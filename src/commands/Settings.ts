@@ -6,7 +6,8 @@ import { UserSettings } from "@models/UserSettings.model.ts";
 import { useButtons } from "@lib/components.ts";
 import { capitalize } from "@lib/text.ts";
 import type { Stringifiable } from "@src/types.ts";
-import { autoReplyValues } from "@cmd/Config.ts";
+import { getAutoReplyValues } from "@cmd/Config.ts";
+import { GuildConfig } from "@models/GuildConfig.model.ts";
 
 // TODO: translate
 
@@ -27,7 +28,7 @@ const configurableOptions: Record<
   [scNames.autoReplyEnabled]: {
     settProp: "autoReplyEnabled",
     settingName: "auto reply state",
-    getValueLabel: (val) => autoReplyValues.find(c => c.value === Boolean(val))?.name,
+    getValueLabel: (val, loc) => getAutoReplyValues(loc).find(c => c.value === Boolean(val))?.name,
     builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
       .setDescription("Change whether the bot will automatically reply to your messages containing a video link")
       .addBooleanOption(opt =>
@@ -88,8 +89,15 @@ export class SettingsCmd extends SlashCommand {
       if(!sett)
         return SettingsCmd.noSettingsFound(int);
 
+      let locale = "en-US";
+      if(int.inGuild()) {
+        await GuildConfig.ensureExists(int.guildId);
+        const guildCfg = await em.findOne(GuildConfig, { id: int.guildId });
+        locale = guildCfg?.locale ?? locale;
+      }
+
       const cfgList = Object.entries(configurableOptions).reduce((acc, [, { settProp: cfgProp, settingName, getValueLabel: getLabel }], i) => {
-        const val = getLabel ? getLabel(sett[cfgProp]) : sett[cfgProp];
+        const val = getLabel ? getLabel(sett[cfgProp], locale) : sett[cfgProp];
         return `${acc}${i !== 0 ? "\n" : ""}- **${capitalize(settingName)}**: \`${val}\``;
       }, "");
 
@@ -182,13 +190,20 @@ export class SettingsCmd extends SlashCommand {
     opt: CommandInteractionOption;
     settProp: TSettKey;
     settingName: string;
-    getValueLabel?: (value: TSettValue) => Stringifiable | undefined;
+    getValueLabel?: (value: TSettValue, locale: string) => Stringifiable | undefined;
     validateValue?: (value: TSettValue) => boolean;
     invalidHint?: string;
   }) {
     try {
       await UserSettings.ensureExists(int.user.id);
       const cfg = await em.findOne(UserSettings, { id: int.user.id });
+
+      let locale = "en-US";
+      if(int.inGuild()) {
+        await GuildConfig.ensureExists(int.guildId);
+        const guildCfg = await em.findOne(GuildConfig, { id: int.guildId });
+        locale = guildCfg?.locale ?? locale;
+      }
 
       if(!cfg)
         return SettingsCmd.noSettingsFound(int);
@@ -198,7 +213,7 @@ export class SettingsCmd extends SlashCommand {
         const cfg = await em.findOne(UserSettings, { id: int.user.id });
         if(!cfg)
           return SettingsCmd.noSettingsFound(int);
-        return int.editReply(useEmbedify(`The current ${settingName} is \`${getValueLabel(cfg[settProp] as TSettValue) ?? cfg[settProp]}\``));
+        return int.editReply(useEmbedify(`The current ${settingName} is \`${getValueLabel(cfg[settProp] as TSettValue, locale) ?? cfg[settProp]}\``));
       }
 
       if(typeof validateValue === "function" && !validateValue(newValue))
@@ -208,7 +223,7 @@ export class SettingsCmd extends SlashCommand {
       cfg.lastAccessed = new Date();
       await em.flush();
 
-      return int.editReply(useEmbedify(`Successfully set the ${settingName} to \`${getValueLabel(newValue) ?? newValue}\``, Col.Success));
+      return int.editReply(useEmbedify(`Successfully set the ${settingName} to \`${getValueLabel(newValue, locale) ?? newValue}\``, Col.Success));
     }
     catch(err) {
       return int.editReply(useEmbedify(`Couldn't set the ${settingName} due to an error: ${err}`, Col.Error));

@@ -13,83 +13,96 @@ import { getLocMap, tr } from "@lib/translate.ts";
 
 //#region constants
 
-// TODO: translate somehow
-
 /** Configuration setting name mapping - value has to adhere to Discord slash command naming rules (lowercase and underscores only!) */
-const scNames = {
-  defaultVideoInfoType: "default_video_info_type",
-  numberFormat: "number_format",
-  locale: "locale",
-  autoReplyEnabled: "auto_reply",
-} as const satisfies Partial<Record<keyof GuildConfig, string>>;
+const getSCNames = () => ({
+  defaultVideoInfoType: tr.forLang("en-US", "commands.config.names.subcmd.settings.defaultVideoInfoType"),
+  numberFormat: tr.forLang("en-US", "commands.config.names.subcmd.settings.numberFormat"),
+  locale: tr.forLang("en-US", "commands.config.names.subcmd.settings.locale"),
+  autoReplyEnabled: tr.forLang("en-US", "commands.config.names.subcmd.settings.autoReplyEnabled"),
+} as const satisfies Partial<Record<keyof GuildConfig, string>>);
 
-export const autoReplyValues = [
-  { name: "Enabled", value: true },
-  { name: "Disabled", value: false },
+export const getAutoReplyValues = (locale: string) => [
+  { name: tr.forLang(locale, "general.enabled"), value: true },
+  { name: tr.forLang(locale, "general.disabled"), value: false },
 ];
 
 /** All options that can be configured */
-const configurableOptions: Record<
-  typeof scNames[keyof typeof scNames],
-  Omit<Parameters<typeof ConfigCmd.editConfigSetting>[0], "int" | "opt"> & {
-    builder: (grpOpt: SlashCommandSubcommandBuilder) => SlashCommandSubcommandBuilder;
-  }
-> = {
-  [scNames.defaultVideoInfoType]: {
-    cfgProp: "defaultVideoInfoType",
-    settingName: "default video info type",
-    getValueLabel: (val) => videoInfoTypeChoices.find(c => c.value === val)?.name,
-    builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
-      .setDescription("The default video_info type, used when a link is sent or no type argument is given")
-      .addStringOption(opt =>
-        opt.setName("new_value")
-          .setDescription("The new default video_info type")
-          .setChoices(videoInfoTypeChoices)
-          .setRequired(true)
-      )
-  },
-  [scNames.numberFormat]: {
-    cfgProp: "numberFormat",
-    settingName: "number format",
-    getValueLabel: (val) => numberFormatChoices.find(c => c.value === val)?.name,
-    builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
-      .setDescription("The number format for this server, used for example when displaying likes and dislikes")
-      .addStringOption(opt =>
-        opt.setName("new_value")
-          .setDescription("The new number format")
-          .setChoices(numberFormatChoices)
-          .setRequired(true)
-      )
-  },
-  [scNames.locale]: {
-    cfgProp: "locale",
-    settingName: "locale",
-    getValueLabel: (val) => localesJson.find(({ code }) => code === val)?.name,
-    validateValue: (val) => localesJson.some(({ code }) => code === val),
-    invalidHint: "Must be in the BCP 47 format: language-COUNTRY (case sensitive), like `en-US`. Not all combinations are supported.",
-    builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
-      .setDescription("The locale (language and country) for the server, used for formatting dates, numbers and more")
-      .addStringOption(opt =>
-        opt.setName("new_value")
-          .setDescription("The new locale")
-          .setAutocomplete(true)
-          .setMinLength(2)
-          .setRequired(true)
-      )
-  },
-  [scNames.autoReplyEnabled]: {
-    cfgProp: "autoReplyEnabled",
-    settingName: "auto reply state",
-    getValueLabel: (val) => autoReplyValues.find(c => c.value === Boolean(val))?.name,
-    builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
-      .setDescription("Whether the bot will automatically reply to all messages containing a video link")
-      .addBooleanOption(opt =>
-        opt.setName("new_value")
-          .setDescription("Whether auto-reply should be enabled")
-          .setRequired(true)
-      )
-  },
-} as const;
+const getConfigurableOptions = () => {
+  const scNames = getSCNames();
+  return {
+    [scNames.defaultVideoInfoType]: {
+      cfgProp: "defaultVideoInfoType",
+      settingNameTrKey: "commands.config.names.subcmd.settingNames.defaultVideoInfoType",
+      getValueLabel: (val: string | boolean | Date) => videoInfoTypeChoices.find(c => c.value === val)?.name,
+      builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
+        .setDescription(tr.forLang("en-US", "commands.config.descriptions.settings.defaultVideoInfoType"))
+        .setDescriptionLocalizations(getLocMap("commands.config.descriptions.settings.defaultVideoInfoType"))
+        .addStringOption(opt =>
+          opt.setName(tr.forLang("en-US", "commands.config.names.subcmd.args.newValue"))
+            .setNameLocalizations(getLocMap("commands.config.names.subcmd.args.newValue"))
+            .setDescription(tr.forLang("en-US", "commands.config.descriptions.args.newValue"))
+            .setDescriptionLocalizations(getLocMap("commands.config.descriptions.args.newValue"))
+            .setChoices(videoInfoTypeChoices)
+            .setRequired(true)
+        )
+    },
+    [scNames.numberFormat]: {
+      cfgProp: "numberFormat",
+      settingNameTrKey: "commands.config.names.subcmd.settingNames.numberFormat",
+      getValueLabel: (val: string | boolean | Date) => numberFormatChoices.find(c => c.value === val)?.name,
+      builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
+        .setDescription(tr.forLang("en-US", "commands.config.descriptions.settings.numberFormat"))
+        .setDescriptionLocalizations(getLocMap("commands.config.descriptions.settings.numberFormat"))
+        .addStringOption(opt =>
+          opt.setName(tr.forLang("en-US", "commands.config.names.subcmd.args.newValue"))
+            .setNameLocalizations(getLocMap("commands.config.names.subcmd.args.newValue"))
+            .setDescription(tr.forLang("en-US", "commands.config.descriptions.args.newValue"))
+            .setDescriptionLocalizations(getLocMap("commands.config.descriptions.args.newValue"))
+            .setChoices(numberFormatChoices)
+            .setRequired(true)
+        )
+    },
+    [scNames.locale]: {
+      cfgProp: "locale",
+      settingNameTrKey: "commands.config.names.subcmd.settingNames.locale",
+      getValueLabel: (val: string) => localesJson.find(({ code }) => code === val)?.name,
+      validateValue: (val: string) => localesJson.some(({ code }) => code === val),
+      invalidHintTrKey: "commands.config.set.localeInvalidHint",
+      builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
+        .setDescription(tr.forLang("en-US", "commands.config.descriptions.settings.locale"))
+        .setDescriptionLocalizations(getLocMap("commands.config.descriptions.settings.locale"))
+        .addStringOption(opt =>
+          opt.setName(tr.forLang("en-US", "commands.config.names.subcmd.args.newValue"))
+            .setNameLocalizations(getLocMap("commands.config.names.subcmd.args.newValue"))
+            .setDescription(tr.forLang("en-US", "commands.config.descriptions.args.newValue"))
+            .setDescriptionLocalizations(getLocMap("commands.config.descriptions.args.newValue"))
+            .setAutocomplete(true)
+            .setMinLength(2)
+            .setRequired(true)
+        )
+    },
+    [scNames.autoReplyEnabled]: {
+      cfgProp: "autoReplyEnabled",
+      settingNameTrKey: "commands.config.names.subcmd.settingNames.autoReplyEnabled",
+      getValueLabel: (val: string | boolean | Date, loc: string) => getAutoReplyValues(loc).find(c => c.value === Boolean(val))?.name,
+      builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
+        .setDescription(tr.forLang("en-US", "commands.config.descriptions.settings.autoReplyEnabled"))
+        .setDescriptionLocalizations(getLocMap("commands.config.descriptions.settings.autoReplyEnabled"))
+        .addBooleanOption(opt =>
+          opt.setName(tr.forLang("en-US", "commands.config.names.subcmd.args.newValue"))
+            .setNameLocalizations(getLocMap("commands.config.names.subcmd.args.newValue"))
+            .setDescription(tr.forLang("en-US", "commands.config.descriptions.args.newValue"))
+            .setDescriptionLocalizations(getLocMap("commands.config.descriptions.args.newValue"))
+            .setRequired(true)
+        )
+    },
+  } as const satisfies Record<
+    ReturnType<typeof getSCNames>[keyof ReturnType<typeof getSCNames>],
+    Omit<Parameters<typeof ConfigCmd.editConfigSetting>[0], "int" | "opt"> & {
+      builder: (grpOpt: SlashCommandSubcommandBuilder) => SlashCommandSubcommandBuilder;
+    }
+  >;
+};
 
 //#region constructor
 
@@ -120,7 +133,7 @@ export class ConfigCmd extends SlashCommand {
           .setDescription(tr.forLang("en-US", "commands.config.descriptions.subcmd.set"))
           .setDescriptionLocalizations(getLocMap("commands.config.descriptions.subcmd.set"));
 
-        for(const [name, { builder }] of Object.entries(configurableOptions))
+        for(const [name, { builder }] of Object.entries(getConfigurableOptions()))
           grpOpt.addSubcommand(option => builder(option).setName(name));
 
         return grpOpt;
@@ -138,9 +151,11 @@ export class ConfigCmd extends SlashCommand {
     const locale = await ConfigCmd.getGuildLocale(int);
 
     switch(opt.name) {
-    case "set":
+    case "set": {
       if(!opt.options?.[0])
         throw new Error("No subcommand received for `/config set` by user " + int.user.id + " in guild " + int.guildId);
+
+      const configurableOptions = getConfigurableOptions();
 
       await GuildConfig.ensureExists(int.guildId);
       return await ConfigCmd.editConfigSetting({
@@ -148,6 +163,7 @@ export class ConfigCmd extends SlashCommand {
         opt,
         ...configurableOptions[opt.options[0].name as keyof typeof configurableOptions],
       });
+    }
     case "list": {
       await GuildConfig.ensureExists(int.guildId);
       const cfg = await em.findOne(GuildConfig, { id: int.guildId });
@@ -155,9 +171,9 @@ export class ConfigCmd extends SlashCommand {
       if(!cfg)
         return await ConfigCmd.noConfigFound(int);
 
-      const cfgList = Object.entries(configurableOptions).reduce((acc, [, { cfgProp, settingName, getValueLabel: getLabel }], i) => {
-        const val = getLabel ? getLabel(cfg[cfgProp]) : cfg[cfgProp];
-        return `${acc}${i !== 0 ? "\n" : ""}- **${capitalize(settingName)}**: \`${val}\``;
+      const cfgList = Object.entries(getConfigurableOptions()).reduce((acc, [, { cfgProp, settingNameTrKey, getValueLabel: getLabel }], i) => {
+        const val = getLabel ? getLabel(cfg[cfgProp], locale) : cfg[cfgProp];
+        return `${acc}${i !== 0 ? "\n" : ""}- **${capitalize(tr.forLang(locale, settingNameTrKey))}**: \`${val}\``;
       }, "");
 
       return int.editReply({
@@ -250,18 +266,18 @@ export class ConfigCmd extends SlashCommand {
     int,
     opt,
     cfgProp,
-    settingName,
+    settingNameTrKey,
     getValueLabel = (val) => val,
     validateValue,
-    invalidHint,
+    invalidHintTrKey,
   }: {
     int: CommandInteraction;
     opt: CommandInteractionOption;
     cfgProp: TCfgKey;
-    settingName: string;
-    getValueLabel?: (value: TCfgValue) => Stringifiable | undefined;
+    settingNameTrKey: string;
+    getValueLabel?: (value: TCfgValue, locale: string) => Stringifiable | undefined;
     validateValue?: (value: TCfgValue) => boolean;
-    invalidHint?: string;
+    invalidHintTrKey?: string;
   }) {
     if(!ConfigCmd.checkInGuild(int))
       return;
@@ -284,11 +300,18 @@ export class ConfigCmd extends SlashCommand {
         const cfg = await em.findOne(GuildConfig, { id: int.guildId });
         if(!cfg)
           return await ConfigCmd.noConfigFound(int);
-        return int.editReply(useEmbedify(tr.forLang(locale, "commands.config.set.currentValue", { settingName, newValue: getValueLabel(cfg[cfgProp] as TCfgValue) ?? cfg[cfgProp] })));
+        return int.editReply(useEmbedify(tr.forLang(locale, "commands.config.set.currentValue", {
+          settingName: tr.forLang(locale, settingNameTrKey),
+          newValue: getValueLabel(cfg[cfgProp] as TCfgValue, locale) ?? cfg[cfgProp],
+        })));
       }
 
       if(typeof validateValue === "function" && !validateValue(newValue))
-        return int.editReply(useEmbedify(tr.forLang(locale, "commands.config.set.invalidValue", { settingName, newValue, invalidHint: invalidHint ? `\n${invalidHint}` : "" }), Col.Error));
+        return int.editReply(useEmbedify(tr.forLang(locale, "commands.config.set.invalidValue", {
+          settingName: tr.forLang(locale, settingNameTrKey),
+          newValue,
+          invalidHint: invalidHintTrKey ? `\n${tr.forLang(locale, invalidHintTrKey)}` : "",
+        }), Col.Error));
 
       cfg[cfgProp] = newValue;
       cfg.lastAccessed = new Date();
@@ -297,10 +320,16 @@ export class ConfigCmd extends SlashCommand {
       if(cfgProp === "locale" && !this.global)
         await registerCommandsForGuild(int.guildId);
 
-      return int.editReply(useEmbedify(tr.forLang(locale, "commands.config.set.success", { settingName, newValue: getValueLabel(newValue) ?? newValue }), Col.Success));
+      return int.editReply(useEmbedify(tr.forLang(locale, "commands.config.set.success", {
+        settingName: tr.forLang(locale, settingNameTrKey),
+        newValue: getValueLabel(newValue, locale) ?? newValue,
+      }), Col.Success));
     }
     catch(err) {
-      return int.editReply(useEmbedify(tr.forLang(locale, "commands.config.set.error", { settingName, err: err instanceof Error ? err.message : tr.forLang(locale, "errors.unknown") }), Col.Error));
+      return int.editReply(useEmbedify(tr.forLang(locale, "commands.config.set.error", {
+        settingName: tr.forLang(locale, settingNameTrKey),
+        err: err instanceof Error ? err.message : tr.forLang(locale, "errors.unknown"),
+      }), Col.Error));
     }
   }
 }

@@ -14,8 +14,8 @@
     "onlyRunInGuild": "Dieser Befehl kann nur in einem Server ausgeführt werden."
   },
   "general": {
-    "promptExpiryNotice": "Dieses Fenster läuft in <$sec>s ab.",
-    "confirmationTimeoutNotice": "Abgebrochen, da keine Bestätigung innerhalb von <$sec>s erhalten wurde.",
+    "promptExpiryNotice": "Dieses Fenster läuft in ${sec}s ab.",
+    "confirmationTimeoutNotice": "Abgebrochen, da keine Bestätigung innerhalb von ${sec}s erhalten wurde.",
     "commandOnlyUsableInServers": "Dieser Befehl kann nur in einem Server benutzt werden."
   },
   "commands": {
@@ -40,10 +40,10 @@
         "list": "Serverkonfiguration:"
       },
       "set": {
-        "currentValue": "Der Wert von \"<$settingName>\" ist momentan `<$newValue>`",
-        "invalidValue": "Ungültiger Wert für \"<$settingName>\": `<$newValue>`<$invalidHint>",
-        "success": "Der Wert von \"<$settingName>\" wurde erfolgreich auf `<$newValue>` gesetzt",
-        "error": "Der Wert von \"<$settingName>\" konnte nicht gesetzt werden: <$err>"
+        "currentValue": "Der Wert von \"${settingName}\" ist momentan `${newValue}`",
+        "invalidValue": "Ungültiger Wert für \"${settingName}\": `${newValue}`${invalidHint}",
+        "success": "Der Wert von \"${settingName}\" wurde erfolgreich auf `${newValue}` gesetzt",
+        "error": "Der Wert von \"${settingName}\" konnte nicht gesetzt werden: ${err}"
       },
       "reset": {
         "confirm": "Bist du sicher, dass du die Konfiguration zurücksetzen möchtest?",
@@ -74,12 +74,12 @@
       },
       "info": {
         "name": "info",
-        "version": "Version: <$version>",
-        "createdBy": "Erstellt von [<authorName>](<$authorUrl>)",
+        "version": "Version: ${version}",
+        "createdBy": "Erstellt von [<authorName>](${authorUrl})",
         "globalOptOut": "Deaktiviere automatische Antworten mit `/einstellungen setze auto_antwort`.",
-        "bugsLink": "- Fehler oder Wünsche bitte auf [GitHub](<$bugsUrl>) melden.",
-        "supportServerLink": "- Tritt dem [Support-Server](<$supportServerInviteUrl>) bei, wenn du Fragen hast.",
-        "donationLink": "- Der Bot ist gratis. Wenn du kannst, bitte unterstütze die Entwicklung [hier ❤️](<$fundingUrl>).",
+        "bugsLink": "- Fehler oder Wünsche bitte auf [GitHub](${bugsUrl}) melden.",
+        "supportServerLink": "- Tritt dem [Support-Server](${supportServerInviteUrl}) bei, wenn du Fragen hast.",
+        "donationLink": "- Der Bot ist gratis. Wenn du kannst, bitte unterstütze die Entwicklung [hier ❤️](${fundingUrl}).",
         "poweredBy": "Verwendet die APIs [ReturnYoutubeDislike](https://returnyoutubedislike.com/), [SponsorBlock](https://sponsor.ajay.app/) und [DeArrow](https://dearrow.ajay.app/)."
       },
       "embedTitles": {
@@ -95,7 +95,7 @@
         "command": "invite"
       },
       "description": "Lade YTInfoBot in deinen Server ein.",
-      "embedContent": "Lade YTInfoBot zu einem deiner Server ein, indem du [hier klickst.](<$inviteUrl>)"
+      "embedContent": "Lade YTInfoBot zu einem deiner Server ein, indem du [hier klickst.](${inviteUrl})"
     },
     "privacy": {
       "names": {
