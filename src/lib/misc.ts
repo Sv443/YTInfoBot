@@ -1,5 +1,9 @@
 import { access, constants as fsconst } from "node:fs/promises";
 import { exec } from "node:child_process";
+import packageJson from "@root/package.json" with { type: "json" };
+
+/** The base URL for the GitHub repository, without trailing slash */
+export const ghBaseUrl = packageJson.repository.url.replace(/(git\+)|(\.git)/g, "");
 
 /** Checks if a file exists */
 export async function exists(path: string) {

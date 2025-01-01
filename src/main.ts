@@ -1,17 +1,20 @@
-import { EmbedBuilder, Events, type Client, type Message } from "discord.js";
+import { readFile, writeFile } from "node:fs/promises";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Events, type Client, type Message, type MessageCreateOptions } from "discord.js";
 import k from "kleur";
+import "dotenv/config";
 import { client, botToken } from "@lib/client.ts";
 import { em, initDatabase } from "@lib/db.ts";
 import { cmdInstances, evtInstances, initRegistry, registerCommandsForGuild } from "@lib/registry.ts";
 import { autoPlural } from "@lib/text.ts";
 import { envVarEquals, getEnvVar } from "@lib/env.ts";
 import { initTranslations } from "@lib/translate.ts";
-import { GuildConfig } from "@models/GuildConfig.model.ts";
-import { readFile, writeFile } from "node:fs/promises";
 import { getHash } from "@lib/crypto.ts";
-import { getCommitHash } from "@lib/misc.ts";
+import { getCommitHash, ghBaseUrl } from "@lib/misc.ts";
 import { Col } from "@lib/embedify.ts";
+import { GuildConfig } from "@models/GuildConfig.model.ts";
 import packageJson from "@root/package.json" with { type: "json" };
+
+//#region validate env
 
 const requiredEnvVars = ["BOT_TOKEN", "APPLICATION_ID", "DB_URL", "BOT_INVITE_URL", "SUPPORT_SERVER_INVITE_URL"];
 
@@ -24,6 +27,8 @@ async function init() {
     setImmediate(() => process.exit(1));
     return;
   }
+
+  //#region init bot
 
   console.log(k.gray("\nInitializing and logging in..."));
 
@@ -57,7 +62,7 @@ async function init() {
   }, 1000);
 }
 
-//#region metrics
+//#region metrics:vars
 
 const metGuildId = getEnvVar("METRICS_GUILD", "stringNoEmpty");
 const metChanId = getEnvVar("METRICS_CHANNEL", "stringNoEmpty");
@@ -67,7 +72,7 @@ const metricsManifFile = ".metrics.json";
 let metricsData: MetricsManifest | undefined;
 let firstMetricRun = true;
 
-//#region m:types
+//#region metrics:types
 
 type MetricsManifest = {
   msgId: string | null;
@@ -150,7 +155,7 @@ async function updateMetrics(client: Client) {
 
         const recreateMsg = async () => {
           await metricsMsg?.delete();
-          metricsMsg = await metricsChan?.send(await useMetricsEmbed(latestMetrics));
+          metricsMsg = await metricsChan?.send(await useMetricsMsg(latestMetrics));
           metricsData!.msgId = metricsMsg?.id;
           await writeFile(metricsManifFile, JSON.stringify(metricsData));
         };
@@ -159,14 +164,14 @@ async function updateMetrics(client: Client) {
           if(!metricsMsg)
             recreateMsg();
           else
-            await metricsMsg?.edit(await useMetricsEmbed(latestMetrics));
+            await metricsMsg?.edit(await useMetricsMsg(latestMetrics));
         }
         catch {
           recreateMsg();
         }
       }
       else if(!metricsData.msgId || metricsData.msgId.length === 0) {
-        metricsMsg = await metricsChan?.send(await useMetricsEmbed(latestMetrics));
+        metricsMsg = await metricsChan?.send(await useMetricsMsg(latestMetrics));
         metricsData.msgId = metricsMsg?.id;
         await writeFile(metricsManifFile, JSON.stringify(metricsData));
       }
@@ -181,13 +186,13 @@ async function updateMetrics(client: Client) {
 
 //#region m:metrEmbed
 
-/** Get the metrics / stats embed */
-async function useMetricsEmbed(metrics: MetricsData) {
+/** Get the metrics / stats embed and buttons */
+async function useMetricsMsg(metrics: MetricsData) {
   const ebd = new EmbedBuilder()
     .setTitle("Bot metrics:")
     .setFields([
-      { name: "Joined guilds", value: String(metrics.guildsAmt), inline: true },
       { name: "Uptime", value: String(metrics.uptimeStr), inline: false },
+      { name: "Guilds", value: String(metrics.guildsAmt), inline: true },
       { name: "Commands", value: String(metrics.commandsAmt), inline: true },
       { name: "Events", value: String(metrics.eventsAmt), inline: true },
     ])
@@ -196,7 +201,17 @@ async function useMetricsEmbed(metrics: MetricsData) {
 
   return {
     embeds: [ebd],
-  };
+    components: [
+      new ActionRowBuilder()
+        .addComponents(
+          new ButtonBuilder()
+            .setStyle(ButtonStyle.Link)
+            .setLabel("Browse current commit")
+            .setURL(`${ghBaseUrl}/tree/${await getCommitHash()}`)
+        )
+        .toJSON(),
+    ],
+  } as Pick<MessageCreateOptions, "embeds" | "components">;
 }
 
 /** Returns the uptime in a human-readable format */
@@ -207,7 +222,7 @@ function getUptime() {
     [(1000 * 60 * 60 * 24), `${Math.floor(upt / (1000 * 60 * 60 * 24))}d`],
     [(1000 * 60 * 60), `${Math.floor(upt / (1000 * 60 * 60)) % 24}h`],
     [(1000 * 60), `${Math.floor(upt / (1000 * 60)) % 60}m`],
-    [1000, `${Math.floor(upt / 1000) % 60}s`],
+    [0, `${Math.floor(upt / 1000) % 60}s`],
   ] as const)
     .filter(([d]) => upt >= d)
     .map(([, s]) => s)
