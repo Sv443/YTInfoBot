@@ -4,7 +4,7 @@ import k from "kleur";
 import "dotenv/config";
 import { client, botToken } from "@lib/client.ts";
 import { em, initDatabase } from "@lib/db.ts";
-import { cmdInstances, evtInstances, initRegistry, registerCommandsForGuild } from "@lib/registry.ts";
+import { cmdInstances, initRegistry, registerCommandsForGuild } from "@lib/registry.ts";
 import { autoPlural } from "@lib/text.ts";
 import { envVarEquals, getEnvVar } from "@lib/env.ts";
 import { initTranslations } from "@lib/translate.ts";
@@ -13,6 +13,7 @@ import { getCommitHash, ghBaseUrl } from "@lib/misc.ts";
 import { Col } from "@lib/embedify.ts";
 import { GuildConfig } from "@models/GuildConfig.model.ts";
 import packageJson from "@root/package.json" with { type: "json" };
+import { UserSettings } from "@models/UserSettings.model.ts";
 
 //#region validate env
 
@@ -82,8 +83,10 @@ type MetricsManifest = {
 type MetricsData = {
   guildsAmt: number;
   uptimeStr: string;
-  commandsAmt: number;
-  eventsAmt: number;
+  slashCmdAmt: number;
+  ctxCmdAmt: number;
+  usersAmt: number;
+  membersAmt: number;
 };
 
 //#region m:intervalChks
@@ -137,11 +140,21 @@ async function updateMetrics(client: Client) {
     if(!metGuildId || !metChanId)
       return;
 
+    let slashCmdAmt = 0, ctxCmdAmt = 0;
+    for(const { type } of [...cmdInstances.values()]) {
+      if(type === "slash")
+        slashCmdAmt++;
+      else if(type === "ctx")
+        ctxCmdAmt++;
+    }
+
     const latestMetrics = {
       guildsAmt: client.guilds.cache.size,
       uptimeStr: getUptime(),
-      commandsAmt: cmdInstances.size,
-      eventsAmt: evtInstances.size,
+      slashCmdAmt,
+      ctxCmdAmt,
+      usersAmt: (await em.findAll(UserSettings)).length,
+      membersAmt: client.guilds.cache.reduce((a, g) => a + g.memberCount, 0),
     } as const satisfies MetricsData;
 
     const metricsChan = client.guilds.cache.find(g => g.id === metGuildId)?.channels.cache.find(c => c.id === metChanId);
@@ -197,13 +210,20 @@ async function updateMetrics(client: Client) {
 
 /** Get the metrics / stats embed and buttons */
 async function useMetricsMsg(metrics: MetricsData) {
+  const {
+    uptimeStr, usersAmt, guildsAmt,
+    membersAmt, slashCmdAmt, ctxCmdAmt,
+  } = metrics;
+  const cmdsTotal = slashCmdAmt + ctxCmdAmt;
+
   const ebd = new EmbedBuilder()
     .setTitle("Bot metrics:")
     .setFields([
-      { name: "Uptime", value: String(metrics.uptimeStr), inline: false },
-      { name: "Guilds", value: String(metrics.guildsAmt), inline: true },
-      { name: "Commands", value: String(metrics.commandsAmt), inline: true },
-      { name: "Events", value: String(metrics.eventsAmt), inline: true },
+      { name: "Uptime:", value: String(uptimeStr), inline: false },
+      { name: "Users:", value: String(usersAmt), inline: true },
+      { name: "Guilds:", value: String(guildsAmt), inline: true },
+      { name: "Members:", value: String(membersAmt), inline: true },
+      { name: `${autoPlural("Command", cmdsTotal)}: (${cmdsTotal})`, value: `${slashCmdAmt} ${autoPlural("slash command", slashCmdAmt)}\n${ctxCmdAmt} ${autoPlural("context command", ctxCmdAmt)}`, inline: false },
     ])
     .setFooter({ text: `v${packageJson.version} - ${await getCommitHash(true)}` })
     .setColor(Col.Info);
@@ -215,7 +235,7 @@ async function useMetricsMsg(metrics: MetricsData) {
         .addComponents(
           new ButtonBuilder()
             .setStyle(ButtonStyle.Link)
-            .setLabel("Browse current commit")
+            .setLabel("Open repo at commit")
             .setURL(`${ghBaseUrl}/tree/${await getCommitHash()}`)
         )
         .toJSON(),

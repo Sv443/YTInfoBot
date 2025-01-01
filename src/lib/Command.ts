@@ -17,6 +17,8 @@ export abstract class CmdBase {
   static readonly global = false;
   /** Prefix for all commands - undefined if `CMD_PREFIX` env var is not set */
   static readonly cmdPrefix = cmdPrefix;
+  /** Type of the cmd instance */
+  public abstract readonly type: "slash" | "ctx";
 
   constructor(name: string) {
     this.name = name;
@@ -56,6 +58,7 @@ export interface SlashCommand extends CmdBase {
 export abstract class SlashCommand extends CmdBase {
   public readonly builder: SharedSlashCommand;
   public readonly builderJson: RESTPostAPIChatInputApplicationCommandsJSONBody;
+  public readonly type = "slash";
 
   constructor(builder: SharedSlashCommand) {
     super(builder.name);
@@ -74,6 +77,7 @@ export abstract class SlashCommand extends CmdBase {
 export abstract class ContextCommand extends CmdBase {
   public readonly builder: ContextMenuCommandBuilder;
   public readonly builderJson: RESTPostAPIContextMenuApplicationCommandsJSONBody;
+  public readonly type = "ctx";
 
   constructor(builder: ContextMenuCommandBuilder) {
     super(builder.name);
