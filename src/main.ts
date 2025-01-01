@@ -1,5 +1,5 @@
 import { readFile, writeFile } from "node:fs/promises";
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Events, type Client, type Message, type MessageCreateOptions } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Events, type Client, type GuildMember, type Message, type MessageCreateOptions } from "discord.js";
 import k from "kleur";
 import "dotenv/config";
 import { client, botToken } from "@lib/client.ts";
@@ -86,7 +86,8 @@ type MetricsData = {
   slashCmdAmt: number;
   ctxCmdAmt: number;
   usersAmt: number;
-  membersAmt: number;
+  totalMembersAmt: number;
+  uniqueMembersAmt: number;
 };
 
 //#region m:intervalChks
@@ -148,13 +149,24 @@ async function updateMetrics(client: Client) {
         ctxCmdAmt++;
     }
 
+    await client.guilds.fetch();
+
+    const totalMembersAmt = client.guilds.cache
+      .reduce((acc, g) => acc + g.memberCount, 0);
+
+    const uniqueMembersAmt = client.guilds.cache
+      .reduce<GuildMember[]>((acc, g) => [...acc, ...g.members.cache.values()], [])
+      .filter((m, i, arr) => arr.findIndex(m2 => m2.id === m.id) === i)
+      .length;
+
     const latestMetrics = {
       guildsAmt: client.guilds.cache.size,
       uptimeStr: getUptime(),
       slashCmdAmt,
       ctxCmdAmt,
       usersAmt: (await em.findAll(UserSettings)).length,
-      membersAmt: client.guilds.cache.reduce((a, g) => a + g.memberCount, 0),
+      totalMembersAmt,
+      uniqueMembersAmt,
     } as const satisfies MetricsData;
 
     const metricsChan = client.guilds.cache.find(g => g.id === metGuildId)?.channels.cache.find(c => c.id === metChanId);
@@ -211,8 +223,10 @@ async function updateMetrics(client: Client) {
 /** Get the metrics / stats embed and buttons */
 async function useMetricsMsg(metrics: MetricsData) {
   const {
-    uptimeStr, usersAmt, guildsAmt,
-    membersAmt, slashCmdAmt, ctxCmdAmt,
+    uptimeStr, usersAmt,
+    guildsAmt, totalMembersAmt,
+    uniqueMembersAmt, slashCmdAmt,
+    ctxCmdAmt,
   } = metrics;
   const cmdsTotal = slashCmdAmt + ctxCmdAmt;
 
@@ -222,7 +236,7 @@ async function useMetricsMsg(metrics: MetricsData) {
       { name: "Uptime:", value: String(uptimeStr), inline: false },
       { name: "Users:", value: String(usersAmt), inline: true },
       { name: "Guilds:", value: String(guildsAmt), inline: true },
-      { name: "Members:", value: String(membersAmt), inline: true },
+      { name: "Members:", value: `${totalMembersAmt} total\n${uniqueMembersAmt} unique`, inline: true },
       { name: `${autoPlural("Command", cmdsTotal)} (${cmdsTotal}):`, value: `${slashCmdAmt} ${autoPlural("slash command", slashCmdAmt)}\n${ctxCmdAmt} ${autoPlural("context command", ctxCmdAmt)}`, inline: false },
     ])
     .setFooter({ text: `v${packageJson.version} - ${await getCommitHash(true)}` })
