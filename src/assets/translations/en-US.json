@@ -18,7 +18,9 @@
     "confirmationTimeoutNotice": "Confirmation not received within ${sec}s, cancelling.",
     "commandOnlyUsableInServers": "This command can only be used in a server",
     "enabled": "Enabled",
-    "disabled": "Disabled"
+    "disabled": "Disabled",
+    "listSeparator": ", ",
+    "listSeparatorLast": " and "
   },
   "commands": {
     "config": {

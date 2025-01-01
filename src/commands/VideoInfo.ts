@@ -283,9 +283,9 @@ export class VideoInfoCmd extends SlashCommand {
 
         // TODO: translate
         if(actionType === "poi")
-          timestampList += `${sponsorBlockCategoryColorEmojiMap[category]} [${secsToYtTime(segment[0])}](${startUrl}) (${sponsorBlockCategoryMap[category]})\n`;
+          timestampList += `${sponsorBlockCategoryColorEmojiMap[category]} [\`${secsToYtTime(segment[0])}\`](${startUrl}) ${sponsorBlockCategoryMap[category]}\n`;
         else
-          timestampList += `${sponsorBlockCategoryColorEmojiMap[category]} [${secsToYtTime(segment[0])}](${startUrl})-[${secsToYtTime(segment[1])}](${endUrl}) (${sponsorBlockCategoryMap[category]})\n`;
+          timestampList += `${sponsorBlockCategoryColorEmojiMap[category]} [\`${secsToYtTime(segment[0])}\`](${startUrl})-[\`${secsToYtTime(segment[1])}\`](${endUrl}) ${sponsorBlockCategoryMap[category]}\n`;
       }
 
       embed.addFields({
@@ -309,7 +309,9 @@ export class VideoInfoCmd extends SlashCommand {
       return null;
 
     // TODO: translate
-    embed.setFooter({ text: `Powered by ${joinArrayReadable(poweredByStr)}` });
+    embed.setFooter({
+      text: `Powered by ${joinArrayReadable(poweredByStr, tr.forLang(locale, "general.listSeparator"), tr.forLang(locale, "general.listSeparatorLast"))}`,
+    });
 
     return embed;
   }
