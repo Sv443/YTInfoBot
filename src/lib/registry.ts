@@ -4,7 +4,7 @@ import { Collection, Events, Routes } from "discord.js";
 import k from "kleur";
 import { Col, useEmbedify } from "@lib/embedify.ts";
 import { getHash } from "@lib/crypto.ts";
-import { exists } from "@lib/fs.ts";
+import { exists } from "@lib/misc.ts";
 import type { ContextCommand, SlashCommand } from "@lib/Command.ts";
 import type { Event } from "@lib/Event.ts";
 import { client, clientId, rest } from "@lib/client.ts";
@@ -18,9 +18,6 @@ const reregisterCmds = Boolean(process.argv.find((arg) => ["--reregister", "-r"]
 export const cmdInstances = new Collection<string, SlashCommand | ContextCommand>();
 /** All event instances registered in `src/events/_events.ts` */
 export const evtInstances = new Collection<string, Event>();
-
-/** Returns the JSON data of each command builder instance */
-const getCommandsJson = () => [...cmdInstances.entries()].map(([, cmd]) => cmd.builderJson);
 
 /** The path to the command hash file - it is used to reduce the amount of API calls to Discord (and the resulting rate limits) */
 const cmdHashFile = resolve(".cmd_hash");
@@ -96,7 +93,10 @@ export async function registerCommandsForGuild(guildId: string) {
     timeout = setTimeout(() => abort(), 10_000),
     data = await rest.put(
       Routes.applicationGuildCommands(clientId, guildId),
-      { body: getCommandsJson(), signal },
+      {
+        body: [...cmdInstances.entries()].map(([, cmd]) => cmd.builderJson),
+        signal,
+      },
     );
   clearTimeout(timeout);
   return data;

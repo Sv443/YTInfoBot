@@ -5,7 +5,7 @@ export enum Col {
   Success = Colors.Green,
   Error = Colors.Red,
   Warning = Colors.Orange,
-  Info = Colors.Blue,
+  Info = Colors.Blurple,
   Secondary = Colors.Greyple,
 }
 

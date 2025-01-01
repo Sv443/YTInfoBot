@@ -17,6 +17,6 @@ export function formatNumber(number: number, locale: (typeof localesJson)[number
 }
 
 /** Checks if the given {@linkcode bitSet} contains the given {@linkcode checkVal} */
-export function bitSetHas<TValueType extends number | bigint>(bitSet: TValueType, checkVal: TValueType): boolean {
+export function bitSetHas<TType extends number | bigint>(bitSet: TType, checkVal: TType): boolean {
   return (bitSet & checkVal) === checkVal;
 }
