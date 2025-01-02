@@ -1,11 +1,10 @@
 import { cp, access, constants } from "node:fs/promises";
 import k from "kleur";
-
-console.log("\nRunning prepare-env script...");
+import { autoPlural } from "@lib/text.ts";
 
 const copyIfNotExists = [
-  { template: "src/assets/emojis.template.json", copyTo: "src/assets/emojis.json" },
   { template: ".env.template", copyTo: ".env" },
+  { template: "src/assets/emojis.template.json", copyTo: "src/assets/emojis.json" },
 ];
 
 async function exists(path: string) {
@@ -18,21 +17,27 @@ async function exists(path: string) {
   }
 }
 
+let modified = 0;
+
 for(const { template: from, copyTo: to } of copyIfNotExists) {
   try {
     if(!await exists(to)) {
       await cp(from, to);
-      console.log(k.green(`Successfully created file '${to}'`), `(from template at '${from}')`);
+      modified++;
+      console.log(k.green(`- Successfully created file '${to}'`), k.gray(`(from template at '${from}')`));
     }
     else
-      console.log(k.gray(`File '${to}' already exists, skipping...`));
+      console.log(k.gray(`- File '${to}' already exists, skipping...`));
   }
   catch(err) {
-    console.error(k.red(`Failed to copy '${from}' to '${to}':`), err);
+    console.error(k.red(`!! Failed to copy '${from}' to '${to}':`), err);
   }
 }
 
 setImmediate(() => {
-  console.log("Done!\n");
+  if(modified > 0)
+    console.log(k.green(`\n> Created ${modified} ${k.bold(autoPlural("file", modified))}.\n`));
+  else
+    console.log(k.gray("\n> No files have been created.\n"));
   process.exit(0);
 });

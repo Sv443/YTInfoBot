@@ -14,17 +14,19 @@ import { Col } from "@lib/embedify.ts";
 import { GuildConfig } from "@models/GuildConfig.model.ts";
 import packageJson from "@root/package.json" with { type: "json" };
 import { UserSettings } from "@models/UserSettings.model.ts";
+import { resolve } from "node:path";
 
 //#region validate env
 
-const requiredEnvVars = ["BOT_TOKEN", "APPLICATION_ID", "DB_URL", "BOT_INVITE_URL", "SUPPORT_SERVER_INVITE_URL"];
+const requiredEnvVars = ["DB_URL", "APPLICATION_ID", "BOT_TOKEN", "BOT_INVITE_URL", "SUPPORT_SERVER_INVITE_URL"] as const;
 
 /** Called before the client is ready to check for environment variables and to initialize the client and database */
 async function init() {
   const missingEnvVars = requiredEnvVars.filter((envVar) => !getEnvVar(envVar, "stringNoEmpty"));
 
   if(missingEnvVars.length > 0) {
-    console.error(`${k.red(`Missing required environment ${autoPlural("variable", missingEnvVars)}:`)}\n- ${missingEnvVars.join("\n- ")}`);
+    console.error(`${k.red(`Missing ${missingEnvVars.length} required environment ${autoPlural("variable", missingEnvVars)}:`)}\n- ${missingEnvVars.join("\n- ")}\n`);
+    console.error("Use the command `pnpm prepare-env` to create the necessary env files if they don't exist already.\n");
     setImmediate(() => process.exit(1));
     return;
   }
@@ -67,10 +69,11 @@ async function init() {
 
 const metGuildId = getEnvVar("METRICS_GUILD", "stringNoEmpty");
 const metChanId = getEnvVar("METRICS_CHANNEL", "stringNoEmpty");
-const metUpdInterval = getEnvVar("METRICS_UPDATE_INTERVAL", "number") ?? 30;
+const metUpdIvRaw = getEnvVar("METRICS_UPDATE_INTERVAL", "number");
+const metUpdInterval = Math.max(isNaN(metUpdIvRaw) ? 30 : metUpdIvRaw, 3);
 
 const initTime = Date.now();
-const metricsManifFile = ".metrics.json";
+const metricsManifFile = resolve(".metrics.json");
 let metricsData: MetricsManifest | undefined;
 let firstMetricRun = true;
 
