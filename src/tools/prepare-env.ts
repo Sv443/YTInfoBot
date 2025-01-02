@@ -1,6 +1,5 @@
 import { cp, access, constants } from "node:fs/promises";
 import k from "kleur";
-import { autoPlural } from "@lib/text.ts";
 
 const copyIfNotExists = [
   { template: ".env.template", copyTo: ".env" },
@@ -36,7 +35,7 @@ for(const { template: from, copyTo: to } of copyIfNotExists) {
 
 setImmediate(() => {
   if(modified > 0)
-    console.log(k.green(`\n> Created ${modified} ${k.bold(autoPlural("file", modified))}.\n`));
+    console.log(k.green(`\n> Created ${modified} ${k.bold("file" + (modified !== 1 ? "s" : ""))}.\n`));
   else
     console.log(k.gray("\n> No files have been created.\n"));
   process.exit(0);
