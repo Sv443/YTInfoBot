@@ -65,8 +65,8 @@ const getConfigurableOptions = () => {
     [scNames.locale]: {
       cfgProp: "locale",
       settingNameTrKey: "commands.config.names.subcmd.settingNames.locale",
-      getValueLabel: (val: string) => localesJson.find(({ code }) => code === val)?.name,
-      validateValue: (val: string) => localesJson.some(({ code }) => code === val),
+      getValueLabel: (val: string | boolean | Date) => localesJson.find(({ code }) => code === val)?.name,
+      validateValue: (val: string | boolean | Date) => localesJson.some(({ code }) => code === val),
       invalidHintTrKey: "commands.config.set.localeInvalidHint",
       builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
         .setDescription(tr.forLang("en-US", "commands.config.descriptions.settings.locale"))
@@ -172,7 +172,7 @@ export class ConfigCmd extends SlashCommand {
         return await ConfigCmd.noConfigFound(int);
 
       const cfgList = Object.entries(getConfigurableOptions()).reduce((acc, [, { cfgProp, settingNameTrKey, getValueLabel: getLabel }], i) => {
-        const val = getLabel ? getLabel(cfg[cfgProp], locale) : cfg[cfgProp];
+        const val = getLabel ? getLabel(String(cfg[cfgProp]), locale) : cfg[cfgProp];
         return `${acc}${i !== 0 ? "\n" : ""}- **${capitalize(tr.forLang(locale, settingNameTrKey))}**: \`${val}\``;
       }, "");
 
