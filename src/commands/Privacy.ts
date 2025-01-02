@@ -44,7 +44,7 @@ export class PrivacyCmd extends SlashCommand {
     const sub = int.options.data[0].name;
 
     if(sub === "info")
-      return int.editReply(useEmbedify(Array.from({ length: 5 }).map((_, i) => tr.forLang(locale, `commands.privacy.info.line${i + 1}`))));
+      return int.editReply(useEmbedify(Array.from({ length: 5 }).map((_, i) => tr.forLang(locale, `commands.privacy.info.line${(i + 1) as 1}`))));
 
     if(sub === "delete_data") {
       if(!await em.findOne(UserSettings, { id: int.user.id }))
@@ -67,7 +67,7 @@ export class PrivacyCmd extends SlashCommand {
 
       const reply = await int.editReply({
         embeds: [
-          embedify(Array.from({ length: 4 }).map((_, i) => tr.forLang(locale, `commands.privacy.delete.confirmLine${i + 1}`)), Col.Warning)
+          embedify(Array.from({ length: 4 }).map((_, i) => tr.forLang(locale, `commands.privacy.delete.confirmLine${(i + 1) as 1}`)), Col.Warning)
             .setFooter({ text: tr.forLang(locale, "general.promptExpiryNotice", promptSec) }),
         ],
         ...useButtons([confirmBtns]),

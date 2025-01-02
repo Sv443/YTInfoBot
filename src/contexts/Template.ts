@@ -6,8 +6,8 @@ import { ContextMenuCommandBuilder, type ContextMenuCommandInteraction } from "d
 export class TemplateCtx extends ContextCommand {
   constructor() {
     super(new ContextMenuCommandBuilder()
-      .setName(tr.forLang("en-US", "commands.template_ctx.name"))
-      .setNameLocalizations(getLocMap("commands.template_ctx.name"))
+      .setName(tr.forLang("en-US", "commands.template_ctx.name" as "_"))
+      .setNameLocalizations(getLocMap("commands.template_ctx.name" as "_"))
     );
   }
 

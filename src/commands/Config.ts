@@ -9,7 +9,7 @@ import { capitalize } from "@lib/text.ts";
 import localesJson from "@assets/locales.json" with { type: "json" };
 import type { Stringifiable } from "@src/types.ts";
 import { registerCommandsForGuild } from "@lib/registry.ts";
-import { getLocMap, tr } from "@lib/translate.ts";
+import { getLocMap, tr, type TrKeyEn } from "@lib/translate.ts";
 
 //#region constants
 
@@ -112,7 +112,7 @@ export class ConfigCmd extends SlashCommand {
       .setName(CmdBase.getCmdName(tr.forLang("en-US", "commands.config.names.command")))
       .setNameLocalizations(getLocMap("commands.config.names.command", ConfigCmd.cmdPrefix))
       .setDescription(tr.forLang("en-US", "commands.config.descriptions.command"))
-      .setDescriptionLocalizations(getLocMap("config", ConfigCmd.cmdPrefix))
+      .setDescriptionLocalizations(getLocMap("commands.config.descriptions.command", ConfigCmd.cmdPrefix))
       .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
       .addSubcommand(option => option
         .setName(tr.forLang("en-US", "commands.config.names.subcmd.reset"))
@@ -274,10 +274,10 @@ export class ConfigCmd extends SlashCommand {
     int: CommandInteraction;
     opt: CommandInteractionOption;
     cfgProp: TCfgKey;
-    settingNameTrKey: string;
+    settingNameTrKey: TrKeyEn;
     getValueLabel?: (value: TCfgValue, locale: string) => Stringifiable | undefined;
     validateValue?: (value: TCfgValue) => boolean;
-    invalidHintTrKey?: string;
+    invalidHintTrKey?: TrKeyEn;
   }) {
     if(!ConfigCmd.checkInGuild(int))
       return;

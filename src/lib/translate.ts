@@ -2,6 +2,7 @@ import type { Stringifiable } from "@src/types.ts";
 import type { LocalizationMap } from "discord.js";
 import k from "kleur";
 import { readdir, readFile } from "node:fs/promises";
+import trEn from "@assets/translations/en-US.json" with { type: "json" };
 
 //#region tr system
 
@@ -30,6 +31,15 @@ export interface TrObject {
 
 /** Function that transforms a matched translation string into something else */
 export type TransformFn = (language: string, trValue: string, matchesArr: RegExpMatchArray, ...trArgs: (Stringifiable | Record<string, Stringifiable>)[]) => Stringifiable;
+
+/** Pass a translation object to this function to get all keys in the object */
+export type TrKeys<TTrObj, P extends string = ""> = {
+  [K in keyof TTrObj]: K extends string | number | boolean | null | undefined
+    ? TTrObj[K] extends object
+      ? TrKeys<TTrObj[K], `${P}${K}.`>
+      : `${P}${K}`
+    : never
+}[keyof TTrObj];
 
 /** All translations loaded into memory */
 const trans: {
@@ -155,7 +165,7 @@ const deleteTranslations = (language = curLang): void => {
  * @param language Language code or name to check in - defaults to the currently active language (set by {@linkcode tr.setLanguage()})
  * @returns Whether the translation key exists in the specified language - always returns `false` if no language is given and no active language was set
  */
-const hasKey = (key: string, language = curLang): boolean => {
+const hasKey = (key: TrKeyEn, language = curLang): boolean => {
   return tr.forLang(language, key) !== key;
 };
 
@@ -235,7 +245,7 @@ const deleteTransform = (patternOrFn: RegExp | string | TransformFn): void => {
  * @param key Key of the translation to return
  * @param args Optional arguments to be passed to the translated text. They will replace placeholders in the format `%n`, where `n` is the 1-indexed argument number
  */
-const forLang = (language: string, key: string, ...args: (Stringifiable | Record<string, Stringifiable>)[]) => {
+const forLang = (language: string, key: TrKeyEn, ...args: (Stringifiable | Record<string, Stringifiable>)[]) => {
   const txt = translate(language, key, ...args);
   if(txt === key)
     return translate(defaultLocale, key, ...args);
@@ -258,6 +268,11 @@ export { tr };
 
 //#region custom stuff
 
+/** All translation keys from the file `@assets/translations/en-US.json` */
+export type TrKeyEn = TrKeys<typeof trEn> | "_";
+// export type TrKeyEn = TrKeys<typeof trEn> | (string & {});
+
+/** The default and fallback locale */
 export const defaultLocale = "en-US";
 
 /** Array of tuples containing the regular expression and the transformation function */
@@ -327,7 +342,7 @@ export async function initTranslations(): Promise<void> {
 //#region getLocMap
 
 /** Returns the localization map for all locales, given the common translation key */
-export function getLocMap(trKey: string, prefix = ""): LocalizationMap {
+export function getLocMap(trKey: TrKeyEn, prefix = ""): LocalizationMap {
   const locMap = {} as LocalizationMap;
 
   for(const [locale, trObj] of Object.entries(trans)) {
