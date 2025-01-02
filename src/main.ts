@@ -67,6 +67,7 @@ async function init() {
 
 const metGuildId = getEnvVar("METRICS_GUILD", "stringNoEmpty");
 const metChanId = getEnvVar("METRICS_CHANNEL", "stringNoEmpty");
+const metUpdInterval = getEnvVar("METRICS_UPDATE_INTERVAL", "number") ?? 30;
 
 const initTime = Date.now();
 const metricsManifFile = ".metrics.json";
@@ -97,7 +98,7 @@ async function intervalChecks(client: Client, i: number) {
   try {
     const tasks: Promise<void | unknown>[] = [];
 
-    if(i === 0 || i % 20 === 0) {
+    if(i === 0 || i % metUpdInterval === 0) {
       tasks.push(updateMetrics(client));
       tasks.push(checkGuilds(client));
     }
