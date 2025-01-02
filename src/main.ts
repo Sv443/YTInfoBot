@@ -155,10 +155,25 @@ async function updateMetrics(client: Client) {
     const totalMembersAmt = client.guilds.cache
       .reduce((acc, g) => acc + g.memberCount, 0);
 
-    const uniqueMembersAmt = client.guilds.cache
-      .reduce<GuildMember[]>((acc, g) => [...acc, ...g.members.cache.values()], [])
-      .filter((m, i, arr) => arr.findIndex(m2 => m2.id === m.id) === i)
-      .length;
+    const memMap = new Map<string, GuildMember>();
+    const memMapPromises: Promise<void>[] = [];
+    for(const g of client.guilds.cache.values()) {
+      memMapPromises.push(new Promise(async (res, rej) => {
+        try {
+          await g.members.fetch();
+          for(const m of g.members.cache.values()) {
+            if(memMap.has(m.id) || m.user.bot || m.user.system || m.user.partial || m.partial)
+              continue;
+            memMap.set(m.id, m);
+          }
+          res();
+        }
+        catch(e) {
+          rej(e);
+        }
+      }));
+    }
+    await Promise.all(memMapPromises);
 
     const latestMetrics = {
       guildsAmt: client.guilds.cache.size,
@@ -167,7 +182,7 @@ async function updateMetrics(client: Client) {
       ctxCmdAmt,
       usersAmt: (await em.findAll(UserSettings)).length,
       totalMembersAmt,
-      uniqueMembersAmt,
+      uniqueMembersAmt: memMap.size,
     } as const satisfies MetricsData;
 
     const metricsChan = client.guilds.cache.find(g => g.id === metGuildId)?.channels.cache.find(c => c.id === metChanId);
