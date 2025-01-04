@@ -10,6 +10,7 @@ import localesJson from "@assets/locales.json" with { type: "json" };
 import type { Stringifiable } from "@src/types.ts";
 import { registerCommandsForGuild } from "@lib/registry.ts";
 import { getLocMap, tr, type TrKeyEn } from "@lib/translate.ts";
+import { getEnvVar } from "@lib/env.ts";
 
 //#region constants
 
@@ -245,11 +246,23 @@ export class ConfigCmd extends SlashCommand {
 
   public async autocomplete(int: AutocompleteInteraction) {
     const searchVal = int.options.getFocused().toLowerCase().trim();
-    const locales = localesJson
-      .filter(({ code, name, nativeName }) => code.toLowerCase().includes(searchVal) || name.toLowerCase().includes(searchVal) || nativeName.toLowerCase().includes(searchVal))
-      .slice(0, 25);
+    const maxAcRes = getEnvVar("MAX_AUTOCOMPLETE_RESULTS", "number");
+    const acResAmt = isNaN(maxAcRes) ? 25 : Math.min(maxAcRes, 25);
 
-    await int.respond(locales.map(({ code, name }) => ({ value: code, name })));
+    switch(int.options.getSubcommand(true)) {
+    case "locale":
+      return int.respond(
+        [...localesJson]
+          .filter(({ code, name, nativeName }) =>
+            code.toLowerCase().includes(searchVal)
+            || name.toLowerCase().includes(searchVal)
+            || nativeName.toLowerCase().includes(searchVal)
+          )
+          .slice(0, acResAmt)
+          .map(({ code, name, nativeName }) => ({ value: code, name: /\(.+\)/.test(name) ? name : `${name} (${nativeName})` }))
+          .sort((a, b) => a.name.localeCompare(b.name))
+      );
+    }
   }
 
   //#region s:utils
