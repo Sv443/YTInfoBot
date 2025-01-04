@@ -8,8 +8,7 @@ import { cmdInstances, initRegistry, registerCommandsForGuild } from "@lib/regis
 import { autoPlural } from "@lib/text.ts";
 import { envVarEq, getEnvVar } from "@lib/env.ts";
 import { initTranslations } from "@lib/translate.ts";
-import { getHash } from "@lib/crypto.ts";
-import { getCommitHash, ghBaseUrl } from "@lib/misc.ts";
+import { getCommitHash, getHash, ghBaseUrl } from "@lib/misc.ts";
 import { Col } from "@lib/embedify.ts";
 import { GuildConfig } from "@models/GuildConfig.model.ts";
 import packageJson from "@root/package.json" with { type: "json" };
