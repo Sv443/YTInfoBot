@@ -1,7 +1,7 @@
 import { SlashCommandBuilder, type CommandInteraction, type CommandInteractionOption } from "discord.js";
 import { embedify } from "@lib/embedify.ts";
 import { CmdBase, SlashCommand } from "@lib/Command.ts";
-import packageJson from "@root/package.json" with { type: "json" };
+import pkg from "@root/package.json" with { type: "json" };
 import { getEnvVar } from "@lib/env.ts";
 import { bitSetHas } from "@lib/math.ts";
 import { getLocMap, tr } from "@lib/translate.ts";
@@ -12,29 +12,29 @@ import { cmdInstances } from "@lib/registry.ts";
 export class HelpCmd extends SlashCommand {
   constructor() {
     super(new SlashCommandBuilder()
-      .setName(CmdBase.getCmdName(tr.forLang("en-US", "commands.help.names.command")))
+      .setName(CmdBase.getCmdName(tr.for("en-US", "commands.help.names.command")))
       .setNameLocalizations(getLocMap("commands.help.names.command", HelpCmd.cmdPrefix))
-      .setDescription(tr.forLang("en-US", "commands.help.descriptions.command"))
+      .setDescription(tr.for("en-US", "commands.help.descriptions.command"))
       .setDescriptionLocalizations(getLocMap("commands.help.descriptions.command"))
       .addSubcommand(subcommand =>
         subcommand
-          .setName(CmdBase.getCmdName(tr.forLang("en-US", "commands.help.names.subcmd.commands")))
+          .setName(CmdBase.getCmdName(tr.for("en-US", "commands.help.names.subcmd.commands")))
           .setNameLocalizations(getLocMap("commands.help.names.subcmd.commands"))
-          .setDescription(tr.forLang("en-US", "commands.help.descriptions.subcmd.commands"))
+          .setDescription(tr.for("en-US", "commands.help.descriptions.subcmd.commands"))
           .setDescriptionLocalizations(getLocMap("commands.help.descriptions.subcmd.commands"))
           .addBooleanOption(option =>
             option
-              .setName(tr.forLang("en-US", "commands.help.names.args.show_hidden"))
+              .setName(tr.for("en-US", "commands.help.names.args.show_hidden"))
               .setNameLocalizations(getLocMap("commands.help.names.args.show_hidden"))
-              .setDescription(tr.forLang("en-US", "commands.help.descriptions.args.show_hidden"))
+              .setDescription(tr.for("en-US", "commands.help.descriptions.args.show_hidden"))
               .setDescriptionLocalizations(getLocMap("commands.help.descriptions.args.show_hidden"))
           )
       )
       .addSubcommand(subcommand =>
         subcommand
-          .setName(CmdBase.getCmdName(tr.forLang("en-US", "commands.help.names.subcmd.info")))
+          .setName(CmdBase.getCmdName(tr.for("en-US", "commands.help.names.subcmd.info")))
           .setNameLocalizations(getLocMap("commands.help.names.subcmd.info"))
-          .setDescription(tr.forLang("en-US", "commands.help.descriptions.subcmd.info"))
+          .setDescription(tr.for("en-US", "commands.help.descriptions.subcmd.info"))
           .setDescriptionLocalizations(getLocMap("commands.help.descriptions.subcmd.info"))
       )
     );
@@ -80,8 +80,8 @@ export class HelpCmd extends SlashCommand {
       return int.reply({
         embeds: [
           embedify(cmdList)
-            .setTitle(tr.forLang(locale, "commands.help.embedTitles.commands"))
-            .setFooter({ text: tr.forLang(locale, "commands.help.embedFooters.commands") }),
+            .setTitle(tr.for(locale, "commands.help.embedTitles.commands"))
+            .setFooter({ text: tr.for(locale, "commands.help.embedFooters.commands") }),
         ],
         ephemeral,
       });
@@ -90,16 +90,21 @@ export class HelpCmd extends SlashCommand {
       return int.reply({
         embeds: [
           embedify([
-            tr.forLang(locale, "commands.help.info.version", packageJson.version),
-            tr.forLang(locale, "commands.help.info.createdBy", packageJson.author.name, packageJson.author.url),
+            tr.for(locale, "commands.help.info.version", pkg.version),
+            tr.for(locale, "commands.help.info.createdBy", pkg.author.name, pkg.author.url),
             "",
-            tr.forLang(locale, "commands.help.info.globalOptOut"),
+            tr.for(locale, "commands.help.info.globalOptOut"),
             "",
-            tr.forLang(locale, "commands.help.info.bugsLink", packageJson.bugs.url),
-            tr.forLang(locale, "commands.help.info.supportServerLink", getEnvVar("SUPPORT_SERVER_INVITE_URL")),
-            tr.forLang(locale, "commands.help.info.donationLink", packageJson.funding.url),
+            tr.for(locale, "commands.help.info.bugsLink", pkg.bugs.url),
+            tr.for(locale, "commands.help.info.supportServerLink", getEnvVar("SUPPORT_SERVER_INVITE_URL")),
+            tr.for(locale, "commands.help.info.donationLink", pkg.funding.url),
             "",
-            tr.forLang(locale, "commands.help.info.poweredBy"),
+            tr.for(locale, "commands.help.info.installExtensions"),
+            tr.for(locale, "commands.help.info.installExtReturnYtDislike"),
+            tr.for(locale, "commands.help.info.installExtSponsorBlock"),
+            tr.for(locale, "commands.help.info.installExtDeArrow"),
+            "",
+            tr.for(locale, "commands.help.info.poweredBy"),
           ])
             .setTitle("commands.help.embedTitles.info"),
         ],
