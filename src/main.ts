@@ -198,9 +198,10 @@ async function updateMetrics(client: Client) {
     }
 
     if(metricsData && metricsChan && metricsChan.isTextBased()) {
-      const metricsChanged = firstMetricRun || metricsData.metricsHash !== getHash(JSON.stringify(latestMetrics), undefined, "base64");
+      const latestMetHash = getHash(JSON.stringify(latestMetrics));
+      const metricsChanged = firstMetricRun || metricsData.metricsHash !== latestMetHash;
       if(metricsChanged)
-        metricsData.metricsHash = getHash(JSON.stringify(latestMetrics), undefined, "base64");
+        metricsData.metricsHash = latestMetHash;
 
       if(metricsChanged && metricsData.msgId && metricsData.msgId.length > 0) {
         metricsMsg = (await metricsChan.messages.fetch({ limit: 1, around: metricsData.msgId })).first();
@@ -209,7 +210,6 @@ async function updateMetrics(client: Client) {
           await metricsMsg?.delete();
           metricsMsg = await metricsChan?.send(await useMetricsMsg(latestMetrics));
           metricsData!.msgId = metricsMsg?.id;
-          await writeFile(metricsManifFile, JSON.stringify(metricsData));
         };
 
         try {
@@ -220,6 +220,14 @@ async function updateMetrics(client: Client) {
         }
         catch {
           recreateMsg();
+        }
+        finally {
+          try {
+            await writeFile(metricsManifFile, JSON.stringify(metricsData));
+          }
+          catch(e) {
+            console.error("Couldn't write metrics manifest:", e);
+          }
         }
       }
       else if(!metricsData.msgId || metricsData.msgId.length === 0) {
