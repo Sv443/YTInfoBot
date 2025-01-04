@@ -84,21 +84,21 @@ export type VideoInfoFetchData = {
 export class VideoInfoCmd extends SlashCommand {
   constructor() {
     super(new SlashCommandBuilder()
-      .setName(CmdBase.getCmdName(tr.forLang("en-US", "commands.video_info.names.command")))
+      .setName(CmdBase.getCmdName(tr.for("en-US", "commands.video_info.names.command")))
       .setNameLocalizations(getLocMap("commands.video_info.names.command", VideoInfoCmd.cmdPrefix))
-      .setDescription(tr.forLang("en-US", "commands.video_info.descriptions.command"))
+      .setDescription(tr.for("en-US", "commands.video_info.descriptions.command"))
       .setDescriptionLocalizations(getLocMap("commands.video_info.descriptions.command"))
       .addStringOption(opt =>
-        opt.setName(tr.forLang("en-US", "commands.video_info.names.args.video"))
+        opt.setName(tr.for("en-US", "commands.video_info.names.args.video"))
           .setNameLocalizations(getLocMap("commands.video_info.names.args.video"))
-          .setDescription(tr.forLang("en-US", "commands.video_info.descriptions.options.video"))
+          .setDescription(tr.for("en-US", "commands.video_info.descriptions.options.video"))
           .setDescriptionLocalizations(getLocMap("commands.video_info.descriptions.options.video"))
           .setRequired(true)
       )
       .addStringOption(opt =>
-        opt.setName(tr.forLang("en-US", "commands.video_info.names.args.type"))
+        opt.setName(tr.for("en-US", "commands.video_info.names.args.type"))
           .setNameLocalizations(getLocMap("commands.video_info.names.args.type"))
-          .setDescription(tr.forLang("en-US", "commands.video_info.descriptions.options.type"))
+          .setDescription(tr.for("en-US", "commands.video_info.descriptions.options.type"))
           .setDescriptionLocalizations(getLocMap("commands.video_info.descriptions.options.type"))
           .addChoices(videoInfoTypeChoices)
       )
@@ -134,7 +134,7 @@ export class VideoInfoCmd extends SlashCommand {
     });
 
     if(!embed)
-      return int.editReply(useEmbedify(tr.forLang(locale, "commands.video_info.errors.foundNoVidInfo"), Col.Error));
+      return int.editReply(useEmbedify(tr.for(locale, "commands.video_info.errors.foundNoVidInfo"), Col.Error));
 
     return int.editReply({ embeds: [embed] });
   }
@@ -223,7 +223,7 @@ export class VideoInfoCmd extends SlashCommand {
     embed.setTitle((hasDeArrowData ? bestDeArrowTitle?.title : ytData?.title) ?? url);
 
     hasDeArrowData && ytData.title && embed.addFields({
-      name: tr.forLang(locale, "commands.video_info.embedFields.originalTitle"),
+      name: tr.for(locale, "commands.video_info.embedFields.originalTitle"),
       value: ytData.title,
       inline: false,
     });
@@ -242,7 +242,7 @@ export class VideoInfoCmd extends SlashCommand {
       const ratioPercent = ratioPerc.toFixed(1);
 
       embed.addFields({
-        name: tr.forLang(locale, "commands.video_info.embedFields.votes"),
+        name: tr.for(locale, "commands.video_info.embedFields.votes"),
         value: `${fmt(likes)} 👍  •  ${fmt(dislikes)} 👎\n${generateEmojiProgressBar(ratioPerc, 7)} ${ratioPercent}%`,
         inline: true,
       });
@@ -289,7 +289,7 @@ export class VideoInfoCmd extends SlashCommand {
       }
 
       embed.addFields({
-        name: tr.forLang(locale, "commands.video_info.embedFields.timestamps"),
+        name: tr.for(locale, "commands.video_info.embedFields.timestamps"),
         value: timestampList,
         inline: false,
       });
@@ -310,7 +310,7 @@ export class VideoInfoCmd extends SlashCommand {
 
     // TODO: translate
     embed.setFooter({
-      text: `Powered by ${joinArrayReadable(poweredByStr, tr.forLang(locale, "general.listSeparator"), tr.forLang(locale, "general.listSeparatorLast"))}`,
+      text: `Powered by ${joinArrayReadable(poweredByStr, tr.for(locale, "general.listSeparator"), tr.for(locale, "general.listSeparatorLast"))}`,
     });
 
     return embed;

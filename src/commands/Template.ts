@@ -8,9 +8,9 @@ import { getLocMap, tr } from "@lib/translate.ts";
 export class TemplateCmd extends SlashCommand {
   constructor() {
     super(new SlashCommandBuilder()
-      .setName(CmdBase.getCmdName(tr.forLang("en-US", "commands.template_command.name" as "_")))
+      .setName(CmdBase.getCmdName(tr.for("en-US", "commands.template_command.name" as "_")))
       .setNameLocalizations(getLocMap("commands.template_command.name" as "_", TemplateCmd.cmdPrefix))
-      .setDescription(tr.forLang("en-US", "commands.template_command.description" as "_"))
+      .setDescription(tr.for("en-US", "commands.template_command.description" as "_"))
       .setDescriptionLocalizations(getLocMap("commands.template_command.description" as "_"))
     );
   }
@@ -23,7 +23,7 @@ export class TemplateCmd extends SlashCommand {
     const locale = await TemplateCmd.getGuildLocale(int);
 
     return int.editReply({
-      ...useEmbedify(tr.forLang(locale, "commands.template_command.embedContent" as "_")),
+      ...useEmbedify(tr.for(locale, "commands.template_command.embedContent" as "_")),
     });
   }
 }

@@ -57,13 +57,13 @@ export class MessageCreateEvt extends Event {
     const locale = (await em.findOne(GuildConfig, { id: guildId }))?.locale ?? defaultLocale;
 
     if(!allVidsDeduped || allVidsDeduped.length === 0)
-      return notFound(tr.forLang(locale, "errors.noYtVidLinksFound"));
+      return notFound(tr.for(locale, "errors.noYtVidLinksFound"));
 
     const guildCfg = await em.findOne(GuildConfig, { id: guildId });
     const embeds = [] as EmbedBuilder[];
 
     if(!guildCfg)
-      return (int?.editReply ?? msg.reply)(useEmbedify(tr.forLang(locale, "errors.guildCfgInaccessible"), Col.Error));
+      return (int?.editReply ?? msg.reply)(useEmbedify(tr.for(locale, "errors.guildCfgInaccessible"), Col.Error));
 
     if(isAutoReply) {
       if(!guildCfg.autoReplyEnabled)
@@ -81,7 +81,7 @@ export class MessageCreateEvt extends Event {
       checked++;
       if(!videoId)
         if(allVidsDeduped.length === checked)
-          return notFound(tr.forLang(locale, "errors.noYtVidLinksFound"));
+          return notFound(tr.for(locale, "errors.noYtVidLinksFound"));
         else
           continue;
 
@@ -101,7 +101,7 @@ export class MessageCreateEvt extends Event {
     }
 
     if(embeds.length === 0)
-      return isAutoReply ? undefined : notFound(tr.forLang(locale, "errors.noVidInfoFound"));
+      return isAutoReply ? undefined : notFound(tr.for(locale, "errors.noVidInfoFound"));
 
     if(int)
       return int.editReply({
@@ -113,7 +113,7 @@ export class MessageCreateEvt extends Event {
       embeds,
       allowedMentions: { repliedUser: false },
       ...(isAutoReply
-        ? useButtons(new ButtonBuilder().setStyle(ButtonStyle.Secondary).setLabel(tr.forLang(locale, "buttons.delete")).setCustomId("delete_auto_reply").setEmoji("🗑️"))
+        ? useButtons(new ButtonBuilder().setStyle(ButtonStyle.Secondary).setLabel(tr.for(locale, "buttons.delete")).setCustomId("delete_auto_reply").setEmoji("🗑️"))
         : {}
       ),
     });

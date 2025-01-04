@@ -109,7 +109,11 @@
         "bugsLink": "- Submit bugs or feature requests on [GitHub](${bugsUrl})",
         "supportServerLink": "- Join the [support server](${supportServerInviteUrl}) if you have any questions or need help",
         "donationLink": "- This bot is completely free so if you are able to, please consider [supporting the development ❤️](${fundingUrl})",
-        "poweredBy": "Powered by [ReturnYoutubeDislike](https://returnyoutubedislike.com/), [SponsorBlock](https://sponsor.ajay.app/), and [DeArrow](https://dearrow.ajay.app/)"
+        "installExtensions": "Install the browser extensions to improve your experience with YouTube:",
+        "installExtReturnYtDislike": "- [ReturnYoutubeDislike](https://returnyoutubedislike.com/) - shows approximate likes and dislikes on videos",
+        "installExtSponsorBlock": "- [SponsorBlock](https://sponsor.ajay.app/) - shows segments and chapters to automatically or manually skip",
+        "installExtDeArrow": "- [DeArrow](https://dearrow.ajay.app/) - shows crowdsourced thumbnails and titles to reduce clickbait",
+        "poweredBy": "This bot wouldn't have been possible without the APIs from [ReturnYoutubeDislike](https://returnyoutubedislike.com/), [SponsorBlock](https://sponsor.ajay.app/), and [DeArrow.](https://dearrow.ajay.app/)"
       },
       "embedTitles": {
         "commands": "Commands:",

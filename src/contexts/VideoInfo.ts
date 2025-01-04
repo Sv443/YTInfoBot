@@ -10,7 +10,7 @@ import { ApplicationCommandType, ContextMenuCommandBuilder, InteractionContextTy
 export class VideoInfoCtx extends ContextCommand {
   constructor() {
     super(new ContextMenuCommandBuilder()
-      .setName(tr.forLang("en-US", "commands.video_info_ctx.nameReduced"))
+      .setName(tr.for("en-US", "commands.video_info_ctx.nameReduced"))
       .setNameLocalizations(getLocMap("commands.video_info_ctx.nameReduced"))
       .setType(ApplicationCommandType.Message as number)
       .setContexts([
@@ -31,7 +31,7 @@ export class VideoInfoCtx extends ContextCommand {
 
     if(!targetMsg)
       return int.editReply({
-        ...useEmbedify(tr.forLang(locale, "errors.messageInaccessible"), Col.Error),
+        ...useEmbedify(tr.for(locale, "errors.messageInaccessible"), Col.Error),
       });
 
     return await MessageCreateEvt.handleYtLinkMsg(targetMsg, int);
@@ -44,7 +44,7 @@ export class VideoInfoCtx extends ContextCommand {
 export class VideoInfoExtendedCtx extends ContextCommand {
   constructor() {
     super(new ContextMenuCommandBuilder()
-      .setName(tr.forLang("en-US", "commands.video_info_ctx.nameExtended"))
+      .setName(tr.for("en-US", "commands.video_info_ctx.nameExtended"))
       .setNameLocalizations(getLocMap("commands.video_info_ctx.nameExtended"))
       .setType(ApplicationCommandType.Message as number)
       .setContexts([
@@ -65,7 +65,7 @@ export class VideoInfoExtendedCtx extends ContextCommand {
 
     if(!targetMsg)
       return int.editReply({
-        ...useEmbedify(tr.forLang(locale, "errors.messageInaccessible"), Col.Error),
+        ...useEmbedify(tr.for(locale, "errors.messageInaccessible"), Col.Error),
       });
 
     return await MessageCreateEvt.handleYtLinkMsg(targetMsg, int, "everything");

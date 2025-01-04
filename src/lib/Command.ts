@@ -35,7 +35,7 @@ export abstract class CmdBase {
   /** Checks whether the passed interaction is in a guild and replies or edits the reply with an error message if not */
   public static checkInGuild(int: CommandInteraction): int is CommandInteraction<"raw" | "cached"> {
     if(!int.inGuild()) {
-      int[int.deferred || int.replied ? "editReply" : "reply"](useEmbedify(tr.forLang("en-US", "errors.onlyRunInGuild"), Col.Error));
+      int[int.deferred || int.replied ? "editReply" : "reply"](useEmbedify(tr.for("en-US", "errors.onlyRunInGuild"), Col.Error));
       return false;
     }
     return true;

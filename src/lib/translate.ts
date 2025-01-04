@@ -166,7 +166,7 @@ const deleteTranslations = (language = curLang): void => {
  * @returns Whether the translation key exists in the specified language - always returns `false` if no language is given and no active language was set
  */
 const hasKey = (key: TrKeyEn, language = curLang): boolean => {
-  return tr.forLang(language, key) !== key;
+  return tr.for(language, key) !== key;
 };
 
 /**
@@ -245,7 +245,7 @@ const deleteTransform = (patternOrFn: RegExp | string | TransformFn): void => {
  * @param key Key of the translation to return
  * @param args Optional arguments to be passed to the translated text. They will replace placeholders in the format `%n`, where `n` is the 1-indexed argument number
  */
-const forLang = (language: string, key: TrKeyEn, ...args: (Stringifiable | Record<string, Stringifiable>)[]) => {
+const trFor = (language: string, key: TrKeyEn, ...args: (Stringifiable | Record<string, Stringifiable>)[]) => {
   const txt = translate(language, key, ...args);
   if(txt === key)
     return translate(defaultLocale, key, ...args);
@@ -253,7 +253,7 @@ const forLang = (language: string, key: TrKeyEn, ...args: (Stringifiable | Recor
 };
 
 const tr = {
-  forLang,
+  for: trFor,
   addTranslations,
   setLanguage,
   getLanguage,

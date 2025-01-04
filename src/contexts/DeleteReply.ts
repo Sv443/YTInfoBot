@@ -6,7 +6,7 @@ import { ApplicationCommandType, ContextMenuCommandBuilder, InteractionContextTy
 export class DeleteReplyCtx extends ContextCommand {
   constructor() {
     super(new ContextMenuCommandBuilder()
-      .setName(tr.forLang("en-US", "commands.delete_reply_ctx.name"))
+      .setName(tr.for("en-US", "commands.delete_reply_ctx.name"))
       .setNameLocalizations(getLocMap("commands.delete_reply_ctx.name"))
       .setType(ApplicationCommandType.Message as number)
       .setContexts(InteractionContextType.Guild, InteractionContextType.PrivateChannel)
