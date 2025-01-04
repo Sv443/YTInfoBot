@@ -3,6 +3,9 @@
 /** Any value that can be implicitly converted to a string with `String(val)`, `val.toString()` or \``${val}`\` */
 export type Stringifiable = string | number | boolean | null | undefined | { toString(): string } | Stringifiable[];
 
+/** Any class reference that can be instantiated with `new` */
+export type Newable<T> = new (...args: any[]) => T;
+
 //#region YT data
 
 export type YTVidDataObj = {

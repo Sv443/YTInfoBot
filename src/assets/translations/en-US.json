@@ -60,16 +60,16 @@
         "settings": {
           "defaultVideoInfoType": "The default video_info type, used when a link is sent or no type argument is given",
           "numberFormat": "The number format for this server, used for example when displaying likes and dislikes",
-          "locale": "The locale (language and country) for the server, used for formatting dates, numbers and more",
+          "locale": "The language and country setting for the server, used for translations, number formatting and more",
           "autoReplyEnabled": "Whether the bot will automatically reply to all messages containing a video link"
         }
       },
       "set": {
         "currentValue": "The current ${settingName} is `${newValue}`",
-        "invalidValue": "Invalid ${settingName} specified: `${newValue}`${invalidHint}",
+        "invalidValue": "Invalid ${settingName} specified: `${newValue}`${invalidHintSuffix}",
         "success": "Successfully set the ${settingName} to `${newValue}`",
         "error": "Couldn't set the ${settingName} due to an error: ${err}",
-        "localeInvalidHint": "Must be in the BCP 47 format: language-COUNTRY (case sensitive), like `en-US`. Not all combinations are supported."
+        "localeInvalidHint": "Only the listed languages are supported."
       },
       "reset": {
         "confirm": "Are you sure you want to reset the configuration?",
