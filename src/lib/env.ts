@@ -5,53 +5,45 @@ import "dotenv/config";
  * Grabs an environment variable's value, and casts it to a `string` (or what's passed in the TRetVal generic).  
  * However if the string is empty (or unset), undefined is returned.
  */
-export function getEnvVar<TRetVal extends string | undefined>(varName: string, asType?: "stringNoEmpty"): TRetVal
+export function getEnvVar(varName: string, asType?: "stringOrUndefined"): string | undefined
 /** Grabs an environment variable's value, and casts it to a `string` (or what's passed in the TRetVal generic) */
-export function getEnvVar<TRetVal extends string>(varName: string, asType?: "string"): TRetVal
+export function getEnvVar(varName: string, asType: "string"): string
 /** Grabs an environment variable's value, and casts it to a `number` (or what's passed in the TRetVal generic) */
-export function getEnvVar<TRetVal extends number>(varName: string, asType: "number"): TRetVal
+export function getEnvVar(varName: string, asType: "number"): number
 /** Grabs an environment variable's value, and casts it to a `string[]` (or what's passed in the TRetVal generic) */
-export function getEnvVar<TRetVal extends string[]>(varName: string, asType: "stringArray"): TRetVal
+export function getEnvVar(varName: string, asType: "stringArray"): string[]
 /** Grabs an environment variable's value, and casts it to a `number[]` (or what's passed in the TRetVal generic) */
-export function getEnvVar<TRetVal extends number[]>(varName: string, asType: "numberArray"): TRetVal
-/** Grabs an environment variable's value, and casts it to a specific type (stringNoEmpty by default) */
+export function getEnvVar(varName: string, asType: "numberArray"): number[]
+/** Grabs an environment variable's value, and casts it to a specific type (stringOrUndefined by default) */
 export function getEnvVar<
-  T extends ("string" | "number" | "stringArray" | "numberArray" | "stringNoEmpty")
+  T extends ("string" | "number" | "stringArray" | "numberArray" | "stringOrUndefined")
 >(
   varName: string,
-  asType: T = "stringNoEmpty" as T
+  asType: T = "stringOrUndefined" as T
 ): undefined | (string | number | string[] | number[]) {
-  const val = process.env[varName];
-
-  if(!val)
-    return undefined;
-
-  let transform: (value: string) => unknown = v => v.trim();
-
+  const val = String(process.env[varName] ?? "").trim();
   const commasRegex = /[,،，٫٬]/g;
 
   switch(asType) {
+  default:
+  case "stringOrUndefined":
+    return val.length === 0 ? undefined : val;
+  case "string":
+    return val;
   case "number":
-    transform = v => parseInt(v.trim());
-    break;
+    return Number(val);
   case "stringArray":
-    transform = v => v.trim().split(commasRegex);
-    break;
+    return val.split(commasRegex);
   case "numberArray":
-    transform = v => v.split(commasRegex).map(n => parseInt(n.trim()));
-    break;
-  case "stringNoEmpty":
-    transform = v => String(v).trim().length == 0 ? undefined : String(v).trim();
+    return val.split(commasRegex).map(n => Number(n.trim()));
   }
-
-  return transform(val) as string; // I'm lazy and ts is happy, so we can all be happy and pretend this doesn't exist
 }
 
 /**
  * Tests if the value of the environment variable {@linkcode varName} equals {@linkcode compareValue} casted to string.  
  * Set {@linkcode caseSensitive} to true to make the comparison case-sensitive.
  */
-export function envVarEquals(varName: string, compareValue: Stringifiable, caseSensitive = false) {
+export function envVarEq(varName: string, compareValue: Stringifiable, caseSensitive = false) {
   const envVal = (caseSensitive ? getEnvVar(varName) : getEnvVar(varName)?.toLowerCase());
   const compVal = (caseSensitive ? String(compareValue) : String(compareValue).toLowerCase());
   return envVal === compVal;

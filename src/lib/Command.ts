@@ -5,7 +5,7 @@ import { defaultLocale, tr } from "@lib/translate.ts";
 import { em } from "@lib/db.ts";
 import { GuildConfig } from "@models/GuildConfig.model.ts";
 
-const cmdPrefix = getEnvVar("CMD_PREFIX", "stringNoEmpty");
+const cmdPrefix = getEnvVar("CMD_PREFIX", "stringOrUndefined");
 
 //#region CmdBase
 

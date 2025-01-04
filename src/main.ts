@@ -6,7 +6,7 @@ import { client, botToken } from "@lib/client.ts";
 import { em, initDatabase } from "@lib/db.ts";
 import { cmdInstances, initRegistry, registerCommandsForGuild } from "@lib/registry.ts";
 import { autoPlural } from "@lib/text.ts";
-import { envVarEquals, getEnvVar } from "@lib/env.ts";
+import { envVarEq, getEnvVar } from "@lib/env.ts";
 import { initTranslations } from "@lib/translate.ts";
 import { getHash } from "@lib/crypto.ts";
 import { getCommitHash, ghBaseUrl } from "@lib/misc.ts";
@@ -22,7 +22,7 @@ const requiredEnvVars = ["DB_URL", "APPLICATION_ID", "BOT_TOKEN", "BOT_INVITE_UR
 
 /** Called before the client is ready to check for environment variables and to initialize the client and database */
 async function init() {
-  const missingEnvVars = requiredEnvVars.filter((envVar) => !getEnvVar(envVar, "stringNoEmpty"));
+  const missingEnvVars = requiredEnvVars.filter((envVar) => !getEnvVar(envVar, "stringOrUndefined"));
 
   if(missingEnvVars.length > 0) {
     console.error(`${k.red(`Missing ${missingEnvVars.length} required environment ${autoPlural("variable", missingEnvVars)}:`)}\n- ${missingEnvVars.join("\n- ")}\n`);
@@ -55,7 +55,7 @@ async function init() {
   });
 
   console.log(k.blue(`${client.user?.displayName ?? client.user?.username} is ready.\n`));
-  envVarEquals("BELL_ON_READY", true) && process.stdout.write("\u0007");
+  envVarEq("BELL_ON_READY", true) && process.stdout.write("\u0007");
 
   let i = 0;
   intervalChecks(client, i);
@@ -67,8 +67,8 @@ async function init() {
 
 //#region metrics:vars
 
-const metGuildId = getEnvVar("METRICS_GUILD", "stringNoEmpty");
-const metChanId = getEnvVar("METRICS_CHANNEL", "stringNoEmpty");
+const metGuildId = getEnvVar("METRICS_GUILD", "stringOrUndefined");
+const metChanId = getEnvVar("METRICS_CHANNEL", "stringOrUndefined");
 const metUpdIvRaw = getEnvVar("METRICS_UPDATE_INTERVAL", "number");
 const metUpdInterval = Math.max(isNaN(metUpdIvRaw) ? 30 : metUpdIvRaw, 3);
 

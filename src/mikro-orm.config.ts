@@ -1,10 +1,10 @@
 import { defineConfig } from "@mikro-orm/core";
-import { envVarEquals, getEnvVar } from "@lib/env.ts";
+import { envVarEq, getEnvVar } from "@lib/env.ts";
 
 export const config = defineConfig({
-  clientUrl: getEnvVar("DB_URL", "stringNoEmpty"),
+  clientUrl: getEnvVar("DB_URL", "stringOrUndefined"),
   charset: "utf8",
   entities: ["dist/**/*.model.js"],
   entitiesTs: ["src/**/*.model.ts"],
-  debug: envVarEquals("DB_DEBUG", true),
+  debug: envVarEq("DB_DEBUG", true),
 });

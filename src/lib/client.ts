@@ -1,8 +1,8 @@
 import { ActivityType, Client, GatewayIntentBits, REST } from "discord.js";
 import { getEnvVar } from "@lib/env.ts";
 
-export const botToken = getEnvVar("BOT_TOKEN")!;
-export const clientId = getEnvVar("APPLICATION_ID")!;
+export const botToken = getEnvVar("BOT_TOKEN", "string");
+export const clientId = getEnvVar("APPLICATION_ID", "string");
 
 export const client = new Client({
   intents: [
