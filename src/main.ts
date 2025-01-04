@@ -1,3 +1,4 @@
+import { resolve } from "node:path";
 import { readFile, writeFile } from "node:fs/promises";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Events, type Client, type GuildMember, type Message, type MessageCreateOptions } from "discord.js";
 import k from "kleur";
@@ -11,9 +12,8 @@ import { initTranslations } from "@lib/translate.ts";
 import { getCommitHash, getHash, ghBaseUrl } from "@lib/misc.ts";
 import { Col } from "@lib/embedify.ts";
 import { GuildConfig } from "@models/GuildConfig.model.ts";
-import packageJson from "@root/package.json" with { type: "json" };
 import { UserSettings } from "@models/UserSettings.model.ts";
-import { resolve } from "node:path";
+import pkg from "@root/package.json" with { type: "json" };
 
 //#region validate env
 
@@ -264,7 +264,7 @@ async function useMetricsMsg(metrics: MetricsData) {
       { name: "Members:", value: `${totalMembersAmt} total\n${uniqueMembersAmt} unique`, inline: true },
       { name: `${autoPlural("Command", cmdsTotal)} (${cmdsTotal}):`, value: `${slashCmdAmt} ${autoPlural("slash command", slashCmdAmt)}\n${ctxCmdAmt} ${autoPlural("context command", ctxCmdAmt)}`, inline: false },
     ])
-    .setFooter({ text: `v${packageJson.version} - ${await getCommitHash(true)}` })
+    .setFooter({ text: `v${pkg.version} - ${await getCommitHash(true)}` })
     .setColor(Col.Info);
 
   return {

@@ -1,4 +1,4 @@
-import { cp, access, constants } from "node:fs/promises";
+import { cp, constants, readFile } from "node:fs/promises";
 import k from "kleur";
 
 const copyIfNotExists = [
@@ -8,7 +8,7 @@ const copyIfNotExists = [
 
 async function exists(path: string) {
   try {
-    await access(path, constants.W_OK | constants.F_OK | constants.R_OK);
+    await readFile(path, { flag: constants.F_OK | constants.R_OK });
     return true;
   }
   catch {

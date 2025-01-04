@@ -1,16 +1,16 @@
-import { access, constants as fsconst } from "node:fs/promises";
+import { constants as fsconst, readFile } from "node:fs/promises";
 import { exec } from "node:child_process";
 import { createHash, type BinaryToTextEncoding } from "node:crypto";
 import type { Stringifiable } from "@src/types.ts";
-import packageJson from "@root/package.json" with { type: "json" };
+import pkg from "@root/package.json" with { type: "json" };
 
 /** The base URL for the GitHub repository, without trailing slash */
-export const ghBaseUrl = packageJson.repository.url.replace(/(git\+)|(\.git)/g, "");
+export const ghBaseUrl = pkg.repository.url.trim().replace(/(git\+)|(\.git)|(\/$)/g, "");
 
 /** Checks if a file exists */
 export async function exists(path: string) {
   try {
-    await access(path, fsconst.R_OK | fsconst.W_OK);
+    await readFile(path, { flag: fsconst.R_OK | fsconst.W_OK });
     return true;
   }
   catch {
