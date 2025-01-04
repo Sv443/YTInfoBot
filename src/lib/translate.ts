@@ -29,8 +29,24 @@ export interface TrObject {
  [key: string]: string | TrObject;
 }
 
+/** Properties for the transform function that transforms a matched translation string into something else */
+export type TransformFnProps<TTrKey extends string = string> = {
+  /** The currently set language - empty string if not set yet */
+  language: string;
+  /** The matches as returned by `RegExp.exec()` */
+  matches: RegExpExecArray[];
+  /** The translation key */
+  trKey: TTrKey;
+  /** Translation value before any transformations */
+  trValue: string;
+  /** Current value, possibly in-between transformations */
+  currentValue: string;
+  /** Arguments passed to the translation function */
+  trArgs: (Stringifiable | Record<string, Stringifiable>)[];
+};
+
 /** Function that transforms a matched translation string into something else */
-export type TransformFn = (language: string, trValue: string, matchesArr: RegExpMatchArray, ...trArgs: (Stringifiable | Record<string, Stringifiable>)[]) => Stringifiable;
+export type TransformFn<TTrKey extends string = string> = (props: TransformFnProps<TTrKey>) => Stringifiable;
 
 /** Pass a translation object to this function to get all keys in the object */
 export type TrKeys<TTrObj, P extends string = ""> = {
@@ -56,7 +72,7 @@ const valTransforms: Array<{
 let curLang = "";
 
 /** Common function to resolve the translation text in a specific language. */
-function translate(language: string, key: string, ...args: (Stringifiable | Record<string, Stringifiable>)[]): string {
+function translate<TTrKey extends string = string>(language: string, key: TTrKey, ...trArgs: (Stringifiable | Record<string, Stringifiable>)[]): string {
   if(typeof language !== "string")
     language = curLang ?? "";
 
@@ -65,12 +81,33 @@ function translate(language: string, key: string, ...args: (Stringifiable | Reco
   if(typeof language !== "string" || language.length === 0 || typeof trObj !== "object" || trObj === null)
     return key;
 
-  const transform = (value: string): string => {
-    const tf = valTransforms.find((t) => t.regex.test(value));
+  const transformTrVal = (trKey: TTrKey, trValue: string): string => {
+    const tfs = valTransforms.filter(({ regex }) => new RegExp(regex).test(trValue));
 
-    return tf
-      ? value.replace(tf.regex, (...matches) => String(tf.fn(language, value, matches, ...args)))
-      : value;
+    if(tfs.length === 0)
+      return trValue;
+
+    let retStr = String(trValue);
+
+    for(const tf of tfs) {
+      const re = new RegExp(tf.regex);
+
+      const matches: RegExpExecArray[] = [];
+      let execRes: RegExpExecArray | null;
+      while((execRes = re.exec(trValue)) !== null)
+        matches.push(execRes);
+
+      retStr = String(tf.fn({
+        language,
+        trValue,
+        currentValue: retStr,
+        matches,
+        trKey,
+        trArgs,
+      }));
+    }
+
+    return retStr;
   };
 
   // try to resolve via traversal (e.g. `trObj["key"]["parts"]`)
@@ -82,12 +119,12 @@ function translate(language: string, key: string, ...args: (Stringifiable | Reco
     value = value?.[part];
   }
   if(typeof value === "string")
-    return transform(value);
+    return transformTrVal(key, value);
 
   // try falling back to `trObj["key.parts"]`
   value = trObj?.[key];
   if(typeof value === "string")
-    return transform(value);
+    return transformTrVal(key, value);
 
   // default to translation key
   return key;
@@ -208,15 +245,15 @@ const hasKey = (key: TrKeyEn, language = curLang): boolean => {
  * ```
  * @param pattern Regular expression or string (passed to `new RegExp(pattern, "gm")`) that should match the entire pattern that calls the transform function
  */
-const addTransform = (pattern: RegExp | string, fn: TransformFn): void => {
-  valTransforms.push({ fn, regex: typeof pattern === "string" ? new RegExp(pattern, "gm") : pattern });
+const addTransform = (pattern: RegExp | string, fn: TransformFn<TrKeyEn>): void => {
+  valTransforms.push({ fn: fn as TransformFn, regex: typeof pattern === "string" ? new RegExp(pattern, "gm") : pattern });
 };
 
 /**
  * Deletes the first transform function from the list of registered transform functions.  
  * @param patternOrFn A reference to the regular expression of the transform function, a string matching the original pattern, or a reference to the transform function to delete
  */
-const deleteTransform = (patternOrFn: RegExp | string | TransformFn): void => {
+const deleteTransform = (patternOrFn: RegExp | string | TransformFn<TrKeyEn>): void => {
   const idx = valTransforms.findIndex((t) =>
     (t.fn === patternOrFn as unknown as () => void)
     || (t.regex === (typeof patternOrFn === "string" ? new RegExp(patternOrFn, "gm") : patternOrFn))
@@ -278,37 +315,39 @@ export const defaultLocale = "en-US";
 /** Array of tuples containing the regular expression and the transformation function */
 const transforms = [
   [
-    /<\$([a-zA-Z0-9$_-]+)>/gm,
-    (_lang, fullMatch, matchesArr, ...args) => {
-      let str = matchesArr[0];
-    
-      const eachKeyInTrString = (keys: string[]) => keys.every((key) => fullMatch.includes("${" + key + "}"));
-    
+    /\$\{([a-zA-Z0-9$_-]+)\}/gm,
+    ({ matches, trArgs, trValue }) => {
+      let str = String(trValue);
+
+      const eachKeyInTrString = (keys: string[]) => keys.every((key) => trValue.includes("${" + key + "}"));
+
       const namedMapping = () => {
-        if(!str.includes("${") || !args[0] || typeof args[0] !== "object" || !eachKeyInTrString(Object.keys(args[0])))
+        if(!str.includes("${") || typeof trArgs[0] === "undefined" || typeof trArgs[0] !== "object" || !eachKeyInTrString(Object.keys(trArgs[0] ?? {})))
           return;
-        for(const key in args[0]) {
-          const regex = new RegExp("\\$" + `{${key}\\}`, "gm");
-          str = str.replace(regex, String((args[0] as Record<string, string>)[key]));
+        for(const match of matches) {
+          str = str.replace(match[0], String((trArgs[0] as Record<string, string>)[match[1]]));
         }
       };
-    
+
       const positionalMapping = () => {
-        if(!(/\${.+}/m.test(str)))
+        if(!(/\$\{.+\}/m.test(str)) || !trArgs[0])
           return;
-        for(const arg of args)
-          str = str.replace(/\${[a-zA-Z0-9$_-]+}/, String(arg));
+        let matchNum = -1;
+        for(const match of matches) {
+          matchNum++;
+          str = str.replace(match[0], String(trArgs[matchNum]));
+        }
       };
-    
-      if(args[0] && typeof args[0] === "object" && eachKeyInTrString(Object.keys(args[0])) && String(args[0]).startsWith("[object"))
+
+      if(trArgs[0] && typeof trArgs[0] === "object" && trArgs[0] !== null && eachKeyInTrString(Object.keys(trArgs[0] ?? {})) && String(trArgs[0]).startsWith("[object"))
         namedMapping();
       else
         positionalMapping();
-    
+
       return str;
     },
   ],
-] as const satisfies [RegExp, TransformFn][];
+] as const satisfies [RegExp, TransformFn<TrKeyEn>][];
 
 /** Loads all translations from files in the folder at `src/assets/translations` and applies transformation functions */
 export async function initTranslations(): Promise<void> {
@@ -345,12 +384,31 @@ export async function initTranslations(): Promise<void> {
 export function getLocMap(trKey: TrKeyEn, prefix = ""): LocalizationMap {
   const locMap = {} as LocalizationMap;
 
-  for(const [locale, trObj] of Object.entries(trans)) {
-    const transform = (value: string): string => {
-      const tf = valTransforms.find((t) => t.regex.test(value));
-      return tf
-        ? value.replace(tf.regex, (...matches) => String(tf.fn(locale, value, matches)))
-        : value;
+  for(const [language, trObj] of Object.entries(trans)) {
+    const transform = (trValue: string): string => {
+      const tf = valTransforms.find((t) => t.regex.test(trValue));
+
+      if(!tf)
+        return trValue;
+
+      let retStr = String(trValue);
+      const re = new RegExp(tf.regex);
+
+      const matches: RegExpExecArray[] = [];
+      let execRes: RegExpExecArray | null;
+      while((execRes = re.exec(trValue)) !== null)
+        matches.push(execRes);
+
+      retStr = String(tf.fn({
+        language,
+        trValue,
+        currentValue: retStr,
+        matches,
+        trKey,
+        trArgs: [],
+      }));
+
+      return retStr;
     };
 
     // try to resolve via traversal (e.g. `trObj["key"]["parts"]`)
@@ -362,12 +420,12 @@ export function getLocMap(trKey: TrKeyEn, prefix = ""): LocalizationMap {
       value = value?.[part];
     }
     if(typeof value === "string")
-      locMap[locale as keyof LocalizationMap] = prefix + transform(value);
+      locMap[language as keyof LocalizationMap] = prefix + transform(value);
 
     // try falling back to `trObj["key.parts"]`
     value = trObj?.[trKey];
     if(typeof value === "string")
-      locMap[locale as keyof LocalizationMap] = prefix + transform(value);
+      locMap[language as keyof LocalizationMap] = prefix + transform(value);
   }
 
   return Object.keys(locMap).length === 0

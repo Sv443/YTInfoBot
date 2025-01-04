@@ -35,13 +35,12 @@ async function init() {
 
   console.log(k.gray("\nInitializing and logging in..."));
 
-  await Promise.all([
-    initTranslations(),
-    new Promise((resolve) => {
-      client.once("ready", resolve);
-      client.login(botToken);
-    }),
-  ]);
+  await initTranslations();
+
+  await new Promise((resolve) => {
+    client.once("ready", resolve);
+    client.login(botToken);
+  });
 
   await Promise.all([
     initRegistry(),

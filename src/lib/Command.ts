@@ -4,6 +4,7 @@ import { Col, useEmbedify } from "@lib/embedify.ts";
 import { defaultLocale, tr } from "@lib/translate.ts";
 import { em } from "@lib/db.ts";
 import { GuildConfig } from "@models/GuildConfig.model.ts";
+import k from "kleur";
 
 const cmdPrefix = getEnvVar("CMD_PREFIX", "stringOrUndefined");
 
@@ -26,6 +27,7 @@ export abstract class CmdBase {
 
   /**
    * Returns the command name, optionally prefixed by the env var `CMD_PREFIX`  
+   * ⚠️ Only use at the top level, not in subcommands!  
    * If no name is passed, returns only the prefix, or an empty string if none is set
    */
   public static getCmdName(name?: string) {
@@ -65,6 +67,17 @@ export abstract class SlashCommand extends CmdBase {
 
     this.builder = builder;
     this.builderJson = builder.toJSON();
+
+    // check if any subcommand has the command prefix and throw error
+    if(cmdPrefix) {
+      const errors = [] as string[];
+      for(const sub of this.builderJson.options ?? []) {
+        if(sub.name.startsWith(cmdPrefix))
+          errors.push(`Subcommand name "${sub.name}" cannot start with the command prefix "${cmdPrefix}"`);
+      }
+      if(errors.length > 0)
+        throw new Error(`${k.red(`Encountered ${errors.length === 1 ? "error" : "errors"} while creating slash command instance "${this.constructor.name}":`)}\n${errors.join("\n")}`);
+    }
   }
 
   /** Gets executed when the command is run by a user */

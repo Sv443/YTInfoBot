@@ -103,17 +103,17 @@
       },
       "info": {
         "name": "info",
-        "version": "Version: ${version}",
-        "createdBy": "Created by [<authorName>](${authorUrl})",
-        "globalOptOut": "Opt out of automatic replies across every server by using the command `/settings set auto_reply new_value:false`",
-        "bugsLink": "- Submit bugs or feature requests on [GitHub](${bugsUrl})",
-        "supportServerLink": "- Join the [support server](${supportServerInviteUrl}) if you have any questions or need help",
-        "donationLink": "- This bot is completely free so if you are able to, please consider [supporting the development ❤️](${fundingUrl})",
-        "installExtensions": "Install the browser extensions to improve your experience with YouTube:",
+        "headline": "Version ${version} - created by [${name}.](${url})",
+        "donationLink": "This bot is completely free so if you are able to, please consider [supporting the development ❤️](${url})",
+        "bugsLink": "- Submit bugs or feature requests [on GitHub](${url})",
+        "supportServerLink": "- [Join the support server](${supportServerInviteUrl}) if you have any questions or need help",
+        "globalOptOut": "- Opt out of automatic replies across every server by using the command `/settings set auto_reply new_value:false`",
+        "installExtensions": "Install these browser extensions to improve your experience with YouTube:",
         "installExtReturnYtDislike": "- [ReturnYoutubeDislike](https://returnyoutubedislike.com/) - shows approximate likes and dislikes on videos",
         "installExtSponsorBlock": "- [SponsorBlock](https://sponsor.ajay.app/) - shows segments and chapters to automatically or manually skip",
         "installExtDeArrow": "- [DeArrow](https://dearrow.ajay.app/) - shows crowdsourced thumbnails and titles to reduce clickbait",
-        "poweredBy": "This bot wouldn't have been possible without the APIs from [ReturnYoutubeDislike](https://returnyoutubedislike.com/), [SponsorBlock](https://sponsor.ajay.app/), and [DeArrow.](https://dearrow.ajay.app/)"
+        "installExtMobile": "On Firefox Beta for Android, you can install these extensions by [creating your own extension collection.](https://www.androidpolice.com/install-add-on-extension-mozilla-firefox-android/)",
+        "poweredBy": "This bot wouldn't have been possible without the APIs of [ReturnYoutubeDislike](https://returnyoutubedislike.com/), [SponsorBlock](https://sponsor.ajay.app/), and [DeArrow.](https://dearrow.ajay.app/)"
       },
       "embedTitles": {
         "commands": "Commands:",

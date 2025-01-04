@@ -18,7 +18,7 @@ export class HelpCmd extends SlashCommand {
       .setDescriptionLocalizations(getLocMap("commands.help.descriptions.command"))
       .addSubcommand(subcommand =>
         subcommand
-          .setName(CmdBase.getCmdName(tr.for("en-US", "commands.help.names.subcmd.commands")))
+          .setName(tr.for("en-US", "commands.help.names.subcmd.commands"))
           .setNameLocalizations(getLocMap("commands.help.names.subcmd.commands"))
           .setDescription(tr.for("en-US", "commands.help.descriptions.subcmd.commands"))
           .setDescriptionLocalizations(getLocMap("commands.help.descriptions.subcmd.commands"))
@@ -32,7 +32,7 @@ export class HelpCmd extends SlashCommand {
       )
       .addSubcommand(subcommand =>
         subcommand
-          .setName(CmdBase.getCmdName(tr.for("en-US", "commands.help.names.subcmd.info")))
+          .setName(tr.for("en-US", "commands.help.names.subcmd.info"))
           .setNameLocalizations(getLocMap("commands.help.names.subcmd.info"))
           .setDescription(tr.for("en-US", "commands.help.descriptions.subcmd.info"))
           .setDescriptionLocalizations(getLocMap("commands.help.descriptions.subcmd.info"))
@@ -45,7 +45,7 @@ export class HelpCmd extends SlashCommand {
   public async run(int: CommandInteraction, opt: CommandInteractionOption) {
     if(!HelpCmd.checkInGuild(int))
       return;
-    const locale = await HelpCmd.getGuildLocale(int);
+
     switch(opt.name) {
     case "commands": {
       let cmdList = "";
@@ -55,7 +55,6 @@ export class HelpCmd extends SlashCommand {
       let ephemeral = false;
 
       const allowedCmds = [...cmdInstances.values()]
-        .sort((a, b) => a.builderJson.name.localeCompare(b.builderJson.name))
         .filter(cmd => {
           if(typeof cmd.builderJson.default_member_permissions === "undefined" || cmd.builderJson.default_member_permissions === "0")
             return true;
@@ -65,50 +64,56 @@ export class HelpCmd extends SlashCommand {
           const hasPerms = bitSetHas(BigInt(int.member.permissions as string), BigInt(cmd.builderJson.default_member_permissions as string));
           if(hasPerms) {
             ephemeral = true;
-            if(showHidden)
-              hiddenCmds.add(cmd.builderJson.name);
+            showHidden && hiddenCmds.add(cmd.builderJson.name);
           }
           return showHidden ? hasPerms : false;
-        });
+        })
+        .sort((a, b) => a.builderJson.name.localeCompare(b.builderJson.name));
 
       if(!showHidden)
         ephemeral = false;
 
-      for(const { builderJson: cmdData } of allowedCmds)
-        cmdList += `- ${hiddenCmds.has(cmdData.name) ? "🔒 " : ""}\`/${cmdData.name}\`${"description" in cmdData ? `\n  ${cmdData.description}` : ""}\n`;
+      for(const { builderJson: data } of allowedCmds)
+        cmdList += `- ${hiddenCmds.has(data.name) ? "🔒 " : ""}\`/${data.name}\`${"description" in data ? `\n  ${data.description}` : ""}\n`;
 
-      return int.reply({
+      await int.deferReply({ ephemeral });
+      const locale = await HelpCmd.getGuildLocale(int);
+
+      return int.editReply({
         embeds: [
           embedify(cmdList)
             .setTitle(tr.for(locale, "commands.help.embedTitles.commands"))
             .setFooter({ text: tr.for(locale, "commands.help.embedFooters.commands") }),
         ],
-        ephemeral,
       });
     }
-    case "info":
-      return int.reply({
+    case "info": {
+      await int.deferReply();
+      const locale = await HelpCmd.getGuildLocale(int);
+
+      const { version, author: { name, url }} = pkg;
+      return int.editReply({
         embeds: [
           embedify([
-            tr.for(locale, "commands.help.info.version", pkg.version),
-            tr.for(locale, "commands.help.info.createdBy", pkg.author.name, pkg.author.url),
-            "",
-            tr.for(locale, "commands.help.info.globalOptOut"),
+            tr.for(locale, "commands.help.info.headline", { version, name, url }),
+            tr.for(locale, "commands.help.info.donationLink", pkg.funding.url),
             "",
             tr.for(locale, "commands.help.info.bugsLink", pkg.bugs.url),
             tr.for(locale, "commands.help.info.supportServerLink", getEnvVar("SUPPORT_SERVER_INVITE_URL")),
-            tr.for(locale, "commands.help.info.donationLink", pkg.funding.url),
+            tr.for(locale, "commands.help.info.globalOptOut"),
             "",
             tr.for(locale, "commands.help.info.installExtensions"),
             tr.for(locale, "commands.help.info.installExtReturnYtDislike"),
             tr.for(locale, "commands.help.info.installExtSponsorBlock"),
             tr.for(locale, "commands.help.info.installExtDeArrow"),
+            tr.for(locale, "commands.help.info.installExtMobile"),
             "",
             tr.for(locale, "commands.help.info.poweredBy"),
           ])
-            .setTitle("commands.help.embedTitles.info"),
+            .setTitle(tr.for(locale, "commands.help.embedTitles.info")),
         ],
       });
+    }
     }
   }
 }
