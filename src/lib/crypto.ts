@@ -1,9 +1,9 @@
-import { createHash } from "node:crypto";
+import { createHash, type BinaryToTextEncoding } from "node:crypto";
 import type { Stringifiable } from "@src/types.ts";
 
 /** Creates a hash from the given stringifiable data */
-export function getHash(data: Stringifiable): string {
-  return createHash("sha256")
+export function getHash(data: Stringifiable, algorithm = "sha256", digest: BinaryToTextEncoding = "hex"): string {
+  return createHash(algorithm)
     .update(String(data))
-    .digest("hex");
+    .digest(digest);
 }

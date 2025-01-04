@@ -198,9 +198,9 @@ async function updateMetrics(client: Client) {
     }
 
     if(metricsData && metricsChan && metricsChan.isTextBased()) {
-      const metricsChanged = firstMetricRun || metricsData.metricsHash !== getHash(JSON.stringify(latestMetrics));
+      const metricsChanged = firstMetricRun || metricsData.metricsHash !== getHash(JSON.stringify(latestMetrics), undefined, "base64");
       if(metricsChanged)
-        metricsData.metricsHash = getHash(JSON.stringify(latestMetrics));
+        metricsData.metricsHash = getHash(JSON.stringify(latestMetrics), undefined, "base64");
 
       if(metricsChanged && metricsData.msgId && metricsData.msgId.length > 0) {
         metricsMsg = (await metricsChan.messages.fetch({ limit: 1, around: metricsData.msgId })).first();

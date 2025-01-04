@@ -70,7 +70,7 @@ async function registerGuildCommands() {
     ? String(await readFile(cmdHashFile)).replace(/\n/gm, "").trim()
     : "";
   const cmdJsons = [...cmdInstances.values()].map(cmd => cmd.builderJson);
-  const newCmdHash = getHash(JSON.stringify(cmdJsons));
+  const newCmdHash = getHash(JSON.stringify(cmdJsons), undefined, "base64");
 
   if(lastCmdHash !== newCmdHash || reregisterCmds) {
     await writeFile(cmdHashFile, newCmdHash);
