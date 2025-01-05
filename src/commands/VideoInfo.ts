@@ -32,17 +32,6 @@ export const numberFormatChoices = [
   { name: "Short", value: "short" },
 ] as const satisfies APIApplicationCommandOptionChoice<NumberFormat>[];
 
-export const sponsorBlockCategoryMap = {
-  sponsor: "Sponsored ad",
-  selfpromo: "Self- / Unpaid promo",
-  interaction: "Interaction reminder",
-  intro: "Intro / Intermission",
-  outro: "Outro / Endcards",
-  preview: "Preview / Recap",
-  music_offtopic: "Non-music section",
-  filler: "Filler / Off-topic",
-} as const satisfies Record<SponsorBlockCategory, string>;
-
 const sponsorBlockCategoryColorEmojiMap = {
   sponsor: "🟩", // green
   selfpromo: "🟨", // yellow
@@ -273,19 +262,56 @@ export class VideoInfoCmd extends SlashCommand {
         return 0;
       });
 
-      for(const { category, segment, actionType } of reorderedSegments) {
+      // join segments together where segment[1] of the previous is the same as segment[0] of the next
+      // join their names together too
+      const concatenatedSegments = [...reorderedSegments] as (SponsorBlockSegmentObj & { categories: SponsorBlockCategory[] })[];
+      // called recursively until no more segments can be joined
+      const joinSegments = () => {
+        let joinedSegs = 0;
+
+        for(let i = 0; i < concatenatedSegments.length - 1; i++) {
+          const left = concatenatedSegments[i];
+          const right = concatenatedSegments[i + 1];
+          const l = Math.round(left.segment[1] * 10) / 10;
+          const r = Math.round(right.segment[0] * 10) / 10;
+
+          if(Math.abs(l - r) <= 0.5) {
+            left.segment[0] = Math.min(left.segment[0], right.segment[0]);
+            left.segment[1] = Math.max(left.segment[1], right.segment[1]);
+            if(!Array.isArray(left.categories))
+              left.categories = [] as SponsorBlockCategory[];
+            left.categories = [...new Set([left.category, ...left.categories, right.category])];
+            concatenatedSegments.splice(i + 1, 1);
+            joinedSegs++;
+          }
+        }
+
+        if(joinedSegs === 0)
+          return;
+        return joinSegments();
+      };
+      joinSegments();
+
+      for(const { segment, actionType, ...rest } of concatenatedSegments) {
         hasSponsorBlockData = true;
+
+        const categories = [...("categories" in rest ? rest.categories as SponsorBlockCategory[] : [(rest as SponsorBlockSegmentObj).category])];
 
         const startUrl = new URL(url);
         startUrl.searchParams.set("t", String(Math.floor(segment[0])));
         const endUrl = new URL(url);
         endUrl.searchParams.set("t", String(Math.floor(segment[1])));
 
-        // TODO: translate
+        const catList = joinArrayReadable(
+          categories.map(cat => `${sponsorBlockCategoryColorEmojiMap[cat]} ${tr.for(locale, `commands.video_info.embedFields.sponsorBlockCategories.${cat as "sponsor"}`)}`),
+          tr.for(locale, "general.listSeparator"),
+          tr.for(locale, "general.listSeparatorLast"),
+        );
+
         if(actionType === "poi")
-          timestampList += `${sponsorBlockCategoryColorEmojiMap[category]} [\`${secsToYtTime(segment[0])}\`](${startUrl}) ${sponsorBlockCategoryMap[category]}\n`;
+          timestampList += `[\`${secsToYtTime(segment[0])}\`](${startUrl}) ${catList}\n`;
         else
-          timestampList += `${sponsorBlockCategoryColorEmojiMap[category]} [\`${secsToYtTime(segment[0])}\`](${startUrl})-[\`${secsToYtTime(segment[1])}\`](${endUrl}) ${sponsorBlockCategoryMap[category]}\n`;
+          timestampList += `[\`${secsToYtTime(segment[0])}\`](${startUrl})-[\`${secsToYtTime(segment[1])}\`](${endUrl}) ${catList}\n`;
       }
 
       embed.addFields({

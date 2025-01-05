@@ -44,8 +44,8 @@ export abstract class CmdBase {
   }
 
   /** Returns the locale of the guild for the given interaction or guild ID */
-  public static async getGuildLocale(intOrId: CommandInteraction | string): Promise<string> {
-    return (await em.findOne(GuildConfig, { id: typeof intOrId === "string" ? intOrId : intOrId.guildId }))?.locale ?? defaultLocale;
+  public static async getGuildLocale(intOrId: Pick<CommandInteraction, "guild" | "guildId"> | string): Promise<string> {
+    return (await em.findOne(GuildConfig, { id: typeof intOrId === "string" ? intOrId : intOrId.guild?.id ?? intOrId?.guildId }))?.locale ?? defaultLocale;
   }
 }
 

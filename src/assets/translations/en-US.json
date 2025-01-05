@@ -184,7 +184,17 @@
       "embedFields": {
         "originalTitle": "Original title:",
         "votes": "Votes (estimated):",
-        "timestamps": "Timestamps:"
+        "timestamps": "Timestamps:",
+        "sponsorBlockCategories": {
+          "sponsor": "Sponsorship",
+          "selfpromo": "Self- / Unpaid promo",
+          "interaction": "Interaction reminder",
+          "intro": "Intro / Intermission",
+          "outro": "Outro / Endcards",
+          "preview": "Preview / Recap",
+          "music_offtopic": "Non-music",
+          "filler": "Filler / Off-topic"
+        }
       }
     },
     "video_info_ctx": {

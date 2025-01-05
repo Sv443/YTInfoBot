@@ -249,6 +249,15 @@ export class ConfigCmd extends SlashCommand {
     const maxAcRes = getEnvVar("MAX_AUTOCOMPLETE_RESULTS", "number");
     const acResAmt = isNaN(maxAcRes) ? 25 : Math.min(maxAcRes, 25);
 
+    let loc: string | undefined;
+
+    await Promise.race([
+      (async () => {
+        loc = await ConfigCmd.getGuildLocale(int);
+      })(),
+      new Promise<void>(res => setTimeout(res, 1500)),
+    ]);
+
     switch(int.options.getSubcommand(true)) {
     case "locale":
       return int.respond(
@@ -260,7 +269,7 @@ export class ConfigCmd extends SlashCommand {
           )
           .slice(0, acResAmt)
           .map(({ code, name, nativeName }) => ({ value: code, name: /\(.+\)/.test(name) ? name : `${name} (${nativeName})` }))
-          .sort((a, b) => a.name.localeCompare(b.name))
+          .sort((a, b) => a.name.localeCompare(b.name, loc))
       );
     }
   }
