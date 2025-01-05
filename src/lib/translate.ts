@@ -130,6 +130,20 @@ function translate<TTrKey extends string = string>(language: string, key: TTrKey
   return key;
 }
 
+/**
+ * Prepares a translation function for a specific language.
+ * @example ```ts
+ * tr.addTranslations("en", {
+ *   hello: "Hello, %1!",
+ * });
+ * const t = tr.useTr("en");
+ * t("hello", "John"); // "Hello, John!"
+ * ```
+ */
+function useTr(language: string) {
+  return (key: string, ...args: (Stringifiable | Record<string, Stringifiable>)[]) => translate(language, key, ...args);
+}
+
 // /**
 //  * Returns the translated text for the specified key in the specified language.  
 //  * If the key is not found in the specified previously registered translation, the key itself is returned.  
@@ -291,6 +305,7 @@ const trFor = (language: string, key: TrKeyEn, ...args: (Stringifiable | Record<
 
 const tr = {
   for: trFor,
+  useTr,
   addTranslations,
   setLanguage,
   getLanguage,

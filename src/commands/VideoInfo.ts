@@ -186,6 +186,8 @@ export class VideoInfoCmd extends SlashCommand {
     if(!ytData)
       return null;
 
+    const t = tr.useTr(locale);
+
     //#SECTION title & thumbnail
 
     const bestDeArrowThumb = deArrowData?.thumbnails?.find(t => !t.original && (t.locked || t.votes > 0))
@@ -212,7 +214,7 @@ export class VideoInfoCmd extends SlashCommand {
     embed.setTitle((hasDeArrowData ? bestDeArrowTitle?.title : ytData?.title) ?? url);
 
     hasDeArrowData && ytData.title && embed.addFields({
-      name: tr.for(locale, "commands.video_info.embedFields.originalTitle"),
+      name: t("commands.video_info.embedFields.originalTitle"),
       value: ytData.title,
       inline: false,
     });
@@ -231,7 +233,7 @@ export class VideoInfoCmd extends SlashCommand {
       const ratioPercent = ratioPerc.toFixed(1);
 
       embed.addFields({
-        name: tr.for(locale, "commands.video_info.embedFields.votes"),
+        name: t("commands.video_info.embedFields.votes"),
         value: `${fmt(likes)} 👍  •  ${fmt(dislikes)} 👎\n${generateEmojiProgressBar(ratioPerc, 7)} ${ratioPercent}%`,
         inline: true,
       });
@@ -296,9 +298,9 @@ export class VideoInfoCmd extends SlashCommand {
         const categories = [...("categories" in rest ? rest.categories as SponsorBlockCategory[] : [(rest as SponsorBlockSegmentObj).category])];
 
         const catList = joinArrayReadable(
-          categories.map(cat => `${sponsorBlockCategoryColorEmojiMap[cat]} ${tr.for(locale, `commands.video_info.embedFields.sponsorBlockCategories.${cat as "sponsor"}`)}`),
-          tr.for(locale, "general.listSeparator"),
-          tr.for(locale, "general.listSeparatorLast"),
+          categories.map(cat => `${sponsorBlockCategoryColorEmojiMap[cat]} ${t(`commands.video_info.embedFields.sponsorBlockCategories.${cat as "sponsor"}`)}`),
+          t("general.shortListSeparator"),
+          t("general.shortListSeparator"),
         );
 
         const atVidEnd = valsWithin(segment[1], videoDuration);
@@ -318,7 +320,7 @@ export class VideoInfoCmd extends SlashCommand {
       }
 
       embed.addFields({
-        name: tr.for(locale, "commands.video_info.embedFields.timestamps"),
+        name: t("commands.video_info.embedFields.timestamps"),
         value: timestampList,
         inline: false,
       });
@@ -339,7 +341,7 @@ export class VideoInfoCmd extends SlashCommand {
 
     // TODO: translate
     embed.setFooter({
-      text: `Powered by ${joinArrayReadable(poweredByStr, tr.for(locale, "general.listSeparator"), tr.for(locale, "general.listSeparatorLast"))}`,
+      text: `Powered by ${joinArrayReadable(poweredByStr, t("general.listSeparator"), t("general.listSeparatorLast"))}`,
     });
 
     return embed;
