@@ -70,6 +70,8 @@ const valTransforms: Array<{
 
 /** Currently set language */
 let curLang = "";
+/** Fallback language - if undefined, the trKey itself will be returned if the translation is not found */
+let fallbackLang: string | undefined;
 
 /** Common function to resolve the translation text in a specific language. */
 function translate<TTrKey extends string = string>(language: string, key: TTrKey, ...trArgs: (Stringifiable | Record<string, Stringifiable>)[]): string {
@@ -79,7 +81,7 @@ function translate<TTrKey extends string = string>(language: string, key: TTrKey
   const trObj = trans[language];
 
   if(typeof language !== "string" || language.length === 0 || typeof trObj !== "object" || trObj === null)
-    return key;
+    return fallbackLang ? translate(fallbackLang, key, ...trArgs) : key;
 
   const transformTrVal = (trKey: TTrKey, trValue: string): string => {
     const tfs = valTransforms.filter(({ regex }) => new RegExp(regex).test(trValue));
@@ -94,8 +96,11 @@ function translate<TTrKey extends string = string>(language: string, key: TTrKey
 
       const matches: RegExpExecArray[] = [];
       let execRes: RegExpExecArray | null;
-      while((execRes = re.exec(trValue)) !== null)
+      while((execRes = re.exec(trValue)) !== null) {
+        if(matches.some(m => m[0] === execRes?.[0]))
+          break;
         matches.push(execRes);
+      }
 
       retStr = String(tf.fn({
         language,
@@ -126,8 +131,8 @@ function translate<TTrKey extends string = string>(language: string, key: TTrKey
   if(typeof value === "string")
     return transformTrVal(key, value);
 
-  // default to translation key
-  return key;
+  // default to en-US or translation key
+  return fallbackLang ? translate(fallbackLang, key, ...trArgs) : key;
 }
 
 /**
@@ -184,6 +189,11 @@ const addTranslations = (language: string, translations: TrObject): void => {
  */
 const setLanguage = (language: string): void => {
   curLang = language;
+};
+
+/** The fallback language to use when a translation key is not found in the currently active language - undefined to disable fallbacks and just return the translation key */
+const setFallbackLanguage = (fallbackLanguage?: string): void => {
+  fallbackLang = fallbackLanguage;
 };
 
 /**
@@ -308,6 +318,7 @@ const tr = {
   useTr,
   addTranslations,
   setLanguage,
+  setFallbackLanguage,
   getLanguage,
   getTranslations,
   deleteTranslations,
@@ -329,6 +340,7 @@ export const defaultLocale = "en-US";
 
 /** Array of tuples containing the regular expression and the transformation function */
 const transforms = [
+  // replace placeholders in the format `${name}` with the value of the key `name` in the passed object or use positional mapping with the passed spread arguments
   [
     /\$\{([a-zA-Z0-9$_-]+)\}/gm,
     ({ matches, trArgs, trValue }) => {
@@ -391,6 +403,7 @@ export async function initTranslations(): Promise<void> {
     tr.addTransform(regex, fn);
 
   tr.setLanguage(enName ?? defaultLocale);
+  tr.setFallbackLanguage(enName ?? defaultLocale);
 }
 
 //#region getLocMap
@@ -411,8 +424,11 @@ export function getLocMap(trKey: TrKeyEn, prefix = ""): LocalizationMap {
 
       const matches: RegExpExecArray[] = [];
       let execRes: RegExpExecArray | null;
-      while((execRes = re.exec(trValue)) !== null)
+      while((execRes = re.exec(trValue)) !== null) {
+        if(matches.some(m => m[0] === execRes?.[0]))
+          break;
         matches.push(execRes);
+      }
 
       retStr = String(tf.fn({
         language,

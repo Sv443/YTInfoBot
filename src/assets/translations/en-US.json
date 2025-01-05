@@ -20,8 +20,7 @@
     "enabled": "Enabled",
     "disabled": "Disabled",
     "listSeparator": ", ",
-    "listSeparatorLast": " and ",
-    "shortListSeparator": " & "
+    "listSeparatorLast": " and "
   },
   "commands": {
     "config": {

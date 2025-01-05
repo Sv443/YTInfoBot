@@ -299,8 +299,8 @@ export class VideoInfoCmd extends SlashCommand {
 
         const catList = joinArrayReadable(
           categories.map(cat => `${sponsorBlockCategoryColorEmojiMap[cat]} ${t(`commands.video_info.embedFields.sponsorBlockCategories.${cat as "sponsor"}`)}`),
-          t("general.shortListSeparator"),
-          t("general.shortListSeparator"),
+          t("general.listSeparator"),
+          t("general.listSeparator"),
         );
 
         const atVidEnd = valsWithin(segment[1], videoDuration);
