@@ -186,7 +186,7 @@
         "votes": "Votes (estimated):",
         "timestamps": "Timestamps:",
         "sponsorBlockCategories": {
-          "sponsor": "Sponsorship",
+          "sponsor": "Sponsored",
           "selfpromo": "Self- / Unpaid promo",
           "interaction": "Interaction reminder",
           "intro": "Intro / Intermission",

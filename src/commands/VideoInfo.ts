@@ -8,7 +8,7 @@ import type { DeArrowObj, ReturnYouTubeDislikeObj, SponsorBlockActionType, Spons
 import { generateEmojiProgressBar, joinArrayReadable, secsToYtTime } from "@lib/text.ts";
 import { getBestThumbnailUrl } from "@lib/thumbnail.ts";
 import { GuildConfig } from "@models/GuildConfig.model.ts";
-import { formatNumber } from "@lib/math.ts";
+import { formatNumber, valsWithin } from "@lib/math.ts";
 import { em } from "@lib/db.ts";
 import { getLocMap, tr } from "@lib/translate.ts";
 import { UserSettings } from "@models/UserSettings.model.ts";
@@ -272,10 +272,8 @@ export class VideoInfoCmd extends SlashCommand {
         for(let i = 0; i < concatenatedSegments.length - 1; i++) {
           const left = concatenatedSegments[i];
           const right = concatenatedSegments[i + 1];
-          const l = Math.round(left.segment[1] * 10) / 10;
-          const r = Math.round(right.segment[0] * 10) / 10;
 
-          if(Math.abs(l - r) <= 0.5) {
+          if(valsWithin(left.segment[1], right.segment[0])) {
             left.segment[0] = Math.min(left.segment[0], right.segment[0]);
             left.segment[1] = Math.max(left.segment[1], right.segment[1]);
             if(!Array.isArray(left.categories))
@@ -292,15 +290,10 @@ export class VideoInfoCmd extends SlashCommand {
       };
       joinSegments();
 
-      for(const { segment, actionType, ...rest } of concatenatedSegments) {
+      for(const { segment, actionType, videoDuration, ...rest } of concatenatedSegments) {
         hasSponsorBlockData = true;
 
         const categories = [...("categories" in rest ? rest.categories as SponsorBlockCategory[] : [(rest as SponsorBlockSegmentObj).category])];
-
-        const startUrl = new URL(url);
-        startUrl.searchParams.set("t", String(Math.floor(segment[0])));
-        const endUrl = new URL(url);
-        endUrl.searchParams.set("t", String(Math.floor(segment[1])));
 
         const catList = joinArrayReadable(
           categories.map(cat => `${sponsorBlockCategoryColorEmojiMap[cat]} ${tr.for(locale, `commands.video_info.embedFields.sponsorBlockCategories.${cat as "sponsor"}`)}`),
@@ -308,10 +301,20 @@ export class VideoInfoCmd extends SlashCommand {
           tr.for(locale, "general.listSeparatorLast"),
         );
 
-        if(actionType === "poi")
+        const atVidEnd = valsWithin(segment[1], videoDuration);
+
+        if(actionType === "poi") {
+          const startUrl = new URL(url);
+          startUrl.searchParams.set("t", String(Math.floor(segment[0])));
+
           timestampList += `[\`${secsToYtTime(segment[0])}\`](${startUrl}) ${catList}\n`;
-        else
-          timestampList += `[\`${secsToYtTime(segment[0])}\`](${startUrl})-[\`${secsToYtTime(segment[1])}\`](${endUrl}) ${catList}\n`;
+        }
+        else {
+          const endUrl = new URL(url);
+          endUrl.searchParams.set("t", String(Math.floor(segment[1])));
+
+          timestampList += `\`${secsToYtTime(segment[0])}\`-${atVidEnd ? "" : "["}\`${secsToYtTime(segment[1])}\`${atVidEnd ? "" : `](${endUrl})`} ${catList}\n`;
+        }
       }
 
       embed.addFields({
