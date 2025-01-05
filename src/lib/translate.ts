@@ -73,7 +73,7 @@ let curLang = "";
 /** Fallback language - if undefined, the trKey itself will be returned if the translation is not found */
 let fallbackLang: string | undefined;
 
-/** Common function to resolve the translation text in a specific language. */
+/** Common function to resolve the translation text in a specific language and apply transform functions. */
 function translate<TTrKey extends string = string>(language: string, key: TTrKey, ...trArgs: (Stringifiable | Record<string, Stringifiable>)[]): string {
   if(typeof language !== "string")
     language = curLang ?? "";
@@ -136,6 +136,22 @@ function translate<TTrKey extends string = string>(language: string, key: TTrKey
 }
 
 /**
+ * Returns the translated text for the specified key in the specified language.  
+ * If the key is not found in the specified previously registered translation, the key itself is returned.  
+ *   
+ * ⚠️ Remember to register a language with {@linkcode tr.addTranslations()} before using this function, otherwise it will always return the key itself.
+ * @param language Language code or name to use for the translation
+ * @param key Key of the translation to return
+ * @param args Optional arguments to be passed to the translated text. They will replace placeholders in the format `%n`, where `n` is the 1-indexed argument number
+ */
+function trFor<TTrKey extends string = string>(language: string, key: TTrKey, ...args: (Stringifiable | Record<string, Stringifiable>)[]) {
+  const txt = translate(language, key, ...args);
+  if(txt === key)
+    return translate(defaultLocale, key, ...args);
+  return txt;
+}
+
+/**
  * Prepares a translation function for a specific language.
  * @example ```ts
  * tr.addTranslations("en", {
@@ -146,19 +162,9 @@ function translate<TTrKey extends string = string>(language: string, key: TTrKey
  * ```
  */
 function useTr<TTrKey extends string = string>(language: string) {
-  return (key: TTrKey, ...args: (Stringifiable | Record<string, Stringifiable>)[]) => translate<TTrKey>(language, key, ...args);
+  return (key: TTrKey, ...args: (Stringifiable | Record<string, Stringifiable>)[]) =>
+    translate<TTrKey>(language, key, ...args);
 }
-
-// /**
-//  * Returns the translated text for the specified key in the specified language.  
-//  * If the key is not found in the specified previously registered translation, the key itself is returned.  
-//  *   
-//  * ⚠️ Remember to register a language with {@linkcode tr.addTranslations()} before using this function, otherwise it will always return the key itself.
-//  * @param language Language code or name to use for the translation
-//  * @param key Key of the translation to return
-//  * @param args Optional arguments to be passed to the translated text. They will replace placeholders in the format `%n`, where `n` is the 1-indexed argument number
-//  */
-// const forLang = translate;
 
 /**
  * Registers a new language and its translations - if the language already exists, it will be overwritten.  
@@ -177,31 +183,9 @@ function useTr<TTrKey extends string = string>(language: string) {
  * });
  * ```
  */
-const addTranslations = (language: string, translations: TrObject): void => {
+function addTranslations(language: string, translations: TrObject): void {
   trans[language] = JSON.parse(JSON.stringify(translations));
-};
-
-/**
- * Sets the active language for the translation functions.  
- * This language will be used by the {@linkcode tr()} function to return the translated text.  
- * If the language is not registered with {@linkcode tr.addTranslations()}, the translation functions will always return the key itself.  
- * @param language Language code or name to set as active
- */
-const setLanguage = (language: string): void => {
-  curLang = language;
-};
-
-/** The fallback language to use when a translation key is not found in the currently active language - undefined to disable fallbacks and just return the translation key */
-const setFallbackLanguage = (fallbackLanguage?: string): void => {
-  fallbackLang = fallbackLanguage;
-};
-
-/**
- * Returns the active language set by {@linkcode tr.setLanguage()}  
- * If no language is set, this function will return `undefined`.  
- * @returns Active language code or name
- */
-const getLanguage = (): string => curLang;
+}
 
 /**
  * Returns the translation object for the specified language or currently active one.  
@@ -209,7 +193,9 @@ const getLanguage = (): string => curLang;
  * @param language Language code or name to get translations for - defaults to the currently active language (set by {@linkcode tr.setLanguage()})
  * @returns Translations for the specified language
  */
-const getTranslations = (language = curLang): TrObject | undefined => trans[language];
+function getTranslations(language = curLang): TrObject | undefined {
+  return trans[language];
+}
 
 /**
  * Deletes the translations for the specified language from memory.  
@@ -220,15 +206,34 @@ const deleteTranslations = (language: string): void => {
 };
 
 /**
- * Checks if a translation exists given its {@linkcode key} in the specified {@linkcode language} or else the currently active one.  
- * If the language is not registered with {@linkcode tr.addTranslations()}, this function will return `false`.  
- * @param key Key of the translation to check for
- * @param language Language code or name to check in - defaults to the currently active language (set by {@linkcode tr.setLanguage()})
- * @returns Whether the translation key exists in the specified language - always returns `false` if no language is given and no active language was set
+ * Sets the active language for the translation functions.  
+ * This language will be used by the {@linkcode tr()} function to return the translated text.  
+ * If the language is not registered with {@linkcode tr.addTranslations()}, the translation functions will always return the key itself or fall back to the previously set fallback language.  
+ * By default, the language will be set to an empty string.
+ * @param language Language code or name to set as active
  */
-const hasKey = <TTrKey extends string = string>(key: TTrKey, language = curLang): boolean => {
-  return tr.for(language, key as TrKeyEn) !== key;
+function setLanguage(language: string): void {
+  curLang = language;
 };
+
+/**
+ * Returns the active language set by {@linkcode tr.setLanguage()}  
+ * By default, the language will be set to an empty string.
+ * @returns Active language code or name, else empty string
+ */
+function getLanguage(): string {
+  return curLang;
+}
+
+/** The fallback language to use when a translation key is not found in the currently active language - undefined to disable fallbacks and just return the translation key */
+function setFallbackLanguage(fallbackLanguage?: string): void {
+  fallbackLang = fallbackLanguage;
+};
+
+/** Returns the fallback language set by {@linkcode tr.setFallbackLanguage()} */
+function getFallbackLanguage(): string | undefined {
+  return fallbackLang;
+}
 
 /**
  * Adds a transform function that gets called after resolving a translation for any language.  
@@ -245,7 +250,7 @@ const hasKey = <TTrKey extends string = string>(key: TTrKey, language = curLang)
  * });
  * 
  * // replace ${PATTERN}
- * tr.addTransform(/<\$([A-Z_]+)>/g, (matches: RegExpMatchArray, language: string) => {
+ * tr.addTransform(/<\$([A-Z_]+)>/g, ({ matches }) => {
  *   switch(matches?.[1]) {
  *     default: return "<UNKNOWN_PATTERN>";
  *     // these would be grabbed from elsewhere in the application:
@@ -255,7 +260,7 @@ const hasKey = <TTrKey extends string = string>(key: TTrKey, language = curLang)
  * });
  * 
  * // replace <c=red>...</c> with <span class="color red">...</span>
- * tr.addTransform(/<c=([a-z]+)>(.*?)<\/c>/g, (matches: RegExpMatchArray, language: string, ...args: (Stringifiable | Record<string, Stringifiable>)[]) => {
+ * tr.addTransform(/<c=([a-z]+)>(.*?)<\/c>/g, ({ matches }) => {
  *   const color = matches?.[1];
  *   const content = matches?.[2];
  * 
@@ -268,8 +273,9 @@ const hasKey = <TTrKey extends string = string>(key: TTrKey, language = curLang)
  * tr("greeting.headline"); // "<b>Hello, JohnDoe45</b>\nYou have 5 unread notifications."
  * ```
  * @param pattern Regular expression or string (passed to `new RegExp(pattern, "gm")`) that should match the entire pattern that calls the transform function
+ * @param fn Function that transforms the matched pattern into something else
  */
-const addTransform = (pattern: RegExp | string, fn: TransformFn): void => {
+function addTransform(pattern: RegExp | string, fn: TransformFn): void {
   valTransforms.push({ fn: fn as TransformFn, regex: typeof pattern === "string" ? new RegExp(pattern, "gm") : pattern });
 };
 
@@ -277,7 +283,7 @@ const addTransform = (pattern: RegExp | string, fn: TransformFn): void => {
  * Deletes the first transform function from the list of registered transform functions.  
  * @param patternOrFn A reference to the regular expression of the transform function, a string matching the original pattern, or a reference to the transform function to delete
  */
-const deleteTransform = (patternOrFn: RegExp | string | TransformFn): void => {
+function deleteTransform(patternOrFn: RegExp | string | TransformFn): void {
   const idx = valTransforms.findIndex((t) =>
     (t.fn === patternOrFn as unknown as () => void)
     || (t.regex === (typeof patternOrFn === "string" ? new RegExp(patternOrFn, "gm") : patternOrFn))
@@ -285,46 +291,30 @@ const deleteTransform = (patternOrFn: RegExp | string | TransformFn): void => {
   idx !== -1 && valTransforms.splice(idx, 1);
 };
 
-// #DBG TODO: commented out because global context is not supported anyway in this project
-// /**
-//  * Returns the translated text for the specified key in the current language set by {@linkcode tr.setLanguage()}  
-//  * Use {@linkcode tr.forLang()} to get the translation for a specific language instead of the currently set one.  
-//  * If the key is not found in the currently set language, the key itself is returned.  
-//  *   
-//  * ⚠️ Remember to register a language with {@linkcode tr.addTranslations()} and set it as active with {@linkcode tr.setLanguage()} before using this function, otherwise it will always return the key itself.
-//  * @param key Key of the translation to return
-//  * @param args Optional arguments to be passed to the translated text. They will replace placeholders in the format `%n`, where `n` is the 1-indexed argument number
-//  */
-// const tr = (key: string, ...args: (Stringifiable | Record<string, Stringifiable>)[]): string => translate(curLang, key, ...args);
-
 /**
- * Returns the translated text for the specified key in the specified language.  
- * If the key is not found in the specified previously registered translation, the key itself is returned.  
- *   
- * ⚠️ Remember to register a language with {@linkcode tr.addTranslations()} before using this function, otherwise it will always return the key itself.
- * @param language Language code or name to use for the translation
- * @param key Key of the translation to return
- * @param args Optional arguments to be passed to the translated text. They will replace placeholders in the format `%n`, where `n` is the 1-indexed argument number
+ * Checks if a translation exists given its {@linkcode key} in the specified {@linkcode language} or else the currently active one.  
+ * If the language is not registered with {@linkcode tr.addTranslations()}, this function will return `false`.  
+ * @param key Key of the translation to check for
+ * @param language Language code or name to check in - defaults to the currently active language (set by {@linkcode tr.setLanguage()})
+ * @returns Whether the translation key exists in the specified language - always returns `false` if no language is given and no active language was set
  */
-const trFor = <TTrKey extends string = string>(language: string, key: TTrKey, ...args: (Stringifiable | Record<string, Stringifiable>)[]) => {
-  const txt = translate(language, key, ...args);
-  if(txt === key)
-    return translate(defaultLocale, key, ...args);
-  return txt;
+function hasKey<TTrKey extends string = string>(key: TTrKey, language = curLang): boolean {
+  return tr.for(language, key as TrKeyEn) !== key;
 };
 
 const tr = {
   for: (...params: Parameters<typeof trFor<TrKeyEn>>) => trFor<TrKeyEn>(...params as Parameters<typeof trFor<TrKeyEn>>),
   use: (...params: Parameters<typeof useTr<TrKeyEn>>) => useTr<TrKeyEn>(...params as Parameters<typeof useTr<TrKeyEn>>),
   addTranslations,
-  setLanguage,
-  setFallbackLanguage,
-  getLanguage,
   getTranslations,
   deleteTranslations,
-  hasKey: <TTrKey extends string = string>(key: TTrKey, language?: string) => hasKey<TTrKey>(key, language),
+  setLanguage,
+  getLanguage,
+  setFallbackLanguage,
+  getFallbackLanguage,
   addTransform,
   deleteTransform,
+  hasKey: (key: TrKeyEn, language?: string) => hasKey<TrKeyEn>(key, language),
 };
 
 export { tr };
@@ -351,8 +341,11 @@ const transforms = [
       const namedMapping = () => {
         if(!str.includes("${") || typeof trArgs[0] === "undefined" || typeof trArgs[0] !== "object" || !eachKeyInTrString(Object.keys(trArgs[0] ?? {})))
           return;
-        for(const match of matches)
-          str = str.replace(match[0], String((trArgs[0] as Record<string, string>)[match[1]]));
+        for(const match of matches) {
+          const repl = (trArgs[0] as Record<string, string>)[match[1]];
+          if(typeof repl !== "undefined")
+            str = str.replace(match[0], String(repl));
+        }
       };
 
       const positionalMapping = () => {
@@ -361,7 +354,8 @@ const transforms = [
         let matchNum = -1;
         for(const match of matches) {
           matchNum++;
-          str = str.replace(match[0], String(trArgs[matchNum]));
+          if(typeof trArgs[matchNum] !== "undefined")
+            str = str.replace(match[0], String(trArgs[matchNum]));
         }
       };
 
