@@ -145,8 +145,8 @@ function translate<TTrKey extends string = string>(language: string, key: TTrKey
  * t("hello", "John"); // "Hello, John!"
  * ```
  */
-function useTr(language: string) {
-  return (key: string, ...args: (Stringifiable | Record<string, Stringifiable>)[]) => translate(language, key, ...args);
+function useTr<TTrKey extends string = string>(language: string) {
+  return (key: TTrKey, ...args: (Stringifiable | Record<string, Stringifiable>)[]) => translate<TTrKey>(language, key, ...args);
 }
 
 // /**
@@ -215,7 +215,7 @@ const getTranslations = (language = curLang): TrObject | undefined => trans[lang
  * Deletes the translations for the specified language from memory.  
  * @param language Language code or name to delete
  */
-const deleteTranslations = (language = curLang): void => {
+const deleteTranslations = (language: string): void => {
   delete trans[language];
 };
 
@@ -226,8 +226,8 @@ const deleteTranslations = (language = curLang): void => {
  * @param language Language code or name to check in - defaults to the currently active language (set by {@linkcode tr.setLanguage()})
  * @returns Whether the translation key exists in the specified language - always returns `false` if no language is given and no active language was set
  */
-const hasKey = (key: TrKeyEn, language = curLang): boolean => {
-  return tr.for(language, key) !== key;
+const hasKey = <TTrKey extends string = string>(key: TTrKey, language = curLang): boolean => {
+  return tr.for(language, key as TrKeyEn) !== key;
 };
 
 /**
@@ -269,7 +269,7 @@ const hasKey = (key: TrKeyEn, language = curLang): boolean => {
  * ```
  * @param pattern Regular expression or string (passed to `new RegExp(pattern, "gm")`) that should match the entire pattern that calls the transform function
  */
-const addTransform = (pattern: RegExp | string, fn: TransformFn<TrKeyEn>): void => {
+const addTransform = (pattern: RegExp | string, fn: TransformFn): void => {
   valTransforms.push({ fn: fn as TransformFn, regex: typeof pattern === "string" ? new RegExp(pattern, "gm") : pattern });
 };
 
@@ -277,7 +277,7 @@ const addTransform = (pattern: RegExp | string, fn: TransformFn<TrKeyEn>): void 
  * Deletes the first transform function from the list of registered transform functions.  
  * @param patternOrFn A reference to the regular expression of the transform function, a string matching the original pattern, or a reference to the transform function to delete
  */
-const deleteTransform = (patternOrFn: RegExp | string | TransformFn<TrKeyEn>): void => {
+const deleteTransform = (patternOrFn: RegExp | string | TransformFn): void => {
   const idx = valTransforms.findIndex((t) =>
     (t.fn === patternOrFn as unknown as () => void)
     || (t.regex === (typeof patternOrFn === "string" ? new RegExp(patternOrFn, "gm") : patternOrFn))
@@ -306,7 +306,7 @@ const deleteTransform = (patternOrFn: RegExp | string | TransformFn<TrKeyEn>): v
  * @param key Key of the translation to return
  * @param args Optional arguments to be passed to the translated text. They will replace placeholders in the format `%n`, where `n` is the 1-indexed argument number
  */
-const trFor = (language: string, key: TrKeyEn, ...args: (Stringifiable | Record<string, Stringifiable>)[]) => {
+const trFor = <TTrKey extends string = string>(language: string, key: TTrKey, ...args: (Stringifiable | Record<string, Stringifiable>)[]) => {
   const txt = translate(language, key, ...args);
   if(txt === key)
     return translate(defaultLocale, key, ...args);
@@ -314,15 +314,15 @@ const trFor = (language: string, key: TrKeyEn, ...args: (Stringifiable | Record<
 };
 
 const tr = {
-  for: trFor,
-  useTr,
+  for: (...params: Parameters<typeof trFor<TrKeyEn>>) => trFor<TrKeyEn>(...params as Parameters<typeof trFor<TrKeyEn>>),
+  useTr: (...params: Parameters<typeof useTr<TrKeyEn>>) => useTr<TrKeyEn>(...params as Parameters<typeof useTr<TrKeyEn>>),
   addTranslations,
   setLanguage,
   setFallbackLanguage,
   getLanguage,
   getTranslations,
   deleteTranslations,
-  hasKey,
+  hasKey: <TTrKey extends string = string>(key: TTrKey, language?: string) => hasKey<TTrKey>(key, language),
   addTransform,
   deleteTransform,
 };
@@ -351,9 +351,8 @@ const transforms = [
       const namedMapping = () => {
         if(!str.includes("${") || typeof trArgs[0] === "undefined" || typeof trArgs[0] !== "object" || !eachKeyInTrString(Object.keys(trArgs[0] ?? {})))
           return;
-        for(const match of matches) {
+        for(const match of matches)
           str = str.replace(match[0], String((trArgs[0] as Record<string, string>)[match[1]]));
-        }
       };
 
       const positionalMapping = () => {
@@ -400,7 +399,7 @@ export async function initTranslations(): Promise<void> {
   }
 
   for(const [regex, fn] of transforms)
-    tr.addTransform(regex, fn);
+    tr.addTransform(regex, fn as TransformFn);
 
   tr.setLanguage(enName ?? defaultLocale);
   tr.setFallbackLanguage(enName ?? defaultLocale);
