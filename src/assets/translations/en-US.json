@@ -76,8 +76,9 @@
         "success": "Configuration successfully reset to default settings.",
         "cancelled": "Reset cancelled."
       },
-      "embedTitles": {
-        "list": "Server configuration values:"
+      "listEmbed": {
+        "title": "Server configuration values:",
+        "footer": "Use /config set setting_name new_value to change the server config"
       }
     },
     "help": {

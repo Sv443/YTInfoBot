@@ -180,7 +180,8 @@ export class ConfigCmd extends SlashCommand {
       return int.editReply({
         embeds: [
           embedify(cfgList, Col.Info)
-            .setTitle(tr.for(locale, "commands.config.embedTitles.list"))
+            .setTitle(tr.for(locale, "commands.config.listEmbed.title"))
+            .setFooter({ text: tr.for(locale, "commands.config.listEmbed.footer") }),
         ],
       });
     }
