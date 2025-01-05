@@ -8,16 +8,18 @@ This bot is currently in development and not yet ready for public use. Inviting 
 # YTInfoBot
 [Features](#features) &bull; [Usage](#regular-usage) &bull; [Commands](#slash-commands) &bull; [Privacy](#privacy) &bull; [Local development](#local-development)
 
-Free Discord bot that replies to YouTube links with information from Return YouTube Dislike (approximate likes and dislikes), SponsorBlock (timestamps to skip certain segments) and DeArrow (crowdsourced thumbnails and titles).  
+Free Discord bot that replies to YouTube links with crowdsourced information from Return YouTube Dislike (approximate likes and dislikes), SponsorBlock (timestamps to skip certain segments) and DeArrow (less clickbaity thumbnails and titles).  
   
-Since the bot is free to use, I rely on donations to keep the bot running and maintained.  
-Please consider [donating](https://github.com/sponsors/Sv443) to support development. Any help is greatly appreciated ❤️  
-  
+Since the bot is free to use, I rely on donations to keep it running and maintained.  
+[Please consider donating to support development](https://github.com/sponsors/Sv443) - any help is greatly appreciated ❤️  
+
+<br>
+
 <a href="https://discord.com/api/oauth2/authorize?client_id=1290320137223802912&permissions=292058098752&scope=bot%20applications.commands" target="_blank"><img src="https://img.shields.io/badge/Invite%20Bot-%E2%96%BA-78f05d" height="30"></a>
 
 <a href="https://dc.sv443.net/" target="_blank"><img src="https://img.shields.io/badge/Join-Support%20Server-6e7bf4" height="20"></a>
 
-<br>
+<br><br>
 
 <img alt="example 1" src="./src/assets/example1.png" width="375" /> <img alt="example 2" src="./src/assets/example2.png" width="375" />
 
@@ -31,12 +33,11 @@ Please consider [donating](https://github.com/sponsors/Sv443) to support develop
   These numbers are crowdsourced and extrapolated. While inaccurate, they're enough to give you a good idea.
 - **[SponsorBlock](https://sponsor.ajay.app/):**  
   Shows openable timestamps for segments that can be skipped, such as sponsor segments, intros, non-music parts, etc.  
-  These timestamps are crowdsourced and might not be 100% accurate.
+  These timestamps are crowdsourced and rounded down, so they won't be 100% accurate.
 - **[DeArrow](https://dearrow.ajay.app/):**  
   Shows a crowdsourced thumbnail and title for the video.  
   These are usually made to reduce clickbait, but they also might spoil parts of the video.
-- **Fallback:**  
-  If no information is present in the DeArrow database, the bot will fall back to the original video's title and thumbnail.  
+- **Default:**  
   If all three providers from above have no information on the video, the bot will not reply to the link at all.
 
 <br>
