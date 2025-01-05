@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, type CommandInteraction, type CommandInteractionOption } from "discord.js";
-import { embedify } from "@lib/embedify.ts";
+import { useEmbedify } from "@lib/embedify.ts";
 import { CmdBase, SlashCommand } from "@lib/Command.ts";
 import pkg from "@root/package.json" with { type: "json" };
 import { getEnvVar } from "@lib/env.ts";
@@ -79,40 +79,32 @@ export class HelpCmd extends SlashCommand {
       await int.deferReply({ ephemeral });
       const locale = await HelpCmd.getGuildLocale(int);
 
-      return int.editReply({
-        embeds: [
-          embedify(cmdList)
-            .setTitle(tr.for(locale, "commands.help.embedTitles.commands"))
-            .setFooter({ text: tr.for(locale, "commands.help.embedFooters.commands") }),
-        ],
-      });
+      return int.editReply(useEmbedify(cmdList, undefined, (e) => e
+        .setTitle(tr.for(locale, "commands.help.embedTitles.commands"))
+        .setFooter({ text: tr.for(locale, "commands.help.embedFooters.commands") }),
+      ));
     }
     case "info": {
       await int.deferReply();
       const locale = await HelpCmd.getGuildLocale(int);
 
       const { version, author: { name, url }} = pkg;
-      return int.editReply({
-        embeds: [
-          embedify([
-            tr.for(locale, "commands.help.info.headline", { version, name, url }),
-            tr.for(locale, "commands.help.info.donationLink", pkg.funding.url),
-            "",
-            tr.for(locale, "commands.help.info.bugsLink", pkg.bugs.url),
-            tr.for(locale, "commands.help.info.supportServerLink", getEnvVar("SUPPORT_SERVER_INVITE_URL")),
-            tr.for(locale, "commands.help.info.globalOptOut"),
-            "",
-            tr.for(locale, "commands.help.info.installExtensions"),
-            tr.for(locale, "commands.help.info.installExtReturnYtDislike"),
-            tr.for(locale, "commands.help.info.installExtSponsorBlock"),
-            tr.for(locale, "commands.help.info.installExtDeArrow"),
-            tr.for(locale, "commands.help.info.installExtMobile"),
-            "",
-            tr.for(locale, "commands.help.info.poweredBy"),
-          ])
-            .setTitle(tr.for(locale, "commands.help.embedTitles.info")),
-        ],
-      });
+      return int.editReply(useEmbedify([
+        tr.for(locale, "commands.help.info.headline", { version, name, url }),
+        tr.for(locale, "commands.help.info.donationLink", pkg.funding.url),
+        "",
+        tr.for(locale, "commands.help.info.bugsLink", pkg.bugs.url),
+        tr.for(locale, "commands.help.info.supportServerLink", getEnvVar("SUPPORT_SERVER_INVITE_URL")),
+        tr.for(locale, "commands.help.info.globalOptOut"),
+        "",
+        tr.for(locale, "commands.help.info.installExtensions"),
+        tr.for(locale, "commands.help.info.installExtReturnYtDislike"),
+        tr.for(locale, "commands.help.info.installExtSponsorBlock"),
+        tr.for(locale, "commands.help.info.installExtDeArrow"),
+        tr.for(locale, "commands.help.info.installExtMobile"),
+        "",
+        tr.for(locale, "commands.help.info.poweredBy"),
+      ], undefined, (e) => e.setTitle(tr.for(locale, "commands.help.embedTitles.info"))));
     }
     }
   }

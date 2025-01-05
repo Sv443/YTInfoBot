@@ -1,5 +1,5 @@
 import { ButtonBuilder, ButtonStyle, PermissionFlagsBits, SlashCommandBuilder, type AutocompleteInteraction, type CommandInteraction, type CommandInteractionOption, type SlashCommandSubcommandBuilder } from "discord.js";
-import { Col, embedify, useEmbedify } from "@lib/embedify.ts";
+import { Col, useEmbedify } from "@lib/embedify.ts";
 import { CmdBase, SlashCommand } from "@lib/Command.ts";
 import { numberFormatChoices, videoInfoTypeChoices } from "@cmd/VideoInfo.ts";
 import { em } from "@lib/db.ts";
@@ -177,13 +177,10 @@ export class ConfigCmd extends SlashCommand {
         return `${acc}${i !== 0 ? "\n" : ""}- **${capitalize(tr.for(locale, settingNameTrKey))}**: \`${val}\``;
       }, "");
 
-      return int.editReply({
-        embeds: [
-          embedify(cfgList, Col.Info)
-            .setTitle(tr.for(locale, "commands.config.listEmbed.title"))
-            .setFooter({ text: tr.for(locale, "commands.config.listEmbed.footer") }),
-        ],
-      });
+      return int.editReply(useEmbedify(cfgList, Col.Info, (e) => e
+        .setTitle(tr.for(locale, "commands.config.listEmbed.title"))
+        .setFooter({ text: tr.for(locale, "commands.config.listEmbed.footer") })
+      ));
     }
     case "reset": {
       const confirmBtns = [
@@ -200,10 +197,7 @@ export class ConfigCmd extends SlashCommand {
       ];
 
       await int.editReply({
-        embeds: [
-          embedify(`**${tr.for(locale, "commands.config.reset.confirm")}**`, Col.Warning)
-            .setFooter({ text: tr.for(locale, "general.promptExpiryNotice", 30) }),
-        ],
+        ...useEmbedify(`**${tr.for(locale, "commands.config.reset.confirm")}**`, Col.Warning, (e) => e.setFooter({ text: tr.for(locale, "general.promptExpiryNotice", 30) })),
         ...useButtons([confirmBtns]),
       });
 

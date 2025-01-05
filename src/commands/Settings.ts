@@ -1,5 +1,5 @@
 import { ButtonBuilder, ButtonStyle, SlashCommandBuilder, type CommandInteraction, type CommandInteractionOption, type SlashCommandSubcommandBuilder } from "discord.js";
-import { Col, embedify, useEmbedify } from "@lib/embedify.ts";
+import { Col, useEmbedify } from "@lib/embedify.ts";
 import { CmdBase, SlashCommand } from "@lib/Command.ts";
 import { em } from "@lib/db.ts";
 import { UserSettings } from "@models/UserSettings.model.ts";
@@ -101,13 +101,10 @@ export class SettingsCmd extends SlashCommand {
         return `${acc}${i !== 0 ? "\n" : ""}- **${capitalize(settingName)}**: \`${val}\``;
       }, "");
 
-      return int.editReply({
-        embeds: [
-          embedify(cfgList, Col.Info)
-            .setTitle("User settings values:")
-            .setFooter({ text: "Use /settings set <name> to edit a setting" }),
-        ],
-      });
+      return int.editReply(useEmbedify(cfgList, Col.Info, (e) => e
+        .setTitle("User settings values:")
+        .setFooter({ text: "Use /settings set <name> to edit a setting" })
+      ));
     }
     case "reset": {
       const confirmBtns = [
@@ -124,10 +121,9 @@ export class SettingsCmd extends SlashCommand {
       ];
 
       await int.editReply({
-        embeds: [
-          embedify("**Are you sure you want to reset your settings?**", Col.Warning)
-            .setFooter({ text: "This prompt will expire in 30s" }),
-        ],
+        ...useEmbedify("**Are you sure you want to reset your settings?**", Col.Warning, (e) =>
+          e.setFooter({ text: "This prompt will expire in 30s" })
+        ),
         ...useButtons([confirmBtns]),
       });
 

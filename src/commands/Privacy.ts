@@ -1,5 +1,5 @@
 import { ButtonBuilder, ButtonStyle, SlashCommandBuilder, type CommandInteraction } from "discord.js";
-import { Col, embedify, useEmbedify } from "@lib/embedify.ts";
+import { Col, useEmbedify } from "@lib/embedify.ts";
 import { CmdBase, SlashCommand } from "@lib/Command.ts";
 import { em } from "@lib/db.ts";
 import { UserSettings } from "@models/UserSettings.model.ts";
@@ -66,10 +66,11 @@ export class PrivacyCmd extends SlashCommand {
       const promptSec = 60;
 
       const reply = await int.editReply({
-        embeds: [
-          embedify(Array.from({ length: 4 }).map((_, i) => tr.for(locale, `commands.privacy.delete.confirmLine${(i + 1) as 1}`)), Col.Warning)
-            .setFooter({ text: tr.for(locale, "general.promptExpiryNotice", promptSec) }),
-        ],
+        ...useEmbedify(
+          Array.from({ length: 4 }).map((_, i) => tr.for(locale, `commands.privacy.delete.confirmLine${(i + 1) as 1}`)),
+          Col.Warning,
+          (e) => e.setFooter({ text: tr.for(locale, "general.promptExpiryNotice", promptSec) })
+        ),
         ...useButtons([confirmBtns]),
       });
 
