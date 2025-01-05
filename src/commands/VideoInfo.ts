@@ -186,7 +186,7 @@ export class VideoInfoCmd extends SlashCommand {
     if(!ytData)
       return null;
 
-    const t = tr.useTr(locale);
+    const t = tr.use(locale);
 
     //#SECTION title & thumbnail
 

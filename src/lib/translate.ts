@@ -315,7 +315,7 @@ const trFor = <TTrKey extends string = string>(language: string, key: TTrKey, ..
 
 const tr = {
   for: (...params: Parameters<typeof trFor<TrKeyEn>>) => trFor<TrKeyEn>(...params as Parameters<typeof trFor<TrKeyEn>>),
-  useTr: (...params: Parameters<typeof useTr<TrKeyEn>>) => useTr<TrKeyEn>(...params as Parameters<typeof useTr<TrKeyEn>>),
+  use: (...params: Parameters<typeof useTr<TrKeyEn>>) => useTr<TrKeyEn>(...params as Parameters<typeof useTr<TrKeyEn>>),
   addTranslations,
   setLanguage,
   setFallbackLanguage,
