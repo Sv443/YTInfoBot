@@ -166,7 +166,7 @@ async function useMetricsMsg(metrics: MetricsData) {
     .setTitle("Bot metrics:")
     .setFields([
       { name: "Uptime:", value: String(uptimeStr), inline: true },
-      { name: "Updated:", value: `${new Date().toLocaleString("en-DE")}\n(last updated)`, inline: false },
+      { name: "Updated:", value: `<t:${Math.floor(Date.now() / 1000)}:R>\n(last metrics update)`, inline: false },
       { name: "Users:", value: `${usersAmt} in DB`, inline: true },
       { name: "Guilds:", value: String(guildsAmt), inline: true },
       { name: "Members:", value: `${totalMembersAmt} total\n${uniqueMembersAmt} unique`, inline: true },
