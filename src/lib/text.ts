@@ -19,7 +19,8 @@ export function truncField(content: string, endStr = "...") {
 
 /**
  * Automatically appends an `s` to the passed `word`, if `num` is not equal to 1.  
- * This doesn't work for all words, but it's a simple and dynamic way to handle most cases.
+ * This doesn't work for all words, but it's a simple and dynamic way to handle most cases.  
+ * ⚠️ Only use this for debugging since it's not translation-friendly
  * @param word A word in singular form, to auto-convert to plural
  * @param num If this is an array, d.js Collection or Map, the amount of items is used
  */

@@ -1,19 +1,14 @@
-import { resolve } from "node:path";
-import { readFile, writeFile } from "node:fs/promises";
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Events, type Client, type GuildMember, type Message, type MessageCreateOptions } from "discord.js";
+import { Events, type Client } from "discord.js";
 import k from "kleur";
 import "dotenv/config";
 import { client, botToken } from "@lib/client.ts";
 import { em, initDatabase } from "@lib/db.ts";
-import { cmdInstances, initRegistry, registerCommandsForGuild } from "@lib/registry.ts";
+import { initRegistry, registerCommandsForGuild } from "@lib/registry.ts";
 import { autoPlural } from "@lib/text.ts";
 import { envVarEq, getEnvVar } from "@lib/env.ts";
 import { initTranslations } from "@lib/translate.ts";
-import { getCommitHash, getHash, ghBaseUrl } from "@lib/misc.ts";
-import { Col } from "@lib/embedify.ts";
 import { GuildConfig } from "@models/GuildConfig.model.ts";
-import { UserSettings } from "@models/UserSettings.model.ts";
-import pkg from "@root/package.json" with { type: "json" };
+import { metChanId, metGuildId, updateMetrics } from "@src/metrics.ts";
 
 //#region validate env
 
@@ -63,55 +58,33 @@ async function init() {
   }, 1000);
 }
 
-//#region metrics:vars
 
-const metGuildId = getEnvVar("METRICS_GUILD", "stringOrUndefined");
-const metChanId = getEnvVar("METRICS_CHANNEL", "stringOrUndefined");
+//#region intervalChks
+
 const metUpdIvRaw = getEnvVar("METRICS_UPDATE_INTERVAL", "number");
-const metUpdInterval = Math.max(isNaN(metUpdIvRaw) ? 30 : metUpdIvRaw, 3);
+const metUpdInterval = Math.max(isNaN(metUpdIvRaw) ? 30 : metUpdIvRaw, 1);
 
-const initTime = Date.now();
-const metricsManifFile = resolve(".metrics.json");
-let metricsData: MetricsManifest | undefined;
-let firstMetricRun = true;
-
-//#region metrics:types
-
-type MetricsManifest = {
-  msgId: string | null;
-  metricsHash: string | null;
-};
-
-type MetricsData = {
-  guildsAmt: number;
-  uptimeStr: string;
-  slashCmdAmt: number;
-  ctxCmdAmt: number;
-  usersAmt: number;
-  totalMembersAmt: number;
-  uniqueMembersAmt: number;
-};
-
-//#region m:intervalChks
+const chkGldIntervalRaw = getEnvVar("GUILD_CHECK_INTERVAL", "number");
+const chkGldInterval = Math.max(isNaN(chkGldIntervalRaw) ? 300 : chkGldIntervalRaw, 10);
 
 /** Runs all interval checks */
 async function intervalChecks(client: Client, i: number) {
   try {
-    const tasks: Promise<void | unknown>[] = [];
+    const ivTasks: Promise<void | unknown>[] = [];
 
-    if(i === 0 || i % metUpdInterval === 0) {
-      tasks.push(updateMetrics(client));
-      tasks.push(checkGuilds(client));
-    }
+    if(metGuildId && metChanId && (i === 0 || i % metUpdInterval === 0))
+      ivTasks.push(updateMetrics(client));
+    if(i === 0 || i % chkGldInterval === 0)
+      ivTasks.push(checkGuilds(client));
 
-    tasks.length > 0 && await Promise.allSettled(tasks);
+    ivTasks.length > 0 && await Promise.allSettled(ivTasks);
   }
   catch(e) {
     console.error("Couldn't run interval checks:", e);
   }
 }
 
-//#region m:chkGuildJoin
+//#region chkGuildJoin
 
 /**
  * Checks if guilds were joined while the bot was offline and creates a GuildConfig for them and registers slash commands.  
@@ -133,173 +106,6 @@ async function checkGuilds(client: Client) {
       tasks.push(em.removeAndFlush(guild));
 
   await Promise.allSettled(tasks);
-}
-
-//#region m:updateMetr
-
-/** Update metrics */
-async function updateMetrics(client: Client) {
-  try {
-    if(!metGuildId || !metChanId)
-      return;
-
-    let slashCmdAmt = 0, ctxCmdAmt = 0;
-    for(const { type } of [...cmdInstances.values()]) {
-      if(type === "slash")
-        slashCmdAmt++;
-      else if(type === "ctx")
-        ctxCmdAmt++;
-    }
-
-    await client.guilds.fetch();
-
-    const totalMembersAmt = client.guilds.cache
-      .reduce((acc, g) => acc + g.memberCount, 0);
-
-    const memMap = new Map<string, GuildMember>();
-    const memMapPromises: Promise<void>[] = [];
-    for(const g of client.guilds.cache.values()) {
-      memMapPromises.push(new Promise(async (res, rej) => {
-        try {
-          await g.members.fetch();
-          for(const m of g.members.cache.values()) {
-            if(memMap.has(m.id) || m.user.bot || m.user.system || m.user.partial || m.partial)
-              continue;
-            memMap.set(m.id, m);
-          }
-          res();
-        }
-        catch(e) {
-          rej(e);
-        }
-      }));
-    }
-    await Promise.all(memMapPromises);
-
-    const latestMetrics = {
-      guildsAmt: client.guilds.cache.size,
-      uptimeStr: getUptime(),
-      slashCmdAmt,
-      ctxCmdAmt,
-      usersAmt: (await em.findAll(UserSettings)).length,
-      totalMembersAmt,
-      uniqueMembersAmt: memMap.size,
-    } as const satisfies MetricsData;
-
-    const metricsChan = client.guilds.cache.find(g => g.id === metGuildId)?.channels.cache.find(c => c.id === metChanId);
-    let metricsMsg: Message | undefined;
-
-    try {
-      metricsData = metricsData ?? JSON.parse(String(await readFile(metricsManifFile, "utf8")));
-    }
-    catch {
-      metricsData = metricsData ?? { msgId: null, metricsHash: null };
-    }
-
-    if(metricsData && metricsChan && metricsChan.isTextBased()) {
-      const latestMetHash = getHash(JSON.stringify(latestMetrics));
-      const metricsChanged = firstMetricRun || metricsData.metricsHash !== latestMetHash;
-      if(metricsChanged)
-        metricsData.metricsHash = latestMetHash;
-
-      if(metricsChanged && typeof metricsData.msgId === "string" && metricsData.msgId.length > 0) {
-        metricsMsg = (await metricsChan.messages.fetch({ limit: 3, around: metricsData.msgId })).find(m => m.id === metricsData!.msgId);
-
-        const recreateMsg = async () => {
-          try {
-            await metricsMsg?.delete();
-          }
-          catch {
-            console.warn("Couldn't delete metrics message, creating a new one...");
-          }
-          metricsMsg = await metricsChan?.send(await useMetricsMsg(latestMetrics));
-          metricsData!.msgId = metricsMsg?.id;
-        };
-
-        try {
-          if(!metricsMsg)
-            recreateMsg();
-          else
-            await metricsMsg?.edit(await useMetricsMsg(latestMetrics));
-        }
-        catch {
-          recreateMsg();
-        }
-        finally {
-          try {
-            await writeFile(metricsManifFile, JSON.stringify(metricsData));
-          }
-          catch(e) {
-            console.error("Couldn't write metrics manifest:", e);
-          }
-        }
-      }
-      else if(!metricsData.msgId || metricsData.msgId.length === 0) {
-        metricsMsg = await metricsChan?.send(await useMetricsMsg(latestMetrics));
-        metricsData.msgId = metricsMsg?.id;
-        await writeFile(metricsManifFile, JSON.stringify(metricsData));
-      }
-
-      firstMetricRun = false;
-    }
-  }
-  catch(e) {
-    console.error("Couldn't update metrics:", e);
-  }
-}
-
-//#region m:metrEmbed
-
-/** Get the metrics / stats embed and buttons */
-async function useMetricsMsg(metrics: MetricsData) {
-  const {
-    uptimeStr, usersAmt,
-    guildsAmt, totalMembersAmt,
-    uniqueMembersAmt, slashCmdAmt,
-    ctxCmdAmt,
-  } = metrics;
-  const cmdsTotal = slashCmdAmt + ctxCmdAmt;
-
-  const ebd = new EmbedBuilder()
-    .setTitle("Bot metrics:")
-    .setFields([
-      { name: "Uptime:", value: String(uptimeStr), inline: false },
-      { name: "Users:", value: String(usersAmt), inline: true },
-      { name: "Guilds:", value: String(guildsAmt), inline: true },
-      { name: "Members:", value: `${totalMembersAmt} total\n${uniqueMembersAmt} unique`, inline: true },
-      { name: `${autoPlural("Command", cmdsTotal)} (${cmdsTotal}):`, value: `${slashCmdAmt} ${autoPlural("slash command", slashCmdAmt)}\n${ctxCmdAmt} ${autoPlural("context command", ctxCmdAmt)}`, inline: false },
-    ])
-    .setFooter({ text: `v${pkg.version} - ${await getCommitHash(true)}` })
-    .setColor(Col.Info);
-
-  return {
-    embeds: [ebd],
-    components: [
-      new ActionRowBuilder()
-        .addComponents(
-          new ButtonBuilder()
-            .setStyle(ButtonStyle.Link)
-            .setLabel("Open repo at commit")
-            .setURL(`${ghBaseUrl}/tree/${await getCommitHash()}`)
-        )
-        .toJSON(),
-    ],
-  } as Pick<MessageCreateOptions, "embeds" | "components">;
-}
-
-/** Returns the uptime in a human-readable format */
-function getUptime() {
-  const upt = Date.now() - initTime;
-
-  return ([
-    [(1000 * 60 * 60 * 24), `${Math.floor(upt / (1000 * 60 * 60 * 24))}d`],
-    [(1000 * 60 * 60), `${Math.floor(upt / (1000 * 60 * 60)) % 24}h`],
-    [(1000 * 60), `${Math.floor(upt / (1000 * 60)) % 60}m`],
-    [0, `${Math.floor(upt / 1000) % 60}s`],
-  ] as const)
-    .filter(([d]) => upt >= d)
-    .map(([, s]) => s)
-    .join(" ");
 }
 
 init();
