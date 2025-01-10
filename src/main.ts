@@ -202,11 +202,16 @@ async function updateMetrics(client: Client) {
       if(metricsChanged)
         metricsData.metricsHash = latestMetHash;
 
-      if(metricsChanged && metricsData.msgId && metricsData.msgId.length > 0) {
-        metricsMsg = (await metricsChan.messages.fetch({ limit: 1, around: metricsData.msgId })).first();
+      if(metricsChanged && typeof metricsData.msgId === "string" && metricsData.msgId.length > 0) {
+        metricsMsg = (await metricsChan.messages.fetch({ limit: 3, around: metricsData.msgId })).find(m => m.id === metricsData!.msgId);
 
         const recreateMsg = async () => {
-          await metricsMsg?.delete();
+          try {
+            await metricsMsg?.delete();
+          }
+          catch {
+            console.warn("Couldn't delete metrics message, creating a new one...");
+          }
           metricsMsg = await metricsChan?.send(await useMetricsMsg(latestMetrics));
           metricsData!.msgId = metricsMsg?.id;
         };
