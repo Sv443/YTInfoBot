@@ -45,10 +45,16 @@ export type TransformFnProps<TTrKey extends string = string> = {
   trArgs: (Stringifiable | Record<string, Stringifiable>)[];
 };
 
-/** Function that transforms a matched translation string into something else */
+/** Function that transforms a matched translation string into another string */
 export type TransformFn<TTrKey extends string = string> = (props: TransformFnProps<TTrKey>) => Stringifiable;
 
-/** Pass a translation object to this function to get all keys in the object */
+/**
+ * Pass a recursive or flat translation object to this generic type to get all keys in the object.  
+ * @example ```ts
+ * type Keys = TrKeys<{ a: { b: "foo" }, c: "bar" }>;
+ * // result: type Keys = "a.b" | "c"
+ * ```
+ */
 export type TrKeys<TTrObj, P extends string = ""> = {
   [K in keyof TTrObj]: K extends string | number | boolean | null | undefined
     ? TTrObj[K] extends object
@@ -323,7 +329,6 @@ export { tr };
 
 /** All translation keys from the file `@assets/translations/en-US.json` */
 export type TrKeyEn = TrKeys<typeof trEn> | "_";
-// export type TrKeyEn = TrKeys<typeof trEn> | (string & {});
 
 /** The default and fallback locale */
 export const defaultLocale = "en-US";
@@ -334,12 +339,16 @@ const transforms = [
   [
     /\$\{([a-zA-Z0-9$_-]+)\}/gm,
     ({ matches, trArgs, trValue }) => {
+      const patternStart = "${",
+        patternEnd = "}",
+        patternRegex = /\$\{.+\}/m;
+
       let str = String(trValue);
 
-      const eachKeyInTrString = (keys: string[]) => keys.every((key) => trValue.includes("${" + key + "}"));
+      const eachKeyInTrString = (keys: string[]) => keys.every((key) => trValue.includes(`${patternStart}${key}${patternEnd}`));
 
       const namedMapping = () => {
-        if(!str.includes("${") || typeof trArgs[0] === "undefined" || typeof trArgs[0] !== "object" || !eachKeyInTrString(Object.keys(trArgs[0] ?? {})))
+        if(!str.includes(patternStart) || typeof trArgs[0] === "undefined" || typeof trArgs[0] !== "object" || !eachKeyInTrString(Object.keys(trArgs[0] ?? {})))
           return;
         for(const match of matches) {
           const repl = (trArgs[0] as Record<string, string>)[match[1]];
@@ -349,7 +358,7 @@ const transforms = [
       };
 
       const positionalMapping = () => {
-        if(!(/\$\{.+\}/m.test(str)) || !trArgs[0])
+        if(!(patternRegex.test(str)) || !trArgs[0])
           return;
         let matchNum = -1;
         for(const match of matches) {
@@ -359,7 +368,10 @@ const transforms = [
         }
       };
 
-      if(trArgs[0] && typeof trArgs[0] === "object" && trArgs[0] !== null && eachKeyInTrString(Object.keys(trArgs[0] ?? {})) && String(trArgs[0]).startsWith("[object"))
+      /** Whether the first args parameter is an object that doesn't implement a custom `toString` method */
+      const isArgsObject = trArgs[0] && typeof trArgs[0] === "object" && trArgs[0] !== null && String(trArgs[0]).startsWith("[object");
+
+      if(isArgsObject && eachKeyInTrString(Object.keys(trArgs[0]!)))
         namedMapping();
       else
         positionalMapping();
@@ -401,7 +413,7 @@ export async function initTranslations(): Promise<void> {
 
 //#region getLocMap
 
-/** Returns the localization map for all locales, given the common translation key */
+/** Returns a localization map for all locales where the given common translation key exists */
 export function getLocMap(trKey: TrKeyEn, prefix = ""): LocalizationMap {
   const locMap = {} as LocalizationMap;
 
@@ -444,12 +456,12 @@ export function getLocMap(trKey: TrKeyEn, prefix = ""): LocalizationMap {
       value = value?.[part];
     }
     if(typeof value === "string")
-      locMap[language as keyof LocalizationMap] = prefix + transform(value);
+      locMap[language as keyof LocalizationMap] = `${prefix}${transform(value)}`;
 
     // try falling back to `trObj["key.parts"]`
     value = trObj?.[trKey];
     if(typeof value === "string")
-      locMap[language as keyof LocalizationMap] = prefix + transform(value);
+      locMap[language as keyof LocalizationMap] = `${prefix}${transform(value)}`;
   }
 
   return Object.keys(locMap).length === 0
