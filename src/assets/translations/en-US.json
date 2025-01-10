@@ -20,7 +20,15 @@
     "enabled": "Enabled",
     "disabled": "Disabled",
     "listSeparator": ", ",
-    "listSeparatorLast": " and "
+    "listSeparatorLast": " and ",
+    "time": {
+      "short": {
+        "days": "d",
+        "hours": "h",
+        "minutes": "m",
+        "seconds": "s"
+      }
+    }
   },
   "commands": {
     "config": {
@@ -183,8 +191,8 @@
         "foundNoVidInfo": "Found no data for this video - please try again later"
       },
       "embedFields": {
-        "originalTitle": "Original title:",
         "votes": "Votes (estimated):",
+        "duration": "Video duration:",
         "timestamps": "Timestamps:",
         "sponsorBlockCategories": {
           "sponsor": "Sponsored",

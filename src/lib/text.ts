@@ -1,5 +1,6 @@
 import { Collection } from "discord.js";
 import emojis from "@assets/emojis.json" with { type: "json" };
+import { tr } from "@lib/translate.ts";
 
 /** Capitalizes the first letter of a string */
 export function capitalize(text: string) {
@@ -125,4 +126,26 @@ export function secsToYtTime(seconds: number) {
   const secs = Math.floor(seconds % 60);
 
   return `${hours ? hours + ":" : ""}${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+}
+
+/** Returns the passed amount of seconds in a human-readable format */
+export function secsToTimeStr(seconds: number, locale = "en-US", padded = false) {
+  const t = tr.use(locale);
+
+  const d = Math.floor(seconds / (60 * 60 * 24)),
+    h = Math.floor(seconds / (60 * 60)) % 24,
+    m = Math.floor(seconds / 60) % 60,
+    s = Math.floor(seconds) % 60;
+
+  const pad = (n: number) => padded ? String(n).padStart(2, "0") : n;
+
+  return ([
+    [(60 * 60 * 24), `${d}${t("general.time.short.days")}`],
+    [(60 * 60), `${pad(h)}${t("general.time.short.hours")}`],
+    [60, `${pad(m)}${t("general.time.short.minutes")}`],
+    [0, `${pad(s)}${t("general.time.short.seconds")}`],
+  ] as const)
+    .filter(([d]) => seconds >= d)
+    .map(([, s]) => s)
+    .join(" ");
 }

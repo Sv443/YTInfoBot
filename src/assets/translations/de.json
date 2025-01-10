@@ -149,7 +149,6 @@
         "foundNoVidInfo": "Keine Infos zum Video gefunden - versuche es später erneut."
       },
       "embedFields": {
-        "originalTitle": "Originaltitel:",
         "votes": "Likes & Dislikes (zirka):",
         "timestamps": "Zeitmarken:"
       }

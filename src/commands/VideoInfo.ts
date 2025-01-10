@@ -5,7 +5,7 @@ import { Col, useEmbedify } from "@lib/embedify.ts";
 import { CmdBase, SlashCommand } from "@lib/Command.ts";
 import { axios } from "@lib/axios.ts";
 import type { DeArrowObj, ReturnYouTubeDislikeObj, SponsorBlockActionType, SponsorBlockCategory, SponsorBlockSegmentObj, YTVidDataObj } from "@src/types.ts";
-import { generateEmojiProgressBar, joinArrayReadable, secsToYtTime } from "@lib/text.ts";
+import { generateEmojiProgressBar, joinArrayReadable, secsToTimeStr, secsToYtTime } from "@lib/text.ts";
 import { getBestThumbnailUrl } from "@lib/thumbnail.ts";
 import { GuildConfig } from "@models/GuildConfig.model.ts";
 import { formatNumber, valsWithin } from "@lib/math.ts";
@@ -211,13 +211,7 @@ export class VideoInfoCmd extends SlashCommand {
     if(type === "dearrow_only" && !hasDeArrowData)
       return null;
 
-    embed.setTitle((hasDeArrowData ? bestDeArrowTitle?.title : ytData?.title) ?? url);
-
-    hasDeArrowData && ytData.title && embed.addFields({
-      name: t("commands.video_info.embedFields.originalTitle"),
-      value: ytData.title,
-      inline: false,
-    });
+    hasDeArrowData && bestDeArrowTitle && embed.setTitle(bestDeArrowTitle.title);
 
     //#SECTION votes
 
@@ -235,6 +229,18 @@ export class VideoInfoCmd extends SlashCommand {
       embed.addFields({
         name: t("commands.video_info.embedFields.votes"),
         value: `${fmt(likes)} 👍  •  ${fmt(dislikes)} 👎\n${generateEmojiProgressBar(ratioPerc, 7)} ${ratioPercent}%`,
+        inline: true,
+      });
+    }
+
+    //#SECTION video duration
+
+    const duration = deArrowData?.videoDuration ?? undefined;
+
+    if(typeof duration === "number") {
+      embed.addFields({
+        name: t("commands.video_info.embedFields.duration"),
+        value: secsToTimeStr(duration, locale, true),
         inline: true,
       });
     }
