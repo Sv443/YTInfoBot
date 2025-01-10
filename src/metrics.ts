@@ -165,8 +165,9 @@ async function useMetricsMsg(metrics: MetricsData) {
   const ebd = new EmbedBuilder()
     .setTitle("Bot metrics:")
     .setFields([
-      { name: "Uptime:", value: String(uptimeStr), inline: false },
-      { name: "Users:", value: String(usersAmt), inline: true },
+      { name: "Uptime:", value: String(uptimeStr), inline: true },
+      { name: "Updated:", value: `${new Date().toLocaleString("en-DE")}\n(last updated)`, inline: false },
+      { name: "Users:", value: `${usersAmt} in DB`, inline: true },
       { name: "Guilds:", value: String(guildsAmt), inline: true },
       { name: "Members:", value: `${totalMembersAmt} total\n${uniqueMembersAmt} unique`, inline: true },
       { name: `${autoPlural("Command", cmdsTotal)} (${cmdsTotal}):`, value: `${slashCmdAmt} ${autoPlural("slash command", slashCmdAmt)}\n${ctxCmdAmt} ${autoPlural("context command", ctxCmdAmt)}`, inline: false },
