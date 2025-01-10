@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, type CommandInteraction, type CommandInteractionOption } from "discord.js";
+import { SlashCommandBuilder, type CommandInteraction, type CommandInteractionOption, type LocaleString } from "discord.js";
 import { useEmbedify } from "@lib/embedify.ts";
 import { CmdBase, SlashCommand } from "@lib/Command.ts";
 import pkg from "@root/package.json" with { type: "json" };
@@ -56,6 +56,8 @@ export class HelpCmd extends SlashCommand {
 
       const allowedCmds = [...cmdInstances.values()]
         .filter(cmd => {
+          if(cmd.type === "ctx")
+            return false;
           if(typeof cmd.builderJson.default_member_permissions === "undefined" || cmd.builderJson.default_member_permissions === "0")
             return true;
           if(typeof int.member?.permissions === "undefined")
@@ -73,38 +75,47 @@ export class HelpCmd extends SlashCommand {
       if(!showHidden)
         ephemeral = false;
 
-      for(const { builderJson: data } of allowedCmds)
-        cmdList += `- ${hiddenCmds.has(data.name) ? "🔒 " : ""}\`/${data.name}\`${"description" in data ? `\n  ${data.description}` : ""}\n`;
-
       await int.deferReply({ ephemeral });
-      const locale = await HelpCmd.getGuildLocale(int);
 
-      return int.editReply(useEmbedify(cmdList, undefined, (e) => e
-        .setTitle(tr.for(locale, "commands.help.embedTitles.commands"))
-        .setFooter({ text: tr.for(locale, "commands.help.embedFooters.commands") }),
-      ));
+      const locale = await HelpCmd.getGuildLocale(int),
+        t = tr.use(locale);
+
+      for(const { builderJson: data } of allowedCmds) {
+        const name = data.name_localizations?.[locale as LocaleString] ?? data.name;
+        const description = data.description_localizations?.[locale as LocaleString] ?? ("description" in data ? data.description : undefined);
+
+        cmdList += `- ${hiddenCmds.has(data.name) ? "🔒 " : ""}\`/${name}\`${description ? `\n ${description}` : ""}\n`;
+      }
+
+      return int.editReply(
+        useEmbedify(cmdList, undefined, (e) => e
+          .setTitle(t("commands.help.embedTitles.commands"))
+          .setFooter({ text: t("commands.help.embedFooters.commands") }),
+        )
+      );
     }
     case "info": {
       await int.deferReply();
-      const locale = await HelpCmd.getGuildLocale(int);
 
+      const t = tr.use(await HelpCmd.getGuildLocale(int));
       const { version, author: { name, url }} = pkg;
+
       return int.editReply(useEmbedify([
-        tr.for(locale, "commands.help.info.headline", { version, name, url }),
-        tr.for(locale, "commands.help.info.donationLink", pkg.funding.url),
+        t("commands.help.info.headline", { version, name, url }),
+        t("commands.help.info.donationLink", pkg.funding.url),
         "",
-        tr.for(locale, "commands.help.info.bugsLink", pkg.bugs.url),
-        tr.for(locale, "commands.help.info.supportServerLink", getEnvVar("SUPPORT_SERVER_INVITE_URL")),
-        tr.for(locale, "commands.help.info.globalOptOut"),
+        t("commands.help.info.bugsLink", pkg.bugs.url),
+        t("commands.help.info.supportServerLink", getEnvVar("SUPPORT_SERVER_INVITE_URL")),
+        t("commands.help.info.globalOptOut"),
         "",
-        tr.for(locale, "commands.help.info.installExtensions"),
-        tr.for(locale, "commands.help.info.installExtReturnYtDislike"),
-        tr.for(locale, "commands.help.info.installExtSponsorBlock"),
-        tr.for(locale, "commands.help.info.installExtDeArrow"),
-        tr.for(locale, "commands.help.info.installExtMobile"),
+        t("commands.help.info.installExtensions"),
+        t("commands.help.info.installExtReturnYtDislike"),
+        t("commands.help.info.installExtSponsorBlock"),
+        t("commands.help.info.installExtDeArrow"),
+        t("commands.help.info.installExtMobile"),
         "",
-        tr.for(locale, "commands.help.info.poweredBy"),
-      ], undefined, (e) => e.setTitle(tr.for(locale, "commands.help.embedTitles.info"))));
+        t("commands.help.info.poweredBy"),
+      ], undefined, (e) => e.setTitle(t("commands.help.embedTitles.info"))));
     }
     }
   }
