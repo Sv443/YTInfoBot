@@ -63,8 +63,7 @@ If you want to opt out of automatic replies across every server, you can use the
   - `/settings list`  
     Shows a list of all available user settings and their current values.
   - `/settings set <name> new_value:<value>`  
-    If no new_value argument is provided, the value of the current setting will be shown.  
-    Otherwise, that setting is changed to the given value.
+    Changes the setting with the given name (see autocomplete) to the given value.
   - `/settings reset`  
     Resets the settings to the default values.  
     Shows a confirmation before actually resetting.
@@ -73,8 +72,7 @@ If you want to opt out of automatic replies across every server, you can use the
     Shows a list of all available server configuration settings and their current values.  
     Requires the `Manage Server` permission to use.
   - 🔒 `/config set <name> new_value:<value>`  
-    If no new_value argument is provided, the value of the current setting will be shown.  
-    Otherwise, that setting is changed to the given value.  
+    Changes the setting with the given name (see autocomplete) to the given value.  
     Requires the `Manage Server` permission to use.
   - 🔒 `/config reset`  
     Resets the configuration to the default values.  
@@ -85,8 +83,8 @@ If you want to opt out of automatic replies across every server, you can use the
     Shows some information about the bot.
   - `/help commands [show_hidden:<true|false>]`  
     Shows a list of commands and their descriptions.  
-    If `show_hidden:true` is specified, commands with elevated permissions will also be shown.  
-    This also makes the reply only visible to you.
+    `show_hidden` is `true` by default, so hidden commands that require elevated permissions will also be shown.  
+    Unless you don't have access to any hidden commands, this also makes the reply only visible to you.
 - **Invite:**
   - `/invite`  
     Shows a link that you can use to invite YTInfoBot to your own server.
