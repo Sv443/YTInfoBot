@@ -6,7 +6,7 @@ This bot is currently in development and not yet ready for public use. Inviting 
 <br><br><br><br>
 
 # YTInfoBot
-[Features](#features) &bull; [Usage](#regular-usage) &bull; [Commands](#slash-commands) &bull; [Privacy](#privacy) &bull; [Local development](#local-development)
+[Features](#features) &bull; [Usage](#regular-usage) &bull; [Commands](#slash-commands) &bull; [Privacy](#privacy) &bull; [Opt-out](#opt-out) &bull; [Local development](#local-development)
 
 Free Discord bot that replies to YouTube links with crowdsourced information from Return YouTube Dislike (approximate likes and dislikes), SponsorBlock (timestamps to skip certain segments) and DeArrow (less clickbaity thumbnails and titles).  
   
@@ -15,13 +15,13 @@ Since the bot is free to use, I rely on donations to keep it running and maintai
 
 <br>
 
-<a href="https://discord.com/api/oauth2/authorize?client_id=1290320137223802912&permissions=292058098752&scope=bot%20applications.commands" target="_blank"><img src="https://img.shields.io/badge/Invite%20Bot-%E2%96%BA-78f05d" height="30"></a>
+<a href="https://discord.com/api/oauth2/authorize?client_id=1290320137223802912&permissions=292058098752&scope=bot%20applications.commands" title="Invite the bot to your server" target="_blank"><img src="https://img.shields.io/badge/Invite%20Bot-%E2%96%BA-78f05d" height="30"></a>
 
-<a href="https://dc.sv443.net/" target="_blank"><img src="https://img.shields.io/badge/Join-Support%20Server-6e7bf4" height="20"></a>
+<a href="https://dc.sv443.net/" title="Join the support server" target="_blank"><img src="https://img.shields.io/badge/Join-Support%20Server-6e7bf4" height="20"></a>
 
 <br><br>
 
-<img alt="example 1" src="./src/assets/example1.png" width="375" /> <img alt="example 2" src="./src/assets/example2.png" width="375" />
+<img alt="Example 1; showing the bot's automatic reply" src="./src/assets/example1.png" width="375" /> <img alt="Example 2; showing the bot configuration process" src="./src/assets/example2.png" width="375" />
 
 </div>
 
@@ -47,18 +47,16 @@ The bot will automatically reply to YouTube links in any channel it has access t
 If there are multiple links in a single message, it will reply to up to 5 links (<!--TODO:-->configurable).  
 These automatic replies contain slightly reduced information by default to reduce spam.  
   
-<!--TODO:-->Additionally, there are right-click context menu options to get more detailed information about a video.  
-To access these, right-click (or hold on mobile) on a message and select the command under "Apps".  
-  
-If you want to opt out of automatic replies across every server, you can use the command `/settings set auto_reply new_value:false`
+Additionally, there are right-click context menu options to get more detailed information about a video.  
+To access these, right-click (or hold on mobile) on a message and select one of the commands under "Apps".  
 
 <br>
 
 ## Slash Commands:
 - **Video Info:**
-  - `/video_info video:<URL or ID> [type:<reduced|all|votes_only|dearrow_only|timestamps_only>]`  
-    Shows detailed information about a video, given its URL (supports youtube.com, music.youtube.com and youtu.be), or just the video ID.  
-    If no type is provided, the bot will default to what the server configuration specifies (`reduced` by default).
+  - `/video_info video:<URL or ID> [type:<reduced|everything|votes_only|dearrow_only|timestamps_only>]`  
+    Shows detailed information about a video via the URL (youtube.com / youtu.be / music.youtube.com), or just the video ID.  
+    If no type is provided, the bot will default to what's set in the server configuration (`everything` by default).
 - **User settings:**
   - `/settings list`  
     Shows a list of all available user settings and their current values.
@@ -107,13 +105,19 @@ If you want to opt out of automatic replies across every server, you can use the
 <br>
 
 ## Privacy:
-The bot stores rudimentary information about the servers it is in and the users that use it, related to configuration settings.  
+The bot stores rudimentary information about the servers it is in and the users that use it, related to configuration settings and nothing else.  
 The only uniquely identifiable information stored are the user ID and server ID (which are publicly obtainable by every member anyway).  
   
 At no point will user account info or message content be persistently stored or shared with third parties.  
   
-To get rid of all data stored about your server, just kick the bot.  
-To delete your personal cross-server data, use the command `/settings delete_data` - note that it will be recreated if you manually use the bot again. After deleting, automatic replies will use the default settings.
+To get rid of all data stored about your server, just kick the bot and it will automatically delete all data related to your server.  
+To delete your personal cross-server data, use the command `/privacy delete_data` - note that the data will be recreated if you manually use the bot again. Automatic replies do not store any data about the user.
+
+<br>
+
+## Opt-out:
+If you want to opt out of automatic replies across every server but still use the commands manually, you can use the command `/settings set auto_reply new_value:false`  
+Alternatively, if you don't want anything to do with the bot on any server, you can simply block it and refrain from using manual commands.
 
 <br>
 
