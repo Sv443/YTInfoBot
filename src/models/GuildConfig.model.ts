@@ -18,7 +18,7 @@ export class GuildConfig {
     id!: string;
 
   @Property({ type: "string", length: 24 })
-    defaultVideoInfoType: VideoInfoType = "reduced";
+    defaultVideoInfoType: VideoInfoType = "everything";
 
   @Property({ type: "string", length: 12 })
     numberFormat: NumberFormat = "long";

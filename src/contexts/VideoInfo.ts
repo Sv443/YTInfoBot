@@ -6,7 +6,7 @@ import { ApplicationCommandType, ContextMenuCommandBuilder, InteractionContextTy
 
 //#region c:basic
 
-/** Reply with video info using the server's default type or "reduced" as a fallback */
+/** Reply with video info using the server's default type or "everything" as a fallback */
 export class VideoInfoCtx extends ContextCommand {
   constructor() {
     super(new ContextMenuCommandBuilder()

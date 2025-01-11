@@ -89,7 +89,7 @@ export class MessageCreateEvt extends Event {
         url,
         videoId,
         guildCfg,
-        type: typeOverride ?? guildCfg?.defaultVideoInfoType ?? "reduced",
+        type: typeOverride ?? guildCfg?.defaultVideoInfoType ?? "everything",
         omitTitleAndThumb: isAutoReply,
         locale,
       });

@@ -20,8 +20,8 @@ const allowedHosts = ["www.youtube.com", "youtube.com", "music.youtube.com", "yo
 // TODO: translate
 
 export const videoInfoTypeChoices = [
-  { name: "Reduced", value: "reduced" }, // (default)
-  { name: "Everything", value: "everything" },
+  { name: "Everything", value: "everything" }, // (default)
+  { name: "Reduced", value: "reduced" },
   { name: "Votes only", value: "votes_only" },
   { name: "DeArrow only", value: "dearrow_only" },
   { name: "Timestamps only", value: "timestamps_only" },
@@ -105,7 +105,7 @@ export class VideoInfoCmd extends SlashCommand {
     if(!videoId)
       return int.reply(useEmbedify("commands.video_info.errors.invalidUrlOrId", Col.Error));
 
-    const type = (int.options.get("type")?.value ?? "reduced") as VideoInfoType;
+    const type = (int.options.get("type")?.value ?? "everything") as VideoInfoType;
 
     await int.deferReply();
 
