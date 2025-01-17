@@ -1,10 +1,10 @@
 import { resolve } from "node:path";
 import { readFile, writeFile } from "node:fs/promises";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, type Client, type GuildMember, type Message, type MessageCreateOptions, time } from "discord.js";
 import { getCommitHash, getHash, ghBaseUrl } from "@lib/misc.ts";
 import { Col } from "@lib/embedify.ts";
 import { UserSettings } from "@models/UserSettings.model.ts";
 import pkg from "@root/package.json" with { type: "json" };
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, type Client, type GuildMember, type Message, type MessageCreateOptions } from "discord.js";
 import { getEnvVar } from "@lib/env.ts";
 import { cmdInstances } from "@lib/registry.ts";
 import { em } from "@lib/db.ts";
@@ -165,12 +165,12 @@ async function useMetricsMsg(metrics: MetricsData) {
   const ebd = new EmbedBuilder()
     .setTitle("Bot metrics:")
     .setFields([
-      { name: "Uptime:", value: String(uptimeStr), inline: true },
-      { name: "Updated:", value: `<t:${Math.floor(Date.now() / 1000)}:R>\n(last metrics update)`, inline: false },
       { name: "Users:", value: `${usersAmt} in DB`, inline: true },
       { name: "Guilds:", value: String(guildsAmt), inline: true },
       { name: "Members:", value: `${totalMembersAmt} total\n${uniqueMembersAmt} unique`, inline: true },
       { name: `${autoPlural("Command", cmdsTotal)} (${cmdsTotal}):`, value: `${slashCmdAmt} ${autoPlural("slash command", slashCmdAmt)}\n${ctxCmdAmt} ${autoPlural("context command", ctxCmdAmt)}`, inline: false },
+      { name: "Uptime:", value: String(uptimeStr), inline: false },
+      { name: "Metrics updated:", value: time(Date.now(), "R"), inline: false },
     ])
     .setFooter({ text: `v${pkg.version} - ${await getCommitHash(true)}` })
     .setColor(Col.Info);

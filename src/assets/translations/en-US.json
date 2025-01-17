@@ -86,7 +86,7 @@
       },
       "listEmbed": {
         "title": "Server configuration values:",
-        "footer": "Use /config set setting_name new_value to change the server config"
+        "footer": "Use '/config set' to change the server config"
       }
     },
     "help": {
