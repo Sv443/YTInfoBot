@@ -6,7 +6,7 @@ import { Col } from "@lib/embedify.ts";
 import { getEnvVar } from "@lib/env.ts";
 import { cmdInstances } from "@lib/registry.ts";
 import { em } from "@lib/db.ts";
-import { autoPlural } from "@lib/text.ts";
+import { autoPlural, secsToTimeStr } from "@lib/text.ts";
 import { UserSettings } from "@models/UserSettings.model.ts";
 import pkg from "@root/package.json" with { type: "json" };
 
@@ -14,6 +14,9 @@ import pkg from "@root/package.json" with { type: "json" };
 
 export const metGuildId = getEnvVar("METRICS_GUILD", "stringOrUndefined");
 export const metChanId = getEnvVar("METRICS_CHANNEL", "stringOrUndefined");
+
+const metUpdIvRaw = getEnvVar("METRICS_UPDATE_INTERVAL", "number");
+export const metUpdInterval = Math.max(isNaN(metUpdIvRaw) ? 60 : metUpdIvRaw, 1);
 
 const initTime = Date.now();
 const commitHash = await getCommitHash(true);
@@ -166,12 +169,12 @@ async function useMetricsMsg(metrics: MetricsData) {
   const ebd = new EmbedBuilder()
     .setTitle("Bot metrics:")
     .setFields([
+      { name: "Guilds:", value: `${guildsAmt} ${autoPlural("guild", guildsAmt)}`, inline: true },
       { name: "Users:", value: `${usersAmt} in DB`, inline: true },
-      { name: "Guilds:", value: `${guildsAmt} guilds`, inline: true },
       { name: "Members:", value: `${totalMembersAmt} total\n${uniqueMembersAmt} unique`, inline: true },
       { name: `${autoPlural("Command", cmdsTotal)} (${cmdsTotal}):`, value: `${slashCmdAmt} ${autoPlural("slash command", slashCmdAmt)}\n${ctxCmdAmt} ${autoPlural("context command", ctxCmdAmt)}`, inline: false },
-      { name: "Uptime:", value: `${uptimeStr}\n${time(new Date(initTime), "R")}`, inline: false },
-      { name: "Metrics updated:", value: time(new Date(), "R"), inline: false },
+      { name: "Uptime:", value: `${time(new Date(initTime), "R")}\nTime: ${uptimeStr}`, inline: false },
+      { name: "Metrics updated:", value: `${time(new Date(), "R")}\nInterval: ${secsToTimeStr(metUpdInterval)}`, inline: false },
     ])
     .setFooter({ text: `v${pkg.version} - ${commitHash}` })
     .setColor(Col.Info);
@@ -193,15 +196,7 @@ async function useMetricsMsg(metrics: MetricsData) {
 
 /** Returns the uptime in a human-readable format */
 function getUptime() {
-  const upt = Date.now() - initTime;
+  const upt = Math.floor((Date.now() - initTime) / 1000);
 
-  return ([
-    [(1000 * 60 * 60 * 24), `${Math.floor(upt / (1000 * 60 * 60 * 24))}d`],
-    [(1000 * 60 * 60), `${Math.floor(upt / (1000 * 60 * 60)) % 24}h`],
-    [(1000 * 60), `${Math.floor(upt / (1000 * 60)) % 60}m`],
-    [0, `${Math.floor(upt / 1000) % 60}s`],
-  ] as const)
-    .filter(([d]) => upt >= d)
-    .map(([, s]) => s)
-    .join(" ");
+  return secsToTimeStr(upt, "en-US");
 }

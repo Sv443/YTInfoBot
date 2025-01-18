@@ -130,7 +130,7 @@ export function secsToYtTime(seconds: number) {
 }
 
 /** Returns the passed amount of seconds in a human-readable format */
-export function secsToTimeStr(seconds: number, locale = "en-US", padded = false) {
+export function secsToTimeStr(seconds: number, locale = "en-US", padded = true) {
   const t = tr.use(locale);
 
   const d = Math.floor(seconds / (60 * 60 * 24)),
@@ -138,13 +138,13 @@ export function secsToTimeStr(seconds: number, locale = "en-US", padded = false)
     m = Math.floor(seconds / 60) % 60,
     s = Math.floor(seconds) % 60;
 
-  const pad = (n: number) => padded ? String(n).padStart(2, "0") : n;
+  const pad = (n: number) => padded && n !== 0 ? String(n).padStart(2, "0") : n;
 
   return ([
     [(60 * 60 * 24), `${d}${t("general.time.short.days")}`],
-    [(60 * 60), `${pad(h)}${t("general.time.short.hours")}`],
-    [60, `${pad(m)}${t("general.time.short.minutes")}`],
-    [0, `${pad(s)}${t("general.time.short.seconds")}`],
+    [(60 * 60), `${seconds >= (60 * 60 * 24) ? pad(h) : h}${t("general.time.short.hours")}`],
+    [60, `${seconds >= (60 * 60) ? pad(m) : m}${t("general.time.short.minutes")}`],
+    [0, `${seconds >= 60 ? pad(s) : s}${t("general.time.short.seconds")}`],
   ] as const)
     .filter(([d]) => seconds >= d)
     .map(([, s]) => s)

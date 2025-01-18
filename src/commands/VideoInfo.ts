@@ -240,7 +240,7 @@ export class VideoInfoCmd extends SlashCommand {
     if(typeof duration === "number") {
       embed.addFields({
         name: t("commands.video_info.embedFields.duration"),
-        value: secsToTimeStr(duration, locale, true),
+        value: secsToTimeStr(duration, locale),
         inline: true,
       });
     }

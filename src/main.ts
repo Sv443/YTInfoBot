@@ -7,7 +7,7 @@ import { initRegistry, registerCommandsForGuild } from "@lib/registry.ts";
 import { autoPlural } from "@lib/text.ts";
 import { envVarEq, getEnvVar } from "@lib/env.ts";
 import { initTranslations } from "@lib/translate.ts";
-import { metChanId, metGuildId, updateMetrics } from "@src/metrics.ts";
+import { metChanId, metGuildId, metUpdInterval, updateMetrics } from "@src/metrics.ts";
 import { GuildConfig } from "@models/GuildConfig.model.ts";
 
 //#region validate env
@@ -59,9 +59,6 @@ async function init() {
 
 
 //#region intervalChks
-
-const metUpdIvRaw = getEnvVar("METRICS_UPDATE_INTERVAL", "number");
-const metUpdInterval = Math.max(isNaN(metUpdIvRaw) ? 60 : metUpdIvRaw, 1);
 
 const chkGldIntervalRaw = getEnvVar("GUILD_CHECK_INTERVAL", "number");
 const chkGldInterval = Math.max(isNaN(chkGldIntervalRaw) ? 300 : chkGldIntervalRaw, 10);
