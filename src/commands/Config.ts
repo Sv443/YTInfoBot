@@ -9,7 +9,7 @@ import { capitalize } from "@lib/text.ts";
 import localesJson from "@assets/locales.json" with { type: "json" };
 import type { Stringifiable } from "@src/types.ts";
 import { registerCommandsForGuild } from "@lib/registry.ts";
-import { getLocMap, tr, type TrKeyEn } from "@lib/translate.ts";
+import { getLocMap, getRegisteredLanguages, tr, type TrKeyEn } from "@lib/translate.ts";
 import { getEnvVar } from "@lib/env.ts";
 
 //#region constants
@@ -275,6 +275,8 @@ export class ConfigCmd extends SlashCommand {
     int[int.deferred || int.replied ? "editReply" : "reply"](useEmbedify(tr.for(await ConfigCmd.getGuildLocale(int), "errors.guildCfgInaccessible"), Col.Error));
   }
 
+  //#region s:editCfgSett
+
   /** Call to edit or view the passed configuration setting */
   public static async editConfigSetting<
     TCfgKey extends keyof GuildConfig,
@@ -311,12 +313,12 @@ export class ConfigCmd extends SlashCommand {
       if(!cfg)
         return await ConfigCmd.noConfigFound(int);
 
-      // TODO: check if new_value needs to be translated
-      const newValue = opt.options?.[0]?.options?.find(o => o.name === "new_value")?.value as TCfgValue | undefined;
+      const newValue = opt.options?.[0]?.options?.find(o => o.name === tr.for("en-US", "commands.config.names.subcmd.args.newValue"))?.value as TCfgValue | undefined;
       if(typeof newValue === "undefined") {
         const cfg = await em.findOne(GuildConfig, { id: int.guildId });
         if(!cfg)
           return await ConfigCmd.noConfigFound(int);
+
         return int.editReply(useEmbedify(tr.for(locale, "commands.config.set.currentValue", {
           settingName: tr.for(locale, settingNameTrKey),
           newValue: getValueLabel(cfg[cfgProp] as TCfgValue, locale) ?? cfg[cfgProp],
@@ -336,6 +338,16 @@ export class ConfigCmd extends SlashCommand {
 
       if(cfgProp === "locale" && !this.global)
         await registerCommandsForGuild(int.guildId);
+
+      // if no translations exist for the new locale, warn the user
+      const localeChanged = locale !== newValue;
+      if(localeChanged && !getRegisteredLanguages().has(String(newValue)) && opt.options?.[0]?.name === getSCNames().locale){
+        const loc = localesJson.find(({ code }) => code === newValue);
+        return await int.editReply(useEmbedify(tr.for(locale, "commands.config.set.localeNotFoundWarning", {
+          localeName: loc ? `${loc.name} (${loc.nativeName})` : newValue,
+          supportServerInviteUrl: getEnvVar("SUPPORT_SERVER_INVITE_URL"),
+        }), Col.Warning));
+      }
 
       return int.editReply(useEmbedify(tr.for(locale, "commands.config.set.success", {
         settingName: tr.for(locale, settingNameTrKey),

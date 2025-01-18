@@ -77,7 +77,8 @@
         "invalidValue": "Invalid ${settingName} specified: `${newValue}`${invalidHintSuffix}",
         "success": "Successfully set the ${settingName} to `${newValue}`",
         "error": "Couldn't set the ${settingName} due to an error: ${err}",
-        "localeInvalidHint": "Only the listed languages are supported."
+        "localeInvalidHint": "Only the listed languages are supported.",
+        "localeNotFoundWarning": "Translations for the locale `${localeName}` were not found.\nThe change has been saved because number formatting will still work, but all text will default to English.\n\nIf you would like to contribute to translations, please [join the support server.](${supportServerInviteUrl})"
       },
       "reset": {
         "confirm": "Are you sure you want to reset the configuration?",

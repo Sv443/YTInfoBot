@@ -88,17 +88,23 @@ async function registerGuildCommands() {
 
 /** Registers all commands for the specified guild in the Discord API - can also be called at runtime to add commands to new guilds */
 export async function registerCommandsForGuild(guildId: string) {
-  const { signal, abort } = new AbortController(),
-    timeout = setTimeout(() => abort(), 10_000),
-    data = await rest.put(
-      Routes.applicationGuildCommands(clientId, guildId),
-      {
-        body: [...cmdInstances.entries()].map(([, cmd]) => cmd.builderJson),
-        signal,
-      },
-    );
-  clearTimeout(timeout);
-  return data;
+  try {
+    const ac = new AbortController(),
+      { signal, abort } = ac,
+      timeout = setTimeout(() => abort(), 10_000),
+      data = await rest.put(
+        Routes.applicationGuildCommands(clientId, guildId),
+        {
+          body: [...cmdInstances.entries()].map(([, cmd]) => cmd.builderJson),
+          signal,
+        },
+      );
+    clearTimeout(timeout);
+    return data;
+  }
+  catch(err) {
+    console.error(`Error while registering commands for guild "${guildId}": ${err}`);
+  }
 }
 
 /** Registers all client events and their listeners */

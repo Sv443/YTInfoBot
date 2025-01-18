@@ -411,6 +411,11 @@ export async function initTranslations(): Promise<void> {
   tr.setFallbackLanguage(enName ?? defaultLocale);
 }
 
+/** Returns all registered languages */
+export function getRegisteredLanguages() {
+  return new Set(Object.keys(trans));
+}
+
 //#region getLocMap
 
 /** Returns a localization map for all locales where the given common translation key exists */

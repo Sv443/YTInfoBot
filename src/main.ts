@@ -43,7 +43,7 @@ async function init() {
   client.on(Events.Error, (err) => console.error(k.red("Client error:"), err));
 
   process.on("unhandledRejection", (reason, promise) => {
-    console.error(k.red("Unhandled rejection at:"), promise, k.red("\nRejection reason:"), reason);
+    console.error(k.red("Unhandled Promise rejection:"), promise, k.red("\n\nRejection reason:"), reason);
   });
 
   console.log(k.blue(`${client.user?.displayName ?? client.user?.username} is ready.\n`));
@@ -90,18 +90,23 @@ async function checkGuilds(client: Client) {
   const registeredGuilds = await em.findAll(GuildConfig);
   const tasks: Promise<unknown | void>[] = [];
 
-  for(const guild of [...client.guilds.cache.values()])
-    !registeredGuilds.some(g => g.id === guild.id)
+  for(const { id } of [...client.guilds.cache.values()])
+    !registeredGuilds.find(g => g.id === id)
       && tasks.push(
-        em.persistAndFlush(new GuildConfig(guild.id)),
-        registerCommandsForGuild(guild.id),
+        em.persistAndFlush(new GuildConfig(id)),
+        registerCommandsForGuild(id),
       );
 
   for(const guild of registeredGuilds)
     if(!client.guilds.cache.has(guild.id))
       tasks.push(em.removeAndFlush(guild));
 
-  await Promise.allSettled(tasks);
+  try {
+    await Promise.allSettled(tasks);
+  }
+  catch(e) {
+    console.error(k.red("Couldn't check guilds:"), e);
+  }
 }
 
 init();

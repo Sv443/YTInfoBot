@@ -10,8 +10,14 @@ export class GuildConfig {
   }
 
   static async ensureExists(id: string) {
-    const conf = await em.findOne(GuildConfig, { id });
-    !conf && await em.persistAndFlush(new GuildConfig(id));
+    let exists = false;
+    try {
+      exists = Boolean(await em.findOne(GuildConfig, { id }));
+    }
+    catch(e) {
+      void e;
+    }
+    !exists && await em.persistAndFlush(new GuildConfig(id));
   }
 
   @PrimaryKey({ type: "string", length: 24 })
