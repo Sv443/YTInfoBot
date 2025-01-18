@@ -3,12 +3,12 @@ import { readFile, writeFile } from "node:fs/promises";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, type Client, type GuildMember, type Message, type MessageCreateOptions, time } from "discord.js";
 import { getCommitHash, getHash, ghBaseUrl } from "@lib/misc.ts";
 import { Col } from "@lib/embedify.ts";
-import { UserSettings } from "@models/UserSettings.model.ts";
-import pkg from "@root/package.json" with { type: "json" };
 import { getEnvVar } from "@lib/env.ts";
 import { cmdInstances } from "@lib/registry.ts";
 import { em } from "@lib/db.ts";
 import { autoPlural } from "@lib/text.ts";
+import { UserSettings } from "@models/UserSettings.model.ts";
+import pkg from "@root/package.json" with { type: "json" };
 
 //#region metrics:vars
 
@@ -16,6 +16,8 @@ export const metGuildId = getEnvVar("METRICS_GUILD", "stringOrUndefined");
 export const metChanId = getEnvVar("METRICS_CHANNEL", "stringOrUndefined");
 
 const initTime = Date.now();
+const commitHash = await getCommitHash(true);
+
 const metricsManifFile = resolve(".metrics.json");
 let metricsData: MetricsManifest | undefined;
 let firstMetricRun = true;
@@ -55,8 +57,7 @@ export async function updateMetrics(client: Client) {
 
     await client.guilds.fetch();
 
-    const totalMembersAmt = client.guilds.cache
-      .reduce((acc, g) => acc + g.memberCount, 0);
+    const totalMembersAmt = client.guilds.cache.reduce((acc, g) => acc + g.memberCount, 0);
 
     const memMap = new Map<string, GuildMember>();
     const memMapPromises: Promise<void>[] = [];
@@ -166,13 +167,13 @@ async function useMetricsMsg(metrics: MetricsData) {
     .setTitle("Bot metrics:")
     .setFields([
       { name: "Users:", value: `${usersAmt} in DB`, inline: true },
-      { name: "Guilds:", value: String(guildsAmt), inline: true },
+      { name: "Guilds:", value: `${guildsAmt} guilds`, inline: true },
       { name: "Members:", value: `${totalMembersAmt} total\n${uniqueMembersAmt} unique`, inline: true },
       { name: `${autoPlural("Command", cmdsTotal)} (${cmdsTotal}):`, value: `${slashCmdAmt} ${autoPlural("slash command", slashCmdAmt)}\n${ctxCmdAmt} ${autoPlural("context command", ctxCmdAmt)}`, inline: false },
-      { name: "Uptime:", value: String(uptimeStr), inline: false },
-      { name: "Metrics updated:", value: time(Date.now(), "R"), inline: false },
+      { name: "Uptime:", value: `${uptimeStr}\n${time(new Date(initTime), "R")}`, inline: false },
+      { name: "Metrics updated:", value: time(new Date(), "R"), inline: false },
     ])
-    .setFooter({ text: `v${pkg.version} - ${await getCommitHash(true)}` })
+    .setFooter({ text: `v${pkg.version} - ${commitHash}` })
     .setColor(Col.Info);
 
   return {
@@ -183,7 +184,7 @@ async function useMetricsMsg(metrics: MetricsData) {
           new ButtonBuilder()
             .setStyle(ButtonStyle.Link)
             .setLabel("Open repo at commit")
-            .setURL(`${ghBaseUrl}/tree/${await getCommitHash()}`)
+            .setURL(`${ghBaseUrl}/tree/${commitHash}`)
         )
         .toJSON(),
     ],
