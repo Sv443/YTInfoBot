@@ -1,5 +1,5 @@
 import type { Stringifiable } from "@root/src/types.ts";
-import { ColorResolvable, EmbedBuilder } from "discord.js";
+import { type ColorResolvable, EmbedBuilder } from "discord.js";
 
 /** Color constants for embeds */
 export enum Col {
