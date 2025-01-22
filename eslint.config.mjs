@@ -35,12 +35,9 @@ const config = [
     },
     languageOptions: {
       globals: {
-        ...globals.browser,
         ...globals.node,
         Atomics: "readonly",
         SharedArrayBuffer: "readonly",
-        GM: "readonly",
-        unsafeWindow: "writable",
       },
       parser: tsParser,
       ecmaVersion: "latest",
