@@ -30,6 +30,7 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
+    "verbatimModuleSyntax": true,
     "paths": {
       "@assets/*": ["src/assets/*"],
       "@cmd/*": ["src/commands/*"],
