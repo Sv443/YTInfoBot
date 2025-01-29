@@ -40,26 +40,26 @@ export class PrivacyCmd extends SlashCommand {
 
     await int.deferReply({ ephemeral: true });
 
-    const locale = await PrivacyCmd.getGuildLocale(int);
+    const t = await PrivacyCmd.getTrFunc(int);
     const sub = int.options.data[0].name;
 
     if(sub === "info")
-      return int.editReply(useEmbedify(Array.from({ length: 5 }).map((_, i) => tr.for(locale, `commands.privacy.info.line${(i + 1) as 1}`))));
+      return int.editReply(useEmbedify(Array.from({ length: 5 }).map((_, i) => t(`commands.privacy.info.line${(i + 1) as 1}`))));
 
     if(sub === "delete_data") {
       if(!await em.findOne(UserSettings, { id: int.user.id }))
-        return int.editReply(useEmbedify(tr.for(locale, "errors.noDataFoundToDelete"), Col.Warning));
+        return int.editReply(useEmbedify(t("errors.noDataFoundToDelete"), Col.Warning));
 
       const confirmBtns = [
         new ButtonBuilder()
           .setCustomId("confirm-delete-data")
           .setStyle(ButtonStyle.Danger)
-          .setLabel(tr.for(locale, "buttons.delete"))
+          .setLabel(t("buttons.delete"))
           .setEmoji("🗑️"),
         new ButtonBuilder()
           .setCustomId("cancel-delete-data")
           .setStyle(ButtonStyle.Secondary)
-          .setLabel(tr.for(locale, "buttons.cancel"))
+          .setLabel(t("buttons.cancel"))
           .setEmoji("❌"),
       ];
 
@@ -67,9 +67,9 @@ export class PrivacyCmd extends SlashCommand {
 
       const reply = await int.editReply({
         ...useEmbedify(
-          Array.from({ length: 4 }).map((_, i) => tr.for(locale, `commands.privacy.delete.confirmLine${(i + 1) as 1}`)),
+          Array.from({ length: 4 }).map((_, i) => t(`commands.privacy.delete.confirmLine${(i + 1) as 1}`)),
           Col.Warning,
-          (e) => e.setFooter({ text: tr.for(locale, "general.promptExpiryNotice", promptSec) })
+          (e) => e.setFooter({ text: t("general.promptExpiryNotice", promptSec) })
         ),
         ...useButtons([confirmBtns]),
       });
@@ -87,20 +87,20 @@ export class PrivacyCmd extends SlashCommand {
         if(conf.customId === "confirm-delete-data") {
           await em.removeAndFlush(await em.find(UserSettings, { id: int.user.id }));
           return conf.editReply({
-            ...useEmbedify(tr.for(locale, "commands.privacy.delete.success"), Col.Success),
+            ...useEmbedify(t("commands.privacy.delete.success"), Col.Success),
             components: [],
           });
         }
         else {
           return await conf.editReply({
-            ...useEmbedify(tr.for(locale, "commands.privacy.delete.cancelled"), Col.Secondary),
+            ...useEmbedify(t("commands.privacy.delete.cancelled"), Col.Secondary),
             components: [],
           });
         }
       }
       catch {
         return await (conf ?? int).editReply({
-          ...useEmbedify(tr.for(locale, "commands.privacy.delete.noConfirmation"), Col.Secondary),
+          ...useEmbedify(t("commands.privacy.delete.noConfirmation"), Col.Secondary),
           components: [],
         });
       }

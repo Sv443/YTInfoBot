@@ -21,8 +21,8 @@ export class InviteCmd extends SlashCommand {
   public async run(int: CommandInteraction) {
     await int.deferReply({ ephemeral: true });
 
-    const locale = await InviteCmd.getGuildLocale(int);
+    const t = await InviteCmd.getTrFunc(int);
 
-    return int.editReply(useEmbedify(tr.for(locale, "commands.invite.embedContent", getEnvVar("BOT_INVITE_URL")), Col.Info));
+    return int.editReply(useEmbedify(t("commands.invite.embedContent", getEnvVar("BOT_INVITE_URL")), Col.Info));
   }
 }

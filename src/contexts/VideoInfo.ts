@@ -27,11 +27,11 @@ export class VideoInfoCtx extends ContextCommand {
 
     const fetchColl = await int.channel?.messages.fetch({ limit: 1, around: int.targetId });
     const targetMsg = fetchColl?.get(int.targetId);
-    const locale = await VideoInfoCtx.getGuildLocale(int);
+    const t = await VideoInfoCtx.getTrFunc(int);
 
     if(!targetMsg)
       return int.editReply({
-        ...useEmbedify(tr.for(locale, "errors.messageInaccessible"), Col.Error),
+        ...useEmbedify(t("errors.messageInaccessible"), Col.Error),
       });
 
     return await MessageCreateEvt.handleYtLinkMsg(targetMsg, int);
@@ -61,11 +61,11 @@ export class VideoInfoExtendedCtx extends ContextCommand {
 
     const fetchColl = await int.channel?.messages.fetch({ limit: 1, around: int.targetId });
     const targetMsg = fetchColl?.get(int.targetId);
-    const locale = await VideoInfoExtendedCtx.getGuildLocale(int);
+    const t = await VideoInfoExtendedCtx.getTrFunc(int);
 
     if(!targetMsg)
       return int.editReply({
-        ...useEmbedify(tr.for(locale, "errors.messageInaccessible"), Col.Error),
+        ...useEmbedify(t("errors.messageInaccessible"), Col.Error),
       });
 
     return await MessageCreateEvt.handleYtLinkMsg(targetMsg, int, "everything");

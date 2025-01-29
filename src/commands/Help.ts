@@ -97,7 +97,7 @@ export class HelpCmd extends SlashCommand {
     case "info": {
       await int.deferReply();
 
-      const t = tr.use(await HelpCmd.getGuildLocale(int));
+      const t = await HelpCmd.getTrFunc(int);
       const { version, author: { name, url }} = pkg;
 
       return int.editReply(useEmbedify([

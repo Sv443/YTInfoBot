@@ -20,10 +20,10 @@ export class TemplateCmd extends SlashCommand {
   public async run(int: CommandInteraction) {
     await int.deferReply({ ephemeral: true });
 
-    const locale = await TemplateCmd.getGuildLocale(int);
+    const t = await TemplateCmd.getTrFunc(int);
 
     return int.editReply({
-      ...useEmbedify(tr.for(locale, "commands.template_command.embedContent" as "_")),
+      ...useEmbedify(t("commands.template_command.embedContent" as "_")),
     });
   }
 }

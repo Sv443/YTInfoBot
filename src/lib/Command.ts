@@ -47,6 +47,11 @@ export abstract class CmdBase {
   public static async getGuildLocale(intOrId: Pick<CommandInteraction, "guild" | "guildId"> | string): Promise<string> {
     return (await em.findOne(GuildConfig, { id: typeof intOrId === "string" ? intOrId : intOrId.guild?.id ?? intOrId?.guildId }))?.locale ?? defaultLocale;
   }
+
+  /** Returns a translation function for the guild of the given interaction or guild ID */
+  public static async getTrFunc(intOrId: Pick<CommandInteraction, "guild" | "guildId"> | string) {
+    return tr.use(await this.getGuildLocale(intOrId));
+  }
 }
 
 //#region SlashCommand
