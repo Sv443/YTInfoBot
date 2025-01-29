@@ -12,7 +12,8 @@
     "lint": "eslint . && tsc --noEmit",
     "format": "eslint --fix .",
     "prepare-env": "tsx src/tools/prepare-env.ts",
-    "build": "tsc"
+    "build": "tsc && tsc-alias",
+    "build-start": "pnpm build && node --enable-source-maps --no-warnings=ExperimentalWarning --import tsx ./dist/src/main.js"
   },
   "author": {
     "name": "Sv443",
