@@ -13,17 +13,13 @@
     "format": "eslint --fix .",
     "prepare-env": "tsx src/tools/prepare-env.ts"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Sv443/YTInfoBot.git"
-  },
-  "engines": {
-    "node": ">=19",
-    "npm": ">=8"
-  },
   "author": {
     "name": "Sv443",
     "url": "https://github.com/Sv443"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sv443/YTInfoBot.git"
   },
   "bugs": {
     "url": "https://github.com/Sv443/YTInfoBot/issues"
@@ -31,6 +27,10 @@
   "funding": {
     "type": "github",
     "url": "https://github.com/sponsors/Sv443"
+  },
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=9"
   },
   "nodemonConfig": {
     "watch": [
