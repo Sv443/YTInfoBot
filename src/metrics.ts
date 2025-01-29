@@ -3,20 +3,14 @@ import { readFile, writeFile } from "node:fs/promises";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, type Client, type GuildMember, type Message, type MessageCreateOptions, time } from "discord.js";
 import { getCommitHash, getHash, ghBaseUrl } from "@lib/misc.js";
 import { Col } from "@lib/embedify.js";
-import { getEnvVar } from "@lib/env.js";
 import { cmdInstances } from "@lib/registry.js";
 import { em } from "@lib/db.js";
 import { autoPlural, secsToTimeStr } from "@lib/text.js";
 import { UserSettings } from "@models/UserSettings.model.js";
 import pkg from "@root/package.json" with { type: "json" };
+import { chkGldInterval, lastGldChkTime, metChanId, metGuildId, metUpdInterval } from "@src/constants.js";
 
 //#region metrics:vars
-
-export const metGuildId = getEnvVar("METRICS_GUILD", "stringOrUndefined");
-export const metChanId = getEnvVar("METRICS_CHANNEL", "stringOrUndefined");
-
-const metUpdIvRaw = getEnvVar("METRICS_UPDATE_INTERVAL", "number");
-export const metUpdInterval = Math.max(isNaN(metUpdIvRaw) ? 60 : metUpdIvRaw, 1);
 
 const initTime = Date.now();
 const commitHash = await getCommitHash(true);
@@ -169,12 +163,13 @@ async function useMetricsMsg(metrics: MetricsData) {
   const ebd = new EmbedBuilder()
     .setTitle("Bot metrics:")
     .setFields([
-      { name: "Guilds:", value: `${guildsAmt} ${autoPlural("guild", guildsAmt)}`, inline: true },
-      { name: "Users:", value: `${usersAmt} in DB`, inline: true },
-      { name: "Members:", value: `${totalMembersAmt} total\n${uniqueMembersAmt} unique`, inline: true },
-      { name: `${autoPlural("Command", cmdsTotal)} (${cmdsTotal}):`, value: `${slashCmdAmt} ${autoPlural("slash command", slashCmdAmt)}\n${ctxCmdAmt} ${autoPlural("context command", ctxCmdAmt)}`, inline: false },
-      { name: "Uptime:", value: `${time(new Date(initTime), "R")}\nTime: ${uptimeStr}`, inline: false },
-      { name: "Metrics updated:", value: `${time(new Date(), "R")}\nInterval: ${secsToTimeStr(metUpdInterval)}`, inline: false },
+      { name: "👨‍👨‍👦‍👦 Guilds:", value: `${guildsAmt} ${autoPlural("guild", guildsAmt)}`, inline: true },
+      { name: "🧑‍💻 Users:", value: `${usersAmt} in DB`, inline: true },
+      { name: "🧑‍🦲 Members:", value: `${totalMembersAmt} total\n${uniqueMembersAmt} unique`, inline: true },
+      { name: `⭐ ${autoPlural("Command", cmdsTotal)} (${cmdsTotal}):`, value: `${slashCmdAmt} ${autoPlural("slash command", slashCmdAmt)}\n${ctxCmdAmt} ${autoPlural("context command", ctxCmdAmt)}`, inline: false },
+      { name: "⏲️ Uptime:", value: `${time(new Date(initTime), "R")}\nTotal: ${uptimeStr}`, inline: false },
+      { name: "🧮 Last guild check:", value: lastGldChkTime === 0 ? "never" : `${time(new Date(lastGldChkTime), "R")}\nInterval: ${secsToTimeStr(chkGldInterval)}`, inline: false },
+      { name: "✏️ Metrics updated:", value: `${time(new Date(), "R")}\nInterval: ${secsToTimeStr(metUpdInterval)}`, inline: false },
     ])
     .setFooter({ text: `v${pkg.version} - ${commitHash}` })
     .setColor(Col.Info);

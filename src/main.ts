@@ -7,7 +7,8 @@ import { initRegistry, registerCommandsForGuild } from "@lib/registry.js";
 import { autoPlural } from "@lib/text.js";
 import { envVarEq, getEnvVar } from "@lib/env.js";
 import { initTranslations } from "@lib/translate.js";
-import { metChanId, metGuildId, metUpdInterval, updateMetrics } from "@src/metrics.js";
+import { updateMetrics } from "@src/metrics.js";
+import { chkGldInterval, metChanId, metGuildId, metUpdInterval, updateLastGldChkTime } from "@src/constants.js";
 import { GuildConfig } from "@models/GuildConfig.model.js";
 
 //#region validate env
@@ -60,9 +61,6 @@ async function init() {
 
 //#region intervalChks
 
-const chkGldIntervalRaw = getEnvVar("GUILD_CHECK_INTERVAL", "number");
-const chkGldInterval = Math.max(isNaN(chkGldIntervalRaw) ? 300 : chkGldIntervalRaw, 10);
-
 /** Runs all interval checks */
 async function intervalChecks(client: Client, i: number) {
   try {
@@ -103,6 +101,7 @@ async function checkGuilds(client: Client) {
 
   try {
     await Promise.allSettled(tasks);
+    updateLastGldChkTime();
   }
   catch(e) {
     console.error(k.red("Couldn't check guilds:"), e);
