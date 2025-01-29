@@ -11,7 +11,8 @@
     "noDataFoundToDelete": "No data found to delete.",
     "guildCfgInaccessible": "No server configuration found - please run `/config reset`",
     "messageInaccessible": "The targeted message could not be accessed.",
-    "onlyRunInGuild": "This command can only be run in a server."
+    "onlyRunInGuild": "This command can only be run in a server.",
+    "notAuthor": "You are not the author of the message."
   },
   "general": {
     "promptExpiryNotice": "This prompt will expire in ${sec}s",
@@ -212,7 +213,8 @@
       "nameExtended": "Video Info (extended)"
     },
     "delete_reply_ctx": {
-      "name": "Admin: Delete Reply"
+      "name": "Admin: Delete Reply",
+      "successMessage": "Successfully deleted the reply."
     }
   }
 }
