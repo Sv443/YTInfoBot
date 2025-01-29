@@ -1,12 +1,12 @@
 import { ButtonBuilder, ButtonStyle, PermissionFlagsBits, type ButtonInteraction, type CommandInteraction, type ContextMenuCommandInteraction, type EmbedBuilder, type Message } from "discord.js";
-import { Event } from "@lib/Event.ts";
-import { VideoInfoCmd, type VideoInfoType } from "@cmd/VideoInfo.ts";
-import { em } from "@lib/db.ts";
-import { GuildConfig } from "@models/GuildConfig.model.ts";
-import { UserSettings } from "@models/UserSettings.model.ts";
-import { Col, useEmbedify } from "@lib/embedify.ts";
-import { useButtons } from "@lib/components.ts";
-import { defaultLocale, tr } from "@lib/translate.ts";
+import { Event } from "@lib/Event.js";
+import { VideoInfoCmd, type VideoInfoType } from "@cmd/VideoInfo.js";
+import { em } from "@lib/db.js";
+import { GuildConfig } from "@models/GuildConfig.model.js";
+import { UserSettings } from "@models/UserSettings.model.js";
+import { Col, useEmbedify } from "@lib/embedify.js";
+import { useButtons } from "@lib/components.js";
+import { defaultLocale, tr } from "@lib/translate.js";
 
 /** Regex that detects youtube.com, music.youtube.com, and youtu.be links */
 const ytVideoRegexStr = "(?:https?:\\/\\/)?(?:www\\.)?(?:youtube\\.com\\/watch\\?v=|music\\.youtube\\.com\\/watch\\?v=|youtu\\.be\\/)([a-zA-Z0-9_-]+)";

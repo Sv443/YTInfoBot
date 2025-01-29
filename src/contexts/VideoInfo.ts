@@ -1,7 +1,7 @@
-import { MessageCreateEvt } from "@evt/MessageCreate.ts";
-import { ContextCommand } from "@lib/Command.ts";
-import { Col, useEmbedify } from "@lib/embedify.ts";
-import { getLocMap, tr } from "@lib/translate.ts";
+import { MessageCreateEvt } from "@evt/MessageCreate.js";
+import { ContextCommand } from "@lib/Command.js";
+import { Col, useEmbedify } from "@lib/embedify.js";
+import { getLocMap, tr } from "@lib/translate.js";
 import { ApplicationCommandType, ContextMenuCommandBuilder, InteractionContextType, type ContextMenuCommandInteraction } from "discord.js";
 
 //#region c:basic

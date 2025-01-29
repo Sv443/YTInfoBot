@@ -1,11 +1,11 @@
-import { ConfigCmd } from "@cmd/Config.ts";
-import { HelpCmd } from "@cmd/Help.ts";
-import { InviteCmd } from "@cmd/Invite.ts";
-import { PrivacyCmd } from "@cmd/Privacy.ts";
-import { SettingsCmd } from "@cmd/Settings.ts";
-import { VideoInfoCmd } from "@cmd/VideoInfo.ts";
-import type { SlashCommand } from "@lib/Command.ts";
-import type { Newable } from "@src/types.ts";
+import { ConfigCmd } from "@cmd/Config.js";
+import { HelpCmd } from "@cmd/Help.js";
+import { InviteCmd } from "@cmd/Invite.js";
+import { PrivacyCmd } from "@cmd/Privacy.js";
+import { SettingsCmd } from "@cmd/Settings.js";
+import { VideoInfoCmd } from "@cmd/VideoInfo.js";
+import type { SlashCommand } from "@lib/Command.js";
+import type { Newable } from "@src/types.js";
 
 /** All slash commands to be registered */
 export const commands = [

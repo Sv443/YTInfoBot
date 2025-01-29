@@ -11,7 +11,8 @@
     "dev": "nodemon --exec pnpm run start",
     "lint": "eslint . && tsc --noEmit",
     "format": "eslint --fix .",
-    "prepare-env": "tsx src/tools/prepare-env.ts"
+    "prepare-env": "tsx src/tools/prepare-env.ts",
+    "build": "tsc"
   },
   "author": {
     "name": "Sv443",

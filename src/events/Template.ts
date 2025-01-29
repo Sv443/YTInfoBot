@@ -1,4 +1,4 @@
-import { Event } from "@lib/Event.ts";
+import { Event } from "@lib/Event.js";
 
 export class TemplateEvt extends Event {
   constructor() {

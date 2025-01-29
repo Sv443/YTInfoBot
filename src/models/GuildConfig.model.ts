@@ -1,7 +1,7 @@
 import { Entity, PrimaryKey, Property } from "@mikro-orm/core";
-import type { NumberFormat, VideoInfoType } from "@cmd/VideoInfo.ts";
+import { em } from "@lib/db.js";
+import type { NumberFormat, VideoInfoType } from "@cmd/VideoInfo.js";
 import localesJson from "@assets/locales.json" with { type: "json" };
-import { em } from "@lib/db.ts";
 
 @Entity()
 export class GuildConfig {

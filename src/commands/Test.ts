@@ -1,5 +1,5 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder, type CommandInteraction } from "discord.js";
-import { SlashCommand } from "@lib/Command.ts";
+import { SlashCommand } from "@lib/Command.js";
 
 //#region constructor
 

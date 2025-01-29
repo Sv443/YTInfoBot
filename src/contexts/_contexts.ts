@@ -1,6 +1,6 @@
-import { VideoInfoCtx, VideoInfoExtendedCtx } from "@ctx/VideoInfo.ts";
-import type { ContextCommand } from "@lib/Command.ts";
-import type { Newable } from "@src/types.ts";
+import { VideoInfoCtx, VideoInfoExtendedCtx } from "@ctx/VideoInfo.js";
+import type { ContextCommand } from "@lib/Command.js";
+import type { Newable } from "@src/types.js";
 
 export const ctxCommands = [
   VideoInfoCtx,

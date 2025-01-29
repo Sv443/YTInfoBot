@@ -1,8 +1,8 @@
-import { GuildCreateEvt } from "@evt/GuildCreate.ts";
-import { GuildDeleteEvt } from "@evt/GuildDelete.ts";
-import { MessageCreateEvt } from "@evt/MessageCreate.ts";
-import type { Event } from "@lib/Event.ts";
-import type { Newable } from "@src/types.ts";
+import { GuildCreateEvt } from "@evt/GuildCreate.js";
+import { GuildDeleteEvt } from "@evt/GuildDelete.js";
+import { MessageCreateEvt } from "@evt/MessageCreate.js";
+import type { Event } from "@lib/Event.js";
+import type { Newable } from "@src/types.js";
 
 export const events = [
   GuildCreateEvt,

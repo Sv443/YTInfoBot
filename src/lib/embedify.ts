@@ -1,4 +1,4 @@
-import type { Stringifiable } from "@root/src/types.ts";
+import type { Stringifiable } from "@root/src/types.js";
 import { type ColorResolvable, EmbedBuilder } from "discord.js";
 
 /** Color constants for embeds */

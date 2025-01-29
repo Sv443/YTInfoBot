@@ -3,6 +3,7 @@
   "typescript.preferences.importModuleSpecifier": "non-relative",
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.preferences.importModuleSpecifierEnding": "js",
+  "javascript.preferences.importModuleSpecifierEnding": "js",
   "npm.packageManager": "pnpm",
   "editor.tabSize": 2,
   "files.associations": {

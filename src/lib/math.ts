@@ -1,5 +1,5 @@
+import type { NumberFormat } from "@cmd/VideoInfo.js";
 import localesJson from "@assets/locales.json" with { type: "json" };
-import type { NumberFormat } from "@cmd/VideoInfo.ts";
 
 /** Formats a number with the given locale and format */
 export function formatNumber(number: number, locale: (typeof localesJson)[number]["code"], format: NumberFormat): string {

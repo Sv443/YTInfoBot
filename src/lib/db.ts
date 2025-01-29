@@ -1,5 +1,5 @@
 import { MikroORM } from "@mikro-orm/postgresql";
-import { config } from "@src/mikro-orm.config.ts";
+import { config } from "@src/mikro-orm.config.js";
 
 /** MikroORM instance */
 export let orm: Awaited<ReturnType<typeof MikroORM.init>>;

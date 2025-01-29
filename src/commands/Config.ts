@@ -1,16 +1,16 @@
 import { ButtonBuilder, ButtonStyle, PermissionFlagsBits, SlashCommandBuilder, type AutocompleteInteraction, type CommandInteraction, type CommandInteractionOption, type SlashCommandSubcommandBuilder } from "discord.js";
-import { Col, useEmbedify } from "@lib/embedify.ts";
-import { CmdBase, SlashCommand } from "@lib/Command.ts";
-import { numberFormatChoices, videoInfoTypeChoices } from "@cmd/VideoInfo.ts";
-import { em } from "@lib/db.ts";
-import { GuildConfig } from "@models/GuildConfig.model.ts";
-import { useButtons } from "@lib/components.ts";
-import { capitalize } from "@lib/text.ts";
+import { Col, useEmbedify } from "@lib/embedify.js";
+import { CmdBase, SlashCommand } from "@lib/Command.js";
+import { numberFormatChoices, videoInfoTypeChoices } from "@cmd/VideoInfo.js";
+import { em } from "@lib/db.js";
+import { GuildConfig } from "@models/GuildConfig.model.js";
+import { useButtons } from "@lib/components.js";
+import { capitalize } from "@lib/text.js";
+import { registerCommandsForGuild } from "@lib/registry.js";
+import { getLocMap, getRegisteredLanguages, tr, type TrKeyEn } from "@lib/translate.js";
+import { getEnvVar } from "@lib/env.js";
+import type { Stringifiable } from "@src/types.js";
 import localesJson from "@assets/locales.json" with { type: "json" };
-import type { Stringifiable } from "@src/types.ts";
-import { registerCommandsForGuild } from "@lib/registry.ts";
-import { getLocMap, getRegisteredLanguages, tr, type TrKeyEn } from "@lib/translate.ts";
-import { getEnvVar } from "@lib/env.ts";
 
 //#region constants
 

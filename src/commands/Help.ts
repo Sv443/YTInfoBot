@@ -1,11 +1,11 @@
 import { SlashCommandBuilder, type CommandInteraction, type CommandInteractionOption, type LocaleString } from "discord.js";
-import { useEmbedify } from "@lib/embedify.ts";
-import { CmdBase, SlashCommand } from "@lib/Command.ts";
+import { useEmbedify } from "@lib/embedify.js";
+import { CmdBase, SlashCommand } from "@lib/Command.js";
+import { getEnvVar } from "@lib/env.js";
+import { bitSetHas } from "@lib/math.js";
+import { getLocMap, tr } from "@lib/translate.js";
+import { cmdInstances } from "@lib/registry.js";
 import pkg from "@root/package.json" with { type: "json" };
-import { getEnvVar } from "@lib/env.ts";
-import { bitSetHas } from "@lib/math.ts";
-import { getLocMap, tr } from "@lib/translate.ts";
-import { cmdInstances } from "@lib/registry.ts";
 
 //#region constructor
 

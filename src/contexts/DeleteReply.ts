@@ -1,7 +1,9 @@
-import { ContextCommand } from "@lib/Command.ts";
-import { useEmbedify } from "@lib/embedify.ts";
-import { getLocMap, tr } from "@lib/translate.ts";
+import { ContextCommand } from "@lib/Command.js";
+import { useEmbedify } from "@lib/embedify.js";
+import { getLocMap, tr } from "@lib/translate.js";
 import { ApplicationCommandType, ContextMenuCommandBuilder, InteractionContextType, PermissionFlagsBits, type ContextMenuCommandInteraction } from "discord.js";
+
+//TODO:
 
 export class DeleteReplyCtx extends ContextCommand {
   constructor() {

@@ -1,7 +1,7 @@
 import { constants as fsconst, readFile } from "node:fs/promises";
 import { exec } from "node:child_process";
 import { createHash, type BinaryToTextEncoding } from "node:crypto";
-import type { Stringifiable } from "@src/types.ts";
+import type { Stringifiable } from "@src/types.js";
 import pkg from "@root/package.json" with { type: "json" };
 
 /** The base URL for the GitHub repository, without trailing slash */

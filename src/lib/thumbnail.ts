@@ -1,5 +1,5 @@
 import type { AxiosResponse } from "axios";
-import { axios } from "@lib/axios.ts";
+import { axios } from "@lib/axios.js";
 
 /** Quality identifier for a thumbnail - from highest to lowest res: `maxresdefault` > `sddefault` > `hqdefault` > `mqdefault` > `default` */
 export type ThumbQuality = `${"maxres" | "sd" | "hq" | "mq" | ""}default`;

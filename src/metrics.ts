@@ -1,13 +1,13 @@
 import { resolve } from "node:path";
 import { readFile, writeFile } from "node:fs/promises";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, type Client, type GuildMember, type Message, type MessageCreateOptions, time } from "discord.js";
-import { getCommitHash, getHash, ghBaseUrl } from "@lib/misc.ts";
-import { Col } from "@lib/embedify.ts";
-import { getEnvVar } from "@lib/env.ts";
-import { cmdInstances } from "@lib/registry.ts";
-import { em } from "@lib/db.ts";
-import { autoPlural, secsToTimeStr } from "@lib/text.ts";
-import { UserSettings } from "@models/UserSettings.model.ts";
+import { getCommitHash, getHash, ghBaseUrl } from "@lib/misc.js";
+import { Col } from "@lib/embedify.js";
+import { getEnvVar } from "@lib/env.js";
+import { cmdInstances } from "@lib/registry.js";
+import { em } from "@lib/db.js";
+import { autoPlural, secsToTimeStr } from "@lib/text.js";
+import { UserSettings } from "@models/UserSettings.model.js";
 import pkg from "@root/package.json" with { type: "json" };
 
 //#region metrics:vars

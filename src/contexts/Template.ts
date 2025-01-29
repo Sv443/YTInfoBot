@@ -1,6 +1,6 @@
-import { ContextCommand } from "@lib/Command.ts";
-import { useEmbedify } from "@lib/embedify.ts";
-import { getLocMap, tr } from "@lib/translate.ts";
+import { ContextCommand } from "@lib/Command.js";
+import { useEmbedify } from "@lib/embedify.js";
+import { getLocMap, tr } from "@lib/translate.js";
 import { ContextMenuCommandBuilder, type ContextMenuCommandInteraction } from "discord.js";
 
 export class TemplateCtx extends ContextCommand {

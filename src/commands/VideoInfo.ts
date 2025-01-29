@@ -1,17 +1,17 @@
 import { EmbedBuilder, SlashCommandBuilder, type APIApplicationCommandOptionChoice, type CommandInteraction } from "discord.js";
 import { AxiosError } from "axios";
 import qs from "qs";
-import { Col, useEmbedify } from "@lib/embedify.ts";
-import { CmdBase, SlashCommand } from "@lib/Command.ts";
-import { axios } from "@lib/axios.ts";
-import type { DeArrowObj, ReturnYouTubeDislikeObj, SponsorBlockActionType, SponsorBlockCategory, SponsorBlockSegmentObj, YTVidDataObj } from "@src/types.ts";
-import { generateEmojiProgressBar, joinArrayReadable, secsToTimeStr, secsToYtTime } from "@lib/text.ts";
-import { getBestThumbnailUrl } from "@lib/thumbnail.ts";
-import { GuildConfig } from "@models/GuildConfig.model.ts";
-import { formatNumber, valsWithin } from "@lib/math.ts";
-import { em } from "@lib/db.ts";
-import { getLocMap, tr } from "@lib/translate.ts";
-import { UserSettings } from "@models/UserSettings.model.ts";
+import { Col, useEmbedify } from "@lib/embedify.js";
+import { CmdBase, SlashCommand } from "@lib/Command.js";
+import { axios } from "@lib/axios.js";
+import { generateEmojiProgressBar, joinArrayReadable, secsToTimeStr, secsToYtTime } from "@lib/text.js";
+import { getBestThumbnailUrl } from "@lib/thumbnail.js";
+import { formatNumber, valsWithin } from "@lib/math.js";
+import { getLocMap, tr } from "@lib/translate.js";
+import { em } from "@lib/db.js";
+import { GuildConfig } from "@models/GuildConfig.model.js";
+import { UserSettings } from "@models/UserSettings.model.js";
+import type { DeArrowObj, ReturnYouTubeDislikeObj, SponsorBlockActionType, SponsorBlockCategory, SponsorBlockSegmentObj, YTVidDataObj } from "@src/types.js";
 
 //#region constants
 

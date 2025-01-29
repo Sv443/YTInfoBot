@@ -1,9 +1,9 @@
 import type { AutocompleteInteraction, CommandInteraction, CommandInteractionOption, ContextMenuCommandBuilder, RESTPostAPIChatInputApplicationCommandsJSONBody, RESTPostAPIContextMenuApplicationCommandsJSONBody, SharedSlashCommand } from "discord.js";
-import { getEnvVar } from "@lib/env.ts";
-import { Col, useEmbedify } from "@lib/embedify.ts";
-import { defaultLocale, tr } from "@lib/translate.ts";
-import { em } from "@lib/db.ts";
-import { GuildConfig } from "@models/GuildConfig.model.ts";
+import { getEnvVar } from "@lib/env.js";
+import { Col, useEmbedify } from "@lib/embedify.js";
+import { defaultLocale, tr } from "@lib/translate.js";
+import { em } from "@lib/db.js";
+import { GuildConfig } from "@models/GuildConfig.model.js";
 import k from "kleur";
 
 const cmdPrefix = getEnvVar("CMD_PREFIX", "stringOrUndefined");

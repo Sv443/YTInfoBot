@@ -1,5 +1,5 @@
 import { defineConfig } from "@mikro-orm/core";
-import { envVarEq, getEnvVar } from "@lib/env.ts";
+import { envVarEq, getEnvVar } from "@lib/env.js";
 
 export const config = defineConfig({
   clientUrl: getEnvVar("DB_URL", "stringOrUndefined"),

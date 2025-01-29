@@ -1,7 +1,7 @@
-import type { Stringifiable } from "@src/types.ts";
 import type { LocalizationMap } from "discord.js";
 import k from "kleur";
 import { readdir, readFile } from "node:fs/promises";
+import type { Stringifiable } from "@src/types.js";
 import trEn from "@assets/translations/en-US.json" with { type: "json" };
 
 //#region tr system

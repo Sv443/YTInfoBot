@@ -1,6 +1,6 @@
 import { Collection } from "discord.js";
+import { tr } from "@lib/translate.js";
 import emojis from "@assets/emojis.json" with { type: "json" };
-import { tr } from "@lib/translate.ts";
 
 /** Capitalizes the first letter of a string */
 export function capitalize(text: string) {

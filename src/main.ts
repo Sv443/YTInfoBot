@@ -1,14 +1,14 @@
 import { Events, type Client } from "discord.js";
 import k from "kleur";
 import "dotenv/config";
-import { client, botToken } from "@lib/client.ts";
-import { em, initDatabase } from "@lib/db.ts";
-import { initRegistry, registerCommandsForGuild } from "@lib/registry.ts";
-import { autoPlural } from "@lib/text.ts";
-import { envVarEq, getEnvVar } from "@lib/env.ts";
-import { initTranslations } from "@lib/translate.ts";
-import { metChanId, metGuildId, metUpdInterval, updateMetrics } from "@src/metrics.ts";
-import { GuildConfig } from "@models/GuildConfig.model.ts";
+import { client, botToken } from "@lib/client.js";
+import { em, initDatabase } from "@lib/db.js";
+import { initRegistry, registerCommandsForGuild } from "@lib/registry.js";
+import { autoPlural } from "@lib/text.js";
+import { envVarEq, getEnvVar } from "@lib/env.js";
+import { initTranslations } from "@lib/translate.js";
+import { metChanId, metGuildId, metUpdInterval, updateMetrics } from "@src/metrics.js";
+import { GuildConfig } from "@models/GuildConfig.model.js";
 
 //#region validate env
 

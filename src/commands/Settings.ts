@@ -1,13 +1,13 @@
 import { ButtonBuilder, ButtonStyle, SlashCommandBuilder, type CommandInteraction, type CommandInteractionOption, type SlashCommandSubcommandBuilder } from "discord.js";
-import { Col, useEmbedify } from "@lib/embedify.ts";
-import { CmdBase, SlashCommand } from "@lib/Command.ts";
-import { em } from "@lib/db.ts";
-import { UserSettings } from "@models/UserSettings.model.ts";
-import { useButtons } from "@lib/components.ts";
-import { capitalize } from "@lib/text.ts";
-import type { Stringifiable } from "@src/types.ts";
-import { getAutoReplyValues } from "@cmd/Config.ts";
-import { GuildConfig } from "@models/GuildConfig.model.ts";
+import { Col, useEmbedify } from "@lib/embedify.js";
+import { CmdBase, SlashCommand } from "@lib/Command.js";
+import { em } from "@lib/db.js";
+import { UserSettings } from "@models/UserSettings.model.js";
+import { useButtons } from "@lib/components.js";
+import { capitalize } from "@lib/text.js";
+import { getAutoReplyValues } from "@cmd/Config.js";
+import { GuildConfig } from "@models/GuildConfig.model.js";
+import type { Stringifiable } from "@src/types.js";
 
 // TODO: translate
 

@@ -1,10 +1,10 @@
 import { ButtonBuilder, ButtonStyle, SlashCommandBuilder, type CommandInteraction } from "discord.js";
-import { Col, useEmbedify } from "@lib/embedify.ts";
-import { CmdBase, SlashCommand } from "@lib/Command.ts";
-import { em } from "@lib/db.ts";
-import { UserSettings } from "@models/UserSettings.model.ts";
-import { useButtons } from "@lib/components.ts";
-import { getLocMap, tr } from "@lib/translate.ts";
+import { Col, useEmbedify } from "@lib/embedify.js";
+import { CmdBase, SlashCommand } from "@lib/Command.js";
+import { em } from "@lib/db.js";
+import { UserSettings } from "@models/UserSettings.model.js";
+import { useButtons } from "@lib/components.js";
+import { getLocMap, tr } from "@lib/translate.js";
 
 //#region constructor
 

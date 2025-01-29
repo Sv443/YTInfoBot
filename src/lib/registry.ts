@@ -2,14 +2,14 @@ import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { Collection, Events, Routes } from "discord.js";
 import k from "kleur";
-import { Col, useEmbedify } from "@lib/embedify.ts";
-import { exists, getHash } from "@lib/misc.ts";
-import type { ContextCommand, SlashCommand } from "@lib/Command.ts";
-import type { Event } from "@lib/Event.ts";
-import { client, clientId, rest } from "@lib/client.ts";
-import { commands } from "@cmd/_commands.ts";
-import { ctxCommands } from "@ctx/_contexts.ts";
-import { events } from "@evt/_events.ts";
+import { Col, useEmbedify } from "@lib/embedify.js";
+import { exists, getHash } from "@lib/misc.js";
+import type { ContextCommand, SlashCommand } from "@lib/Command.js";
+import type { Event } from "@lib/Event.js";
+import { client, clientId, rest } from "@lib/client.js";
+import { commands } from "@cmd/_commands.js";
+import { ctxCommands } from "@ctx/_contexts.js";
+import { events } from "@evt/_events.js";
 
 const reregisterCmds = Boolean(process.argv.find((arg) => ["--reregister", "-r"].includes(arg.toLowerCase())));
 

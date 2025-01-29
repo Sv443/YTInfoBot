@@ -1,8 +1,8 @@
 import type { Guild } from "discord.js";
-import { Event } from "@lib/Event.ts";
-import { em } from "@lib/db.ts";
-import { GuildConfig } from "@models/GuildConfig.model.ts";
-import { registerCommandsForGuild } from "@lib/registry.ts";
+import { Event } from "@lib/Event.js";
+import { em } from "@lib/db.js";
+import { GuildConfig } from "@models/GuildConfig.model.js";
+import { registerCommandsForGuild } from "@lib/registry.js";
 
 export class GuildCreateEvt extends Event {
   constructor() {

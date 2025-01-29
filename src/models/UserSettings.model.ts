@@ -1,4 +1,4 @@
-import { em } from "@lib/db.ts";
+import { em } from "@lib/db.js";
 import { Entity, PrimaryKey, Property } from "@mikro-orm/core";
 
 @Entity()
