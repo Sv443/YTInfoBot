@@ -35,6 +35,9 @@ export class GuildConfig {
   @Property({ type: "bool" })
     autoReplyEnabled: boolean = true;
 
+  @Property({ type: "number" })
+    linksPerReplyLimit: number = 5;
+
   @Property({ type: "datetime", nullable: true })
     lastAccessed: Date = new Date();
 }

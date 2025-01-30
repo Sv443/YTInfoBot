@@ -32,6 +32,7 @@ const getSCNames = () => ({
   numberFormat: tr.for("en-US", "commands.config.names.subcmd.settings.numberFormat"),
   locale: tr.for("en-US", "commands.config.names.subcmd.settings.locale"),
   autoReplyEnabled: tr.for("en-US", "commands.config.names.subcmd.settings.autoReplyEnabled"),
+  linksPerReplyLimit: tr.for("en-US", "commands.config.names.subcmd.settings.linksPerReplyLimit"),
 } as const satisfies Partial<Record<keyof GuildConfig, string>>);
 
 export const getAutoReplyValues = (locale: string) => [
@@ -46,7 +47,7 @@ const getConfigurableOptions = () => {
     [scNames.defaultVideoInfoType]: {
       cfgProp: "defaultVideoInfoType",
       settingNameTrKey: "commands.config.names.subcmd.settingNames.defaultVideoInfoType",
-      getValueLabel: (val: string | boolean | Date) => videoInfoTypeChoices.find(c => c.value === val)?.name,
+      getValueLabel: (val: unknown) => videoInfoTypeChoices.find(c => c.value === val)?.name,
       builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
         .setDescription(tr.for("en-US", "commands.config.descriptions.settings.defaultVideoInfoType"))
         .setDescriptionLocalizations(getLocMap("commands.config.descriptions.settings.defaultVideoInfoType"))
@@ -62,7 +63,7 @@ const getConfigurableOptions = () => {
     [scNames.numberFormat]: {
       cfgProp: "numberFormat",
       settingNameTrKey: "commands.config.names.subcmd.settingNames.numberFormat",
-      getValueLabel: (val: string | boolean | Date) => numberFormatChoices.find(c => c.value === val)?.name,
+      getValueLabel: (val: unknown) => numberFormatChoices.find(c => c.value === val)?.name,
       builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
         .setDescription(tr.for("en-US", "commands.config.descriptions.settings.numberFormat"))
         .setDescriptionLocalizations(getLocMap("commands.config.descriptions.settings.numberFormat"))
@@ -78,8 +79,8 @@ const getConfigurableOptions = () => {
     [scNames.locale]: {
       cfgProp: "locale",
       settingNameTrKey: "commands.config.names.subcmd.settingNames.locale",
-      getValueLabel: (val: string | boolean | Date) => localesJson.find(({ code }) => code === val)?.name,
-      validateValue: (val: string | boolean | Date) => localesJson.some(({ code }) => code === val),
+      getValueLabel: (val: unknown) => localesJson.find(({ code }) => code === val)?.name,
+      validateValue: (val: unknown) => localesJson.some(({ code }) => code === val),
       invalidHintTrKey: "commands.config.set.localeInvalidHint",
       builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
         .setDescription(tr.for("en-US", "commands.config.descriptions.settings.locale"))
@@ -97,7 +98,7 @@ const getConfigurableOptions = () => {
     [scNames.autoReplyEnabled]: {
       cfgProp: "autoReplyEnabled",
       settingNameTrKey: "commands.config.names.subcmd.settingNames.autoReplyEnabled",
-      getValueLabel: (val: string | boolean | Date, loc: string) => getAutoReplyValues(loc).find(c => c.value === Boolean(val))?.name,
+      getValueLabel: (val: unknown, loc: string) => getAutoReplyValues(loc).find(c => c.value === Boolean(val))?.name,
       builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
         .setDescription(tr.for("en-US", "commands.config.descriptions.settings.autoReplyEnabled"))
         .setDescriptionLocalizations(getLocMap("commands.config.descriptions.settings.autoReplyEnabled"))
@@ -109,6 +110,21 @@ const getConfigurableOptions = () => {
             .setRequired(true)
         )
     },
+    [scNames.linksPerReplyLimit]: {
+      cfgProp: "linksPerReplyLimit",
+      settingNameTrKey: "commands.config.names.subcmd.settingNames.linksPerReplyLimit",
+      getValueLabel: (val: unknown) => String(val),
+      builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
+        .setDescription(tr.for("en-US", "commands.config.descriptions.settings.linksPerReplyLimit"))
+        .setDescriptionLocalizations(getLocMap("commands.config.descriptions.settings.linksPerReplyLimit"))
+        .addIntegerOption(opt =>
+          opt.setName(tr.for("en-US", "commands.config.names.subcmd.args.newValue"))
+            .setNameLocalizations(getLocMap("commands.config.names.subcmd.args.newValue"))
+            .setDescription(tr.for("en-US", "commands.config.descriptions.args.newValue"))
+            .setDescriptionLocalizations(getLocMap("commands.config.descriptions.args.newValue"))
+            .setRequired(true)
+        )
+    }
   } as const satisfies Record<
     ReturnType<typeof getSCNames>[keyof ReturnType<typeof getSCNames>],
     Omit<Parameters<typeof ConfigCmd.editConfigSetting>[0], "int" | "opt"> & {
@@ -239,7 +255,8 @@ export class ConfigCmd extends SlashCommand {
           });
         }
       }
-      catch {
+      catch(err) {
+        console.error(k.red("Error while sending confirmation for `/config reset`:"), err);
         await (conf ?? int).editReply({
           ...useEmbedify(tr.for(locale, "general.confirmationTimeoutNotice", 30), Col.Secondary),
           components: [],

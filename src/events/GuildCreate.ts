@@ -12,7 +12,8 @@ export class GuildCreateEvt extends Event {
   //#region pb:run
 
   public async run({ id }: Guild) {
-    await em.persistAndFlush(new GuildConfig(id));
+    if(!await em.findOne(GuildConfig, { id }))
+      await em.persistAndFlush(new GuildConfig(id));
     await registerCommandsForGuild(id);
   }
 }

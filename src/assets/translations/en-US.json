@@ -42,13 +42,15 @@
             "defaultVideoInfoType": "default_video_info_type",
             "numberFormat": "number_format",
             "locale": "locale",
-            "autoReplyEnabled": "auto_reply"
+            "autoReplyEnabled": "auto_reply",
+            "linksPerReplyLimit": "links_per_reply_limit"
           },
           "settingNames": {
             "defaultVideoInfoType": "default video info type",
             "numberFormat": "number format",
             "locale": "locale",
-            "autoReplyEnabled": "auto reply state"
+            "autoReplyEnabled": "auto reply state",
+            "linksPerReplyLimit": "links per reply limit"
           },
           "args": {
             "newValue": "new_value"
@@ -69,7 +71,8 @@
           "defaultVideoInfoType": "The default video_info type, used when a link is sent or no type argument is given",
           "numberFormat": "The number format for this server, used for example when displaying likes and dislikes",
           "locale": "The language and country setting for the server, used for translations, number formatting and more",
-          "autoReplyEnabled": "Whether the bot will automatically reply to all messages containing a video link"
+          "autoReplyEnabled": "Whether the bot will automatically reply to all messages containing a video link",
+          "linksPerReplyLimit": "The maximum number of links the bot will process in a single message"
         }
       },
       "set": {
