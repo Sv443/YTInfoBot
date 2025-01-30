@@ -7,12 +7,24 @@ import { GuildConfig } from "@models/GuildConfig.model.js";
 import { useButtons } from "@lib/components.js";
 import { capitalize } from "@lib/text.js";
 import { registerCommandsForGuild } from "@lib/registry.js";
-import { getLocMap, getRegisteredLanguages, tr, type TrKeyEn } from "@lib/translate.js";
+import { getLocMap, getRegisteredTranslations, tr, type TrKeyEn } from "@lib/translate.js";
 import { getEnvVar } from "@lib/env.js";
 import type { Stringifiable } from "@src/types.js";
 import localesJson from "@assets/locales.json" with { type: "json" };
+import k from "kleur";
 
 //#region constants
+
+const localesReformatted = [...localesJson]
+  .sort((a, b) => a.nativeName.localeCompare(b.nativeName))
+  .map((loc) => ({
+    value: loc.code,
+    name: `${loc.emoji} ${/\(.+\)/.test(loc.name)
+      ? loc.name
+      : `${loc.name} (${loc.nativeName})`
+    } ${getRegisteredTranslations().has(loc.code) ? "✅" : "⚠️"}`,
+    loc,
+  }));
 
 /** Configuration setting name mapping - value has to adhere to Discord slash command naming rules (lowercase and underscores only!) */
 const getSCNames = () => ({
@@ -244,28 +256,24 @@ export class ConfigCmd extends SlashCommand {
     const maxAcRes = getEnvVar("MAX_AUTOCOMPLETE_RESULTS", "number");
     const acResAmt = isNaN(maxAcRes) ? 25 : Math.min(maxAcRes, 25);
 
-    let loc: string | undefined;
-
-    await Promise.race([
-      (async () => {
-        loc = await ConfigCmd.getGuildLocale(int);
-      })(),
-      new Promise<void>(res => setTimeout(res, 1500)),
-    ]);
-
     switch(int.options.getSubcommand(true)) {
-    case "locale":
-      return int.respond(
-        [...localesJson]
-          .filter(({ code, name, nativeName }) =>
-            code.toLowerCase().includes(searchVal)
-            || name.toLowerCase().includes(searchVal)
-            || nativeName.toLowerCase().includes(searchVal)
-          )
-          .slice(0, acResAmt)
-          .map(({ code, name, nativeName }) => ({ value: code, name: /\(.+\)/.test(name) ? name : `${name} (${nativeName})` }))
-          .sort((a, b) => a.name.localeCompare(b.name, loc))
-      );
+    case "locale": {
+      const res = localesReformatted
+        .filter(({ loc: { code, name, nativeName } }) =>
+          code.toLowerCase().includes(searchVal)
+          || name.toLowerCase().includes(searchVal)
+          || nativeName.toLowerCase().includes(searchVal)
+        )
+        .slice(0, acResAmt)
+        .map(({ name, value }) => ({ name, value }));
+
+      try {
+        await int.respond(res);
+      }
+      catch(err) {
+        console.error(k.red("Error while sending autocomplete response for `/config set locale`:"), err);
+      }
+    }
     }
   }
 
@@ -341,7 +349,7 @@ export class ConfigCmd extends SlashCommand {
 
       // if no translations exist for the new locale, warn the user
       const localeChanged = locale !== newValue;
-      if(localeChanged && !getRegisteredLanguages().has(String(newValue)) && opt.options?.[0]?.name === getSCNames().locale){
+      if(localeChanged && !getRegisteredTranslations().has(String(newValue)) && opt.options?.[0]?.name === getSCNames().locale){
         const loc = localesJson.find(({ code }) => code === newValue);
         return await int.editReply(useEmbedify(tr.for(locale, "commands.config.set.localeNotFoundWarning", {
           localeName: loc ? `${loc.name} (${loc.nativeName})` : newValue,

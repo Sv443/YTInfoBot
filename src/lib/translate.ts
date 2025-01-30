@@ -411,8 +411,8 @@ export async function initTranslations(): Promise<void> {
   tr.setFallbackLanguage(enName ?? defaultLocale);
 }
 
-/** Returns all registered languages */
-export function getRegisteredLanguages() {
+/** Returns all registered translations */
+export function getRegisteredTranslations() {
   return new Set(Object.keys(trans));
 }
 

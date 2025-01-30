@@ -104,6 +104,18 @@ To access these, right-click (or hold on mobile) on a message and select one of 
 
 <br>
 
+## Context Menu Commands:
+These commands are available when right-clicking (on PC) or tapping and holding (on mobile) on a <!--✉️ -->message<!-- or 👤 member-->.
+- `Delete Reply`  
+  You can use this command on all automatic replies that the bot sent to your messages to delete them.  
+  Members with the `Manage Messages` permission can also delete replies from other members this way.
+- `Video Info (default)`  
+  Shows information about all video links in the message this command is used on, using the guild's defaults.
+- `Video Info (extended)`  
+  Shows detailed information about all video links in the message this command is used on, regardless of the guild's defaults.
+
+<br>
+
 ## Privacy:
 The bot stores rudimentary information about the servers it is in and the users that use it, related to configuration settings and nothing else.  
 The only uniquely identifiable information stored are the user ID and server ID (which are publicly obtainable by every member anyway).  
