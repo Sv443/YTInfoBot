@@ -15,16 +15,22 @@ import k from "kleur";
 
 //#region constants
 
-const localesReformatted = [...localesJson]
-  .sort((a, b) => a.nativeName.localeCompare(b.nativeName))
-  .map((loc) => ({
-    value: loc.code,
-    name: `${loc.emoji} ${/\(.+\)/.test(loc.name)
-      ? loc.name
-      : `${loc.name} (${loc.nativeName})`
-    } ${getRegisteredTranslations().has(loc.code) ? "✅" : "⚠️"}`,
-    loc,
-  }));
+let localesReformatted: { value: string; name: string; loc: typeof localesJson[0] }[];
+
+const getLocalesReformatted = () => {
+  if(!localesReformatted)
+    localesReformatted = [...localesJson]
+      .sort((a, b) => a.nativeName.localeCompare(b.nativeName))
+      .map((loc) => ({
+        value: loc.code,
+        name: `${loc.emoji} ${/\(.+\)/.test(loc.name)
+          ? loc.name
+          : `${loc.name} (${loc.nativeName})`
+        } ${getRegisteredTranslations().has(loc.code) ? "✅" : "⚠️"}`,
+        loc,
+      }));
+  return localesReformatted;
+};
 
 /** Configuration setting name mapping - value has to adhere to Discord slash command naming rules (lowercase and underscores only!) */
 const getSCNames = () => ({
@@ -275,7 +281,7 @@ export class ConfigCmd extends SlashCommand {
 
     switch(int.options.getSubcommand(true)) {
     case "locale": {
-      const res = localesReformatted
+      const res = getLocalesReformatted()
         .filter(({ loc: { code, name, nativeName } }) =>
           code.toLowerCase().includes(searchVal)
           || name.toLowerCase().includes(searchVal)
