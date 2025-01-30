@@ -22,4 +22,6 @@ export const client = new Client({
   },
 });
 
-export const rest = new REST().setToken(botToken);
+export const rest = new REST({
+  timeout: 15e3,
+}).setToken(botToken);

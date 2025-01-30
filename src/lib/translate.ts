@@ -418,7 +418,7 @@ export function getRegisteredTranslations() {
 
 //#region getLocMap
 
-/** Returns a localization map for all locales where the given common translation key exists */
+/** Returns a Discord API localization map for all locales where the given common translation key exists */
 export function getLocMap(trKey: TrKeyEn, prefix = ""): LocalizationMap {
   const locMap = {} as LocalizationMap;
 
