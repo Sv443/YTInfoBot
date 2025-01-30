@@ -3,6 +3,7 @@ import { client } from "@lib/client.js";
 import { ContextCommand } from "@lib/Command.js";
 import { Col, useEmbedify } from "@lib/embedify.js";
 import { getLocMap, tr } from "@lib/translate.js";
+import { getMsgLink } from "@lib/misc.js";
 
 export class DeleteReplyCtx extends ContextCommand {
   constructor() {
@@ -29,21 +30,21 @@ export class DeleteReplyCtx extends ContextCommand {
       const { targetMessage } = int;
 
       if(!targetMessage.reference || targetMessage.author.id !== client.user?.id)
-        return int.editReply(useEmbedify(t("errors.messageInaccessible"), Col.Error));
+        return int.editReply(useEmbedify(t("commands.delete_reply_ctx.wrongMessageError"), Col.Error));
 
       const refMsg = (await int.channel?.messages.fetch({ around: targetMessage.reference.messageId, limit: 1 }))?.at(0);
 
       if(refMsg?.author.id === int.user.id) {
         try {
           await int.targetMessage.delete();
-          return int.editReply(useEmbedify(t("commands.delete_reply_ctx.successMessage"), Col.Success));
+          return int.editReply(useEmbedify(t("commands.delete_reply_ctx.success", { msgLink: getMsgLink(refMsg) }), Col.Success));
         }
         catch {
-          return await int.editReply(useEmbedify(t("errors.messageInaccessible"), Col.Error));
+          return await int.editReply(useEmbedify(t("commands.delete_reply_ctx.wrongMessageError"), Col.Error));
         }
       }
       else
-        return await int.editReply(useEmbedify(t("errors.notAuthor"), Col.Error));
+        return await int.editReply(useEmbedify(t("commands.delete_reply_ctx.wrongMessageError"), Col.Error));
     }
     catch {
       return await int.editReply(useEmbedify(t("errors.unknown"), Col.Error));

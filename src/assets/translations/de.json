@@ -10,7 +10,7 @@
     "noVidInfoFound": "Keine Informationen über das Video gefunden.",
     "noDataFoundToDelete": "Keine Daten zum Löschen gefunden.",
     "guildCfgInaccessible": "Keine Serverkonfiguration gefunden - bitte `/konfiguration zurücksetzen` ausführen.",
-    "messageInaccessible": "Die angepeilte Nachricht konnte nicht abgerufen werden.",
+    "messageInaccessible": "Die Nachricht konnte nicht abgerufen werden.",
     "onlyRunInGuild": "Dieser Befehl kann nur in einem Server ausgeführt werden."
   },
   "general": {
@@ -158,7 +158,7 @@
       "nameExtended": "Video-Infos (Erweitert)"
     },
     "delete_reply_ctx": {
-      "name": "Admin: Antwort löschen"
+      "name": "Antwort löschen"
     }
   }
 }

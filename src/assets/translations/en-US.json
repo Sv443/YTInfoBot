@@ -11,8 +11,7 @@
     "noDataFoundToDelete": "No data found to delete.",
     "guildCfgInaccessible": "No server configuration found - please run `/config reset`",
     "messageInaccessible": "The targeted message could not be accessed.",
-    "onlyRunInGuild": "This command can only be run in a server.",
-    "notAuthor": "You are not the author of the message."
+    "onlyRunInGuild": "This command can only be run in a server."
   },
   "general": {
     "promptExpiryNotice": "This prompt will expire in ${sec}s",
@@ -213,8 +212,9 @@
       "nameExtended": "Video Info (extended)"
     },
     "delete_reply_ctx": {
-      "name": "Admin: Delete Reply",
-      "successMessage": "Successfully deleted the reply."
+      "name": "Delete Reply",
+      "success": "Successfully deleted the reply to [your message.](${msgLink})",
+      "wrongMessageError": "This command can only be used on a reply YTInfoBot sent to one of your messages."
     }
   }
 }

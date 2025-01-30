@@ -161,7 +161,7 @@ async function useMetricsMsg({ uptimeStr, usersAmt, guildsAmt, totalMembersAmt, 
       { name: "🧑‍💻 Users:", value: `${usersAmt} in DB`, inline: true },
       { name: "🧑‍🦲 Members:", value: `${totalMembersAmt} total\n${uniqueMembersAmt} unique`, inline: true },
       { name: `⭐ ${autoPlural("Command", cmdsTotal)} (${cmdsTotal}):`, value: `${slashCmdAmt} ${autoPlural("slash command", slashCmdAmt)}\n${ctxCmdAmt} ${autoPlural("context command", ctxCmdAmt)}`, inline: false },
-      { name: "⏲️ Uptime:", value: `${time(new Date(initTime), "R")}\nTotal: ${uptimeStr}`, inline: false },
+      { name: "⏲ Uptime:", value: `${time(new Date(initTime), "R")}\nTotal: ${uptimeStr}`, inline: false },
       { name: "🧮 Last guild check:", value: lastGldChkTime === 0 ? "never" : `${time(new Date(lastGldChkTime), "R")}\nInterval: ${secsToTimeStr(chkGldInterval)}`, inline: false },
       { name: "✏️ Metrics updated:", value: `${time(new Date(), "R")}\nInterval: ${secsToTimeStr(metUpdInterval)}`, inline: false },
     ])

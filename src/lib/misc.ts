@@ -3,6 +3,7 @@ import { exec } from "node:child_process";
 import { createHash, type BinaryToTextEncoding } from "node:crypto";
 import type { Stringifiable } from "@src/types.js";
 import pkg from "@root/package.json" with { type: "json" };
+import type { Message } from "discord.js";
 
 /** The base URL for the GitHub repository, without trailing slash */
 export const ghBaseUrl = pkg.repository.url.trim().replace(/(git\+)|(\.git)|(\/$)/g, "");
@@ -34,4 +35,9 @@ export function getHash(data: Stringifiable, algorithm = "sha256", digest: Binar
   return createHash(algorithm)
     .update(String(data))
     .digest(digest);
+}
+
+/** Returns a permalink to the given message */
+export function getMsgLink(msg: Message) {
+  return `https://discord.com/channels/${msg.guildId}/${msg.channelId}/${msg.id}`;
 }
