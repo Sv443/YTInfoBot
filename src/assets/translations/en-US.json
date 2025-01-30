@@ -175,6 +175,34 @@
         "noConfirmation": "No confirmation received, cancelling deletion of data."
       }
     },
+    "settings": {
+      "names": {
+        "command": "settings",
+        "subcmd": {
+          "reset": "reset",
+          "list": "list",
+          "set": "set",
+          "args": {
+            "newValue": "new_value"
+          }
+        }
+      },
+      "descriptions": {
+        "command": "View or edit the bot's settings for your user account",
+        "subcmd": {
+          "reset": "Reset the settings to the default values",
+          "list": "List all configurable settings and their current values",
+          "set": "Set a specific setting to a new value"
+        }
+      },
+      "settingName": {
+        "autoReplyEnabled": "auto reply state"
+      },
+      "changeSettingDescription": {
+        "autoReplyEnabled": "Change whether the bot will automatically reply to your messages containing a video link",
+        "autoReplyEnabledArg": "Whether auto-reply should be enabled"
+      }
+    },
     "video_info": {
       "names": {
         "command": "video_info",

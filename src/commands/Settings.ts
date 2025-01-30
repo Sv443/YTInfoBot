@@ -8,6 +8,7 @@ import { capitalize } from "@lib/text.js";
 import { getAutoReplyValues } from "@cmd/Config.js";
 import { GuildConfig } from "@models/GuildConfig.model.js";
 import type { Stringifiable } from "@src/types.js";
+import { getLocMap, tr } from "@lib/translate.js";
 
 // TODO: translate
 
@@ -19,25 +20,28 @@ const scNames = {
 } as const satisfies Partial<Record<keyof UserSettings, string>>;
 
 /** All options that can be configured */
-const configurableOptions: Record<
+const getConfigurableOptions: (locale: string) => Record<
   typeof scNames[keyof typeof scNames],
   Omit<Parameters<typeof SettingsCmd.editSetting>[0], "int" | "opt"> & {
     builder: (grpOpt: SlashCommandSubcommandBuilder) => SlashCommandSubcommandBuilder;
   }
-> = {
+> = (locale: string) => ({
   [scNames.autoReplyEnabled]: {
     settProp: "autoReplyEnabled",
-    settingName: "auto reply state",
+    settingName: tr.for(locale, "commands.settings.settingName.autoReplyEnabled"),
     getValueLabel: (val, loc) => getAutoReplyValues(loc).find(c => c.value === Boolean(val))?.name,
     builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
-      .setDescription("Change whether the bot will automatically reply to your messages containing a video link")
+      .setDescription(tr.for("en-US", "commands.settings.changeSettingDescription.autoReplyEnabled"))
+      .setDescriptionLocalizations(getLocMap("commands.settings.changeSettingDescription.autoReplyEnabled"))
       .addBooleanOption(opt =>
-        opt.setName("new_value")
-          .setDescription("Whether auto-reply should be enabled")
+        opt.setName(tr.for("en-US", "commands.settings.names.subcmd.args.newValue"))
+          .setNameLocalizations(getLocMap("commands.settings.names.subcmd.args.newValue"))
+          .setDescription(tr.for("en-US", "commands.settings.changeSettingDescription.autoReplyEnabledArg"))
+          .setDescriptionLocalizations(getLocMap("commands.settings.changeSettingDescription.autoReplyEnabledArg"))
           .setRequired(true)
       )
   },
-} as const;
+} as const);
 
 //#region constructor
 
@@ -45,21 +49,26 @@ export class SettingsCmd extends SlashCommand {
   constructor() {
     super(new SlashCommandBuilder()
       .setName(CmdBase.getCmdName("settings"))
-      .setDescription("View or edit the bot's settings for your user account")
+      .setNameLocalizations(getLocMap("commands.settings.names.command", SettingsCmd.cmdPrefix))
+      .setDescription(tr.for("en-US", "commands.settings.descriptions.command"))
+      .setDescriptionLocalizations(getLocMap("commands.settings.descriptions.command"))
       .addSubcommand(option => option
         .setName("reset")
-        .setDescription("Reset the settings to the default values")
+        .setNameLocalizations(getLocMap("commands.settings.names.subcmd.reset"))
+        .setDescription(tr.for("en-US", "commands.settings.descriptions.subcmd.reset"))
       )
       .addSubcommand(option => option
         .setName("list")
-        .setDescription("List all configurable settings and their current values")
+        .setNameLocalizations(getLocMap("commands.settings.names.subcmd.list"))
+        .setDescription(tr.for("en-US", "commands.settings.descriptions.subcmd.list"))
       )
       .addSubcommandGroup(grpOpt => {
         grpOpt
           .setName("set")
-          .setDescription("Set a specific setting to a new value");
+          .setNameLocalizations(getLocMap("commands.settings.names.subcmd.set"))
+          .setDescription(tr.for("en-US", "commands.settings.descriptions.subcmd.set"));
 
-        for(const [name, { builder }] of Object.entries(configurableOptions))
+        for(const [name, { builder }] of Object.entries(getConfigurableOptions("en-US")))
           grpOpt.addSubcommand(option => builder(option).setName(name));
 
         return grpOpt;
@@ -71,6 +80,12 @@ export class SettingsCmd extends SlashCommand {
 
   public async run(int: CommandInteraction, opt: CommandInteractionOption) {
     const reply = await int.deferReply({ ephemeral: true });
+
+    const locale = await SettingsCmd.getGuildLocale(int);
+    const configurableOptions = getConfigurableOptions(locale);
+    const t = tr.use(locale);
+
+    void ["TODO:", t];
 
     switch(opt.name) {
     case "set":
