@@ -1,10 +1,15 @@
 //#region misc
 
+import type { Collection } from "discord.js";
+
 /** Any value that can be implicitly converted to a string with `String(val)`, `val.toString()` or \``${val}`\` */
 export type Stringifiable = string | number | boolean | null | undefined | { toString(): string } | Stringifiable[];
 
 /** Any class reference that can be instantiated with `new` */
 export type Newable<T> = new (...args: any[]) => T;
+
+/** Any value that is list-like, i.e. has a numeric length, count or size property */
+export type ListLike = unknown[] | Collection<unknown, unknown> | { length: number } | { count: number } | { size: number };
 
 //#region YT data
 

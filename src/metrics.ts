@@ -151,13 +151,7 @@ export async function updateMetrics(client: Client) {
 //#region m:metrEmbed
 
 /** Get the metrics / stats embed and buttons */
-async function useMetricsMsg(metrics: MetricsData) {
-  const {
-    uptimeStr, usersAmt,
-    guildsAmt, totalMembersAmt,
-    uniqueMembersAmt, slashCmdAmt,
-    ctxCmdAmt,
-  } = metrics;
+async function useMetricsMsg({ uptimeStr, usersAmt, guildsAmt, totalMembersAmt, uniqueMembersAmt, slashCmdAmt, ctxCmdAmt }: MetricsData) {
   const cmdsTotal = slashCmdAmt + ctxCmdAmt;
 
   const ebd = new EmbedBuilder()
