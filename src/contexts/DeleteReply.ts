@@ -32,12 +32,13 @@ export class DeleteReplyCtx extends ContextCommand {
       if(!targetMessage.reference || targetMessage.author.id !== client.user?.id)
         return int.editReply(useEmbedify(t("commands.delete_reply_ctx.wrongMessageError"), Col.Error));
 
-      const refMsg = (await int.channel?.messages.fetch({ around: targetMessage.reference.messageId, limit: 1 }))?.at(0);
+      const refMsg = (await int.channel?.messages.fetch({ around: targetMessage.reference.messageId, limit: 1 }))?.first();
 
-      if(refMsg?.author.id === int.user.id) {
+      // allow only author of message that was replied to or user with ManageMessages permission to delete the message
+      if(refMsg && (refMsg.author.id === int.user.id || int.memberPermissions?.has(PermissionFlagsBits.ManageMessages))) {
         try {
           await int.targetMessage.delete();
-          return int.editReply(useEmbedify(t("commands.delete_reply_ctx.success", { msgLink: getMsgLink(refMsg) }), Col.Success));
+          return int.editReply(useEmbedify(t("commands.delete_reply_ctx.success", { msgLink: getMsgLink(refMsg!) }), Col.Success));
         }
         catch {
           return await int.editReply(useEmbedify(t("commands.delete_reply_ctx.wrongMessageError"), Col.Error));

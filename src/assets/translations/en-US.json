@@ -213,7 +213,7 @@
     },
     "delete_reply_ctx": {
       "name": "Delete Reply",
-      "success": "Successfully deleted the reply to [your message.](${msgLink})",
+      "success": "Successfully deleted the reply to [this message.](${msgLink})",
       "wrongMessageError": "This command can only be used on a reply YTInfoBot sent to one of your messages."
     }
   }
