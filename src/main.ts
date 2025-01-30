@@ -43,10 +43,6 @@ async function init() {
 
   client.on(Events.Error, (err) => console.error(k.red("Client error:"), err));
 
-  process.on("unhandledRejection", (reason, promise) => {
-    console.error(k.red("Unhandled Promise rejection:"), promise, k.red("\n\nRejection reason:"), reason);
-  });
-
   console.log(k.blue(`${client.user?.displayName ?? client.user?.username} is ready.\n`));
   envVarEq("BELL_ON_READY", true) && process.stdout.write("\u0007");
 
@@ -57,7 +53,6 @@ async function init() {
     intervalChecks(client, i);
   }, 1000);
 }
-
 
 //#region intervalChks
 
@@ -107,5 +102,15 @@ async function checkGuilds(client: Client) {
     console.error(k.red("Couldn't check guilds:"), e);
   }
 }
+
+//#region run init
+
+process.on("unhandledRejection", (reason, promise) => {
+  console.error(k.red(`${k.bold("[!]")} Unhandled Promise rejection:`), promise, k.red(`\n\n${k.bold("[!]")} Rejection reason:`), reason);
+});
+
+process.on("uncaughtException", (err, origin) => {
+  console.error(k.red(`${k.bold("[!]")} Uncaught exception:`), err, k.red(`\n\n${k.bold("[!]")} Origin:`), origin);
+});
 
 init();
