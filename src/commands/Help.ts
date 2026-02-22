@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, type CommandInteraction, type CommandInteractionOption, type LocaleString } from "discord.js";
+import { SlashCommandBuilder, type ChatInputCommandInteraction, type CommandInteractionOption, type LocaleString } from "discord.js";
 import { useEmbedify } from "@lib/embedify.js";
 import { CmdBase, SlashCommand } from "@lib/Command.js";
 import { getEnvVar } from "@lib/env.js";
@@ -42,7 +42,7 @@ export class HelpCmd extends SlashCommand {
 
   //#region pb:run
 
-  public async run(int: CommandInteraction, opt: CommandInteractionOption) {
+  public async run(int: ChatInputCommandInteraction, opt: CommandInteractionOption) {
     if(!HelpCmd.checkInGuild(int))
       return;
 

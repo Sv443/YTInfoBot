@@ -1,4 +1,4 @@
-import { ButtonBuilder, ButtonStyle, SlashCommandBuilder, type CommandInteraction } from "discord.js";
+import { ButtonBuilder, ButtonStyle, SlashCommandBuilder, type ChatInputCommandInteraction } from "discord.js";
 import { Col, useEmbedify } from "@lib/embedify.js";
 import { CmdBase, SlashCommand } from "@lib/Command.js";
 import { em } from "@lib/db.js";
@@ -34,7 +34,7 @@ export class PrivacyCmd extends SlashCommand {
 
   //#region pb:run
 
-  public async run(int: CommandInteraction) {
+  public async run(int: ChatInputCommandInteraction) {
     if(!PrivacyCmd.checkInGuild(int))
       return;
 

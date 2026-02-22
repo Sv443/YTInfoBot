@@ -29,7 +29,7 @@ async function registerGuildCommands() {
   }
 
   client.on(Events.InteractionCreate, async (int) => {
-    if(int.isCommand() || int.isContextMenuCommand()) {
+    if(int.isChatInputCommand() || int.isContextMenuCommand()) {
       try {
         const command = cmdInstances.get(int.commandName);
 
@@ -38,7 +38,12 @@ async function registerGuildCommands() {
 
         const opt = int.options.data?.[0];
 
-        await command.run(int, opt);
+        if(int.isChatInputCommand() && command.type === "slash")
+          await command.run(int, opt);
+        else if(int.isContextMenuCommand() && command.type === "ctx")
+          await command.run(int);
+        else
+          console.error(`Received interaction for command "${int.commandName}" but found command instance is of type "${command.type}" which doesn't match the interaction type "${int.type}"`);
       }
       catch(err) {
         try {

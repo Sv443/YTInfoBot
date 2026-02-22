@@ -1,4 +1,4 @@
-import type { AutocompleteInteraction, CommandInteraction, CommandInteractionOption, ContextMenuCommandBuilder, RESTPostAPIChatInputApplicationCommandsJSONBody, RESTPostAPIContextMenuApplicationCommandsJSONBody, SharedSlashCommand } from "discord.js";
+import type { AutocompleteInteraction, ChatInputCommandInteraction, CommandInteraction, CommandInteractionOption, ContextMenuCommandBuilder, ContextMenuCommandInteraction, RESTPostAPIChatInputApplicationCommandsJSONBody, RESTPostAPIContextMenuApplicationCommandsJSONBody, SharedSlashCommand } from "discord.js";
 import { getEnvVar } from "@lib/env.js";
 import { Col, useEmbedify } from "@lib/embedify.js";
 import { defaultLocale, tr } from "@lib/translate.js";
@@ -86,7 +86,7 @@ export abstract class SlashCommand extends CmdBase {
   }
 
   /** Gets executed when the command is run by a user */
-  abstract run(int: CommandInteraction, opt?: CommandInteractionOption): Promise<void | unknown>;
+  abstract run(int: ChatInputCommandInteraction, opt?: CommandInteractionOption): Promise<void | unknown>;
 }
 
 //#region CtxCommand
@@ -105,5 +105,5 @@ export abstract class ContextCommand extends CmdBase {
   }
 
   /** Gets executed when the command is run by a user */
-  abstract run(int: CommandInteraction): Promise<void | unknown>;
+  abstract run(int: ContextMenuCommandInteraction): Promise<void | unknown>;
 }

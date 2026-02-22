@@ -1,4 +1,4 @@
-import { EmbedBuilder, SlashCommandBuilder, type APIApplicationCommandOptionChoice, type CommandInteraction } from "discord.js";
+import { EmbedBuilder, SlashCommandBuilder, type APIApplicationCommandOptionChoice, type ChatInputCommandInteraction } from "discord.js";
 import { AxiosError } from "axios";
 import qs from "qs";
 import { Col, useEmbedify } from "@lib/embedify.js";
@@ -96,7 +96,7 @@ export class VideoInfoCmd extends SlashCommand {
 
   //#region pb:run
 
-  public async run(int: CommandInteraction) {
+  public async run(int: ChatInputCommandInteraction) {
     if(!VideoInfoCmd.checkInGuild(int))
       return;
 
