@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, type ChatInputCommandInteraction, type CommandInteractionOption, type LocaleString } from "discord.js";
+import { SlashCommandBuilder, type ChatInputCommandInteraction, type CommandInteractionOption, type Locale } from "discord.js";
 import { useEmbedify } from "@lib/embedify.js";
 import { CmdBase, SlashCommand } from "@lib/Command.js";
 import { getEnvVar } from "@lib/env.js";
@@ -81,8 +81,8 @@ export class HelpCmd extends SlashCommand {
         t = tr.use(locale);
 
       for(const { builderJson: data } of allowedCmds) {
-        const name = data.name_localizations?.[locale as LocaleString] ?? data.name;
-        const description = data.description_localizations?.[locale as LocaleString] ?? ("description" in data ? data.description : undefined);
+        const name = data.name_localizations?.[locale as Locale] ?? data.name;
+        const description = data.description_localizations?.[locale as Locale] ?? ("description" in data ? data.description : undefined);
 
         cmdList += `- ${hiddenCmds.has(data.name) ? "🔒 " : ""}\`/${name}\`${description ? `\n ${description}` : ""}\n`;
       }

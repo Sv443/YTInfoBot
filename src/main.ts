@@ -32,7 +32,7 @@ async function init() {
   await initTranslations();
 
   await new Promise((resolve) => {
-    client.once("ready", resolve);
+    client.once("clientReady", resolve);
     client.login(botToken);
   });
 

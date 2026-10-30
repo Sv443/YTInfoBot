@@ -2,7 +2,7 @@ import { Event } from "@lib/Event.js";
 
 export class TemplateEvt extends Event {
   constructor() {
-    super("ready");
+    super("clientReady");
   }
 
   //#region pb:run
