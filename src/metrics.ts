@@ -18,6 +18,8 @@ const commitHash = await getCommitHash(true);
 const metricsManifFile = resolve(".metrics.json");
 let metricsData: MetricsManifest | undefined;
 let firstMetricRun = true;
+/** Maps guild IDs to the timestamp after which members may be fetched again (after a gateway rate limit) */
+const memFetchRetryAt = new Map<string, number>();
 
 //#region m:types
 
@@ -57,24 +59,28 @@ export async function updateMetrics(client: Client) {
     const totalMembersAmt = client.guilds.cache.reduce((acc, g) => acc + g.memberCount, 0);
 
     const memMap = new Map<string, GuildMember>();
-    const memMapPromises: Promise<void>[] = [];
     for(const g of client.guilds.cache.values()) {
-      memMapPromises.push(new Promise(async (res, rej) => {
+      // opcode 8 (Request Guild Members) is heavily rate limited and discord.js no longer queues it,
+      // so only fetch if the cache is incomplete and fall back to the cached members if it's rate limited
+      if(g.members.cache.size < g.memberCount && Date.now() >= (memFetchRetryAt.get(g.id) ?? 0)) {
         try {
           await g.members.fetch();
-          for(const m of g.members.cache.values()) {
-            if(memMap.has(m.id) || m.user.bot || m.user.system || m.user.partial || m.partial)
-              continue;
-            memMap.set(m.id, m);
-          }
-          res();
         }
         catch(e) {
-          rej(e);
+          const retryAfter = (e as { data?: { retry_after?: number } })?.data?.retry_after;
+          if(typeof retryAfter !== "number")
+            throw e;
+          memFetchRetryAt.set(g.id, Date.now() + Math.ceil(retryAfter * 1000) + 1000);
+          console.warn(`Member fetch for guild ${g.id} was rate limited, using cached members (retry in ${retryAfter.toFixed(1)}s)`);
         }
-      }));
+      }
+
+      for(const m of g.members.cache.values()) {
+        if(memMap.has(m.id) || m.user.bot || m.user.system || m.user.partial || m.partial)
+          continue;
+        memMap.set(m.id, m);
+      }
     }
-    await Promise.all(memMapPromises);
 
     const latestMetrics = {
       guildsAmt: client.guilds.cache.size,
@@ -96,7 +102,7 @@ export async function updateMetrics(client: Client) {
       metricsData = metricsData ?? { msgId: null, metricsHash: null };
     }
 
-    if(metricsData && metricsChan && metricsChan.isTextBased()) {
+    if(metricsData && metricsChan && metricsChan.isTextBased() && metricsChan.isSendable()) {
       const latestMetHash = getHash(JSON.stringify(latestMetrics));
       const metricsChanged = firstMetricRun || metricsData.metricsHash !== latestMetHash;
       if(metricsChanged)
