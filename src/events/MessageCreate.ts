@@ -1,4 +1,4 @@
-import { ButtonBuilder, ButtonStyle, PermissionFlagsBits, type ButtonInteraction, type CommandInteraction, type ContextMenuCommandInteraction, type EmbedBuilder, type Message } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionFlagsBits, type ButtonInteraction, type CommandInteraction, type ContextMenuCommandInteraction, type EmbedBuilder, type Message } from "discord.js";
 import { Event } from "@lib/Event.js";
 import { VideoInfoCmd, type VideoInfoType } from "@cmd/VideoInfo.js";
 import { em } from "@lib/db.js";
@@ -163,7 +163,11 @@ export class MessageCreateEvt extends Event {
       // the reply might have been deleted in the meantime (error 10008 "Unknown Message"), in which case there's nothing left to edit
       try {
         if(rep.editable)
-          return await rep.edit({ embeds, allowedMentions: { repliedUser: false }, components: [] });
+          return await rep.edit({ embeds, allowedMentions: { repliedUser: false }, components: [
+            ...(onlyUrl ? [
+              new ActionRowBuilder<ButtonBuilder>().setComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(tr.for(locale, "buttons.open")).setURL(onlyUrl))
+            ] : [])
+          ] });
       }
       catch(err) {
         if((err as { code?: number })?.code !== 10008)
