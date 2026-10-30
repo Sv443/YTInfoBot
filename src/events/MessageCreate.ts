@@ -38,7 +38,9 @@ export class MessageCreateEvt extends Event {
       return;
 
     if(ytVideoRegex.test(msg.content))
-      setImmediate(() => MessageCreateEvt.handleYtLinkMsg(msg, undefined, undefined, true));
+      setImmediate(() => MessageCreateEvt.handleYtLinkMsg(msg, undefined, undefined, true).catch((err) => {
+        console.error("Couldn't handle YT link message:", err);
+      }));
   }
 
   //#region s:handleLnkMsg
@@ -155,11 +157,18 @@ export class MessageCreateEvt extends Event {
       await conf.deferUpdate();
 
       if(conf.customId === "delete_auto_reply")
-        return rep.delete();
+        return await rep.delete();
     }
     catch {
-      if(rep.editable)
-        return rep.edit({ embeds, allowedMentions: { repliedUser: false }, components: [] });
+      // the reply might have been deleted in the meantime (error 10008 "Unknown Message"), in which case there's nothing left to edit
+      try {
+        if(rep.editable)
+          return await rep.edit({ embeds, allowedMentions: { repliedUser: false }, components: [] });
+      }
+      catch(err) {
+        if((err as { code?: number })?.code !== 10008)
+          console.error("Couldn't remove components from auto reply:", err);
+      }
     }
   }
 }

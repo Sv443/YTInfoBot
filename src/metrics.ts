@@ -124,12 +124,12 @@ export async function updateMetrics(client: Client) {
 
         try {
           if(!metricsMsg)
-            recreateMsg();
+            await recreateMsg();
           else
             await metricsMsg?.edit(await useMetricsMsg(latestMetrics));
         }
         catch {
-          recreateMsg();
+          await recreateMsg();
         }
         finally {
           try {
