@@ -1,4 +1,4 @@
-import { ButtonBuilder, ButtonStyle, SlashCommandBuilder, type ChatInputCommandInteraction } from "discord.js";
+import { ButtonBuilder, ButtonStyle, MessageFlags, SlashCommandBuilder, type ChatInputCommandInteraction } from "discord.js";
 import { Col, useEmbedify } from "@lib/embedify.js";
 import { CmdBase, SlashCommand } from "@lib/Command.js";
 import { em } from "@lib/db.js";
@@ -38,7 +38,7 @@ export class PrivacyCmd extends SlashCommand {
     if(!PrivacyCmd.checkInGuild(int))
       return;
 
-    await int.deferReply({ ephemeral: true });
+    await int.deferReply({ flags: [MessageFlags.Ephemeral] });
 
     const t = await PrivacyCmd.getTrFunc(int);
     const sub = int.options.data[0].name;

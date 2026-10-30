@@ -1,7 +1,7 @@
 import { ContextCommand } from "@lib/Command.js";
 import { useEmbedify } from "@lib/embedify.js";
 import { getLocMap, tr } from "@lib/translate.js";
-import { ContextMenuCommandBuilder, type ContextMenuCommandInteraction } from "discord.js";
+import { ContextMenuCommandBuilder, MessageFlags, type ContextMenuCommandInteraction } from "discord.js";
 
 export class TemplateCtx extends ContextCommand {
   constructor() {
@@ -16,7 +16,7 @@ export class TemplateCtx extends ContextCommand {
   public async run(int: ContextMenuCommandInteraction) {
     return int.reply({
       ...useEmbedify("CONTEXT_TEMPLATE"),
-      ephemeral: true,
+      flags: [MessageFlags.Ephemeral],
     });
   }
 }

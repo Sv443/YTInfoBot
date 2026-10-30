@@ -1,4 +1,4 @@
-import { ApplicationCommandType, ContextMenuCommandBuilder, InteractionContextType, PermissionFlagsBits, type ContextMenuCommandInteraction } from "discord.js";
+import { ApplicationCommandType, ContextMenuCommandBuilder, InteractionContextType, MessageFlags, PermissionFlagsBits, type ContextMenuCommandInteraction } from "discord.js";
 import { client } from "@lib/client.js";
 import { ContextCommand } from "@lib/Command.js";
 import { Col, useEmbedify } from "@lib/embedify.js";
@@ -19,7 +19,7 @@ export class DeleteReplyCtx extends ContextCommand {
   //#region pb:run
 
   public async run(int: ContextMenuCommandInteraction) {
-    await int.deferReply({ ephemeral: true });
+    await int.deferReply({ flags: [MessageFlags.Ephemeral] });
     const t = await DeleteReplyCtx.getTrFunc(int);
 
     try {

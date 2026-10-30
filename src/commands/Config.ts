@@ -1,4 +1,4 @@
-import { ButtonBuilder, ButtonStyle, PermissionFlagsBits, SlashCommandBuilder, type AutocompleteInteraction, type CommandInteraction, type CommandInteractionOption, type SlashCommandSubcommandBuilder } from "discord.js";
+import { ButtonBuilder, ButtonStyle, MessageFlags, PermissionFlagsBits, SlashCommandBuilder, type AutocompleteInteraction, type CommandInteraction, type CommandInteractionOption, type SlashCommandSubcommandBuilder } from "discord.js";
 import { Col, useEmbedify } from "@lib/embedify.js";
 import { CmdBase, SlashCommand } from "@lib/Command.js";
 import { numberFormatChoices, videoInfoTypeChoices } from "@cmd/VideoInfo.js";
@@ -182,7 +182,7 @@ export class ConfigCmd extends SlashCommand {
     if(!ConfigCmd.checkInGuild(int))
       return;
 
-    const reply = await int.deferReply({ ephemeral: true });
+    const reply = await int.deferReply({ flags: [MessageFlags.Ephemeral] });
     const locale = await ConfigCmd.getGuildLocale(int);
 
     switch(opt.name) {
@@ -333,7 +333,7 @@ export class ConfigCmd extends SlashCommand {
       return;
 
     if(!int.deferred && !int.replied)
-      await int.deferReply({ ephemeral: true });
+      await int.deferReply({ flags: [MessageFlags.Ephemeral] });
 
     const locale = await ConfigCmd.getGuildLocale(int);
 

@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, type CommandInteraction } from "discord.js";
+import { MessageFlags, SlashCommandBuilder, type CommandInteraction } from "discord.js";
 import { Col, useEmbedify } from "@lib/embedify.js";
 import { getEnvVar } from "@lib/env.js";
 import { CmdBase, SlashCommand } from "@lib/Command.js";
@@ -19,7 +19,7 @@ export class InviteCmd extends SlashCommand {
   //#region pb:run
 
   public async run(int: CommandInteraction) {
-    await int.deferReply({ ephemeral: true });
+    await int.deferReply({ flags: [MessageFlags.Ephemeral] });
 
     const t = await InviteCmd.getTrFunc(int);
 

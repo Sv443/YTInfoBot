@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, type CommandInteraction } from "discord.js";
+import { MessageFlags, SlashCommandBuilder, type CommandInteraction } from "discord.js";
 import { useEmbedify } from "@lib/embedify.js";
 import { CmdBase, SlashCommand } from "@lib/Command.js";
 import { getLocMap, tr } from "@lib/translate.js";
@@ -18,7 +18,7 @@ export class TemplateCmd extends SlashCommand {
   //#region pb:run
 
   public async run(int: CommandInteraction) {
-    await int.deferReply({ ephemeral: true });
+    await int.deferReply({ flags: [MessageFlags.Ephemeral] });
 
     const t = await TemplateCmd.getTrFunc(int);
 

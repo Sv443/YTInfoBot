@@ -1,4 +1,4 @@
-import { ButtonBuilder, ButtonStyle, SlashCommandBuilder, type CommandInteraction, type CommandInteractionOption, type SlashCommandSubcommandBuilder } from "discord.js";
+import { ButtonBuilder, ButtonStyle, MessageFlags, SlashCommandBuilder, type CommandInteraction, type CommandInteractionOption, type SlashCommandSubcommandBuilder } from "discord.js";
 import { Col, useEmbedify } from "@lib/embedify.js";
 import { CmdBase, SlashCommand } from "@lib/Command.js";
 import { em } from "@lib/db.js";
@@ -79,7 +79,7 @@ export class SettingsCmd extends SlashCommand {
   //#region pb:run
 
   public async run(int: CommandInteraction, opt: CommandInteractionOption) {
-    const reply = await int.deferReply({ ephemeral: true });
+    const reply = await int.deferReply({ flags: [MessageFlags.Ephemeral] });
 
     const locale = await SettingsCmd.getGuildLocale(int);
     const configurableOptions = getConfigurableOptions(locale);
@@ -118,7 +118,7 @@ export class SettingsCmd extends SlashCommand {
 
       return int.editReply(useEmbedify(cfgList, Col.Info, (e) => e
         .setTitle("User settings values:")
-        .setFooter({ text: "Use /settings set <name> to edit a setting" })
+        .setFooter({ text: "Use '/settings set <name>' to edit a setting" })
       ));
     }
     case "reset": {
