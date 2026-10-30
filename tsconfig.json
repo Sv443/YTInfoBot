@@ -42,9 +42,4 @@
   "exclude": [
     "node_modules/**/*",
   ],
-  "ts-node": {
-    "require": ["tsconfig-paths/register"],
-    "esm": true,
-    "transpileOnly": true,
-  },
 }
