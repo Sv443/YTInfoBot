@@ -163,7 +163,7 @@
         "line2": "- When you invite it to your server, it stores the server's ID and the server configuration data (locale, number format, etc.).  ",
         "line3": "  After you kick it from your server, it also deletes all server data.",
         "line4": "- When editing your user settings, it stores your user ID and the settings you've changed.  ",
-        "line5": "  You can delete your user data by using the `/privacy delete` command."
+        "line5": "  You can delete your user data by using the `/privacy delete_data` command."
       },
       "delete": {
         "confirmLine1": "**Are you sure you want to delete all data associated with your account?**",

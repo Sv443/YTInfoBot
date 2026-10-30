@@ -117,7 +117,7 @@
         "line2": "- Beim Einladen wird die Server-ID und Konfiguration gespeichert.",
         "line3": "  Wenn der Bot gekickt wird, wird alles gelöscht.",
         "line4": "- Beim Bearbeiten von Benutzereinstellungen wird die Benutzer-ID gespeichert.",
-        "line5": "  Lösche deine Daten mit `/privacy delete`."
+        "line5": "  Lösche deine Daten mit `/privacy delete_data`."
       },
       "delete": {
         "confirmLine1": "**Willst du wirklich alle dir zugehörigen Daten löschen?**",
