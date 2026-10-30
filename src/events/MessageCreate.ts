@@ -8,8 +8,21 @@ import { Col, useEmbedify } from "@lib/embedify.js";
 import { useButtons } from "@lib/components.js";
 import { defaultLocale, tr } from "@lib/translate.js";
 
-/** Regex that detects youtube.com, music.youtube.com, and youtu.be links */
-const ytVideoRegexStr = "(?:https?:\\/\\/)?(?:www\\.)?(?:youtube\\.com\\/watch\\?v=|music\\.youtube\\.com\\/watch\\?v=|youtu\\.be\\/)([a-zA-Z0-9_-]+)";
+/**
+ * Regex that detects youtube.com, music.youtube.com, and youtu.be video links and captures the full URL, including all query parameters and the hash.  
+ * The `v` parameter of watch URLs may be at any position in the query string.  
+ * The URL ends at whitespace, `<`, `>`, `(`, `)`, `|` or at trailing sentence punctuation (`.,;:!?'"`).
+ */
+const ytVideoRegexStr = [
+  "(?:https?:\\/\\/)?",
+  "(?:",
+  // watch URLs - the query string must contain a `v` parameter somewhere
+  "(?:www\\.|music\\.)?youtube\\.com\\/watch\\?(?=(?:[^\\s<>()|#]*&)?v=[a-zA-Z0-9_-]+)[^\\s<>()|]*[^\\s<>()|.,;:!?'\"]",
+  "|",
+  // short URLs - the video ID is in the path, optionally followed by a query string and/or hash
+  "youtu\\.be\\/[a-zA-Z0-9_-]+(?:[?#][^\\s<>()|]*[^\\s<>()|.,;:!?'\"])?",
+  ")",
+].join("");
 const ytVideoRegex = new RegExp(ytVideoRegexStr);
 const ytVideoRegexGlobal = new RegExp(ytVideoRegexStr, "gm");
 
@@ -47,10 +60,15 @@ export class MessageCreateEvt extends Event {
 
     int && !int.deferred && await int.deferReply();
 
-    const allVids = msg.content.match(ytVideoRegexGlobal)?.map((url) => ({
-      url,
-      videoId: VideoInfoCmd.parseVideoId(url),
-    }));
+    const allVids = msg.content.match(ytVideoRegexGlobal)?.map((rawUrl) => {
+      // the scheme is optional in the regex, but required for URL parsing
+      const url = /^https?:\/\//.test(rawUrl) ? rawUrl : `https://${rawUrl}`;
+
+      return {
+        url,
+        videoId: VideoInfoCmd.parseVideoId(url),
+      };
+    });
 
     const allVidsDeduped = allVids?.filter((vid, idx, self) => self.findIndex((v) => v.videoId === vid.videoId) === idx);
 

@@ -46,6 +46,17 @@ const sponsorBlockCategoryColorEmojiMap = {
 const defaultSbCategories: SponsorBlockCategory[] = ["sponsor","selfpromo","interaction","intro","outro","preview","music_offtopic"];
 const defaultSbActionTypes: SponsorBlockActionType[] = ["skip", "mute", "poi"];
 
+/** Keys of extra URL parameters that are allowed through when using {@linkcode VideoInfoCmd.sanitizeVideoUrl()}. */
+const allowedExtraUrlParams = [
+  "t", "start", "time_continue",
+  "list", "start_radio", "lc",
+];
+
+/** Map of URL parameter keys that should be renamed to the given value when using {@linkcode VideoInfoCmd.sanitizeVideoUrl()}. These keys also have to be in {@linkcode allowedExtraUrlParams}. */
+const renameUrlParams = {
+  "start": "t",
+};
+
 //#region types
 
 export type VideoInfoType = 
@@ -100,7 +111,8 @@ export class VideoInfoCmd extends SlashCommand {
     if(!VideoInfoCmd.checkInGuild(int))
       return;
 
-    const videoId = VideoInfoCmd.parseVideoId(int.options.get("video", true).value as string);
+    const videoUrl = int.options.get("video", true).value as string;
+    const videoId = VideoInfoCmd.parseVideoId(videoUrl);
 
     if(!videoId)
       return int.reply(useEmbedify("commands.video_info.errors.invalidUrlOrId", Col.Error));
@@ -117,7 +129,7 @@ export class VideoInfoCmd extends SlashCommand {
     const embed = await VideoInfoCmd.getVideoInfoEmbed({
       guildCfg,
       type,
-      url: `https://youtu.be/${videoId}`,
+      url: videoUrl,
       videoId,
       locale,
     });
@@ -162,6 +174,27 @@ export class VideoInfoCmd extends SlashCommand {
     }
   }
 
+  //#region s:parseVideoUrl
+
+  /** Sanitizes a raw video URL to remove unwanted parameters. Throws if an invalid video URL is passed. */
+  public static sanitizeVideoUrl(url: string): string {
+    const videoId = VideoInfoCmd.parseVideoId(url);
+
+    if(!videoId)
+      throw new Error("URL doesn't contain the 'v' video ID parameter.");
+
+    const { searchParams } = new URL(url);
+    const extraParams = allowedExtraUrlParams.reduce((a, key) => {
+      const val = searchParams.get(key);
+      if(!val)
+        return a;
+
+      return `${a}&${renameUrlParams?.[key as keyof typeof renameUrlParams] ?? key}=${val}`;
+    }, "");
+
+    return `https://www.youtube.com/watch?v=${videoId}${extraParams}`;
+  }
+
   //#region s:get embed
 
   /** Returns an embed with information about the video */
@@ -174,7 +207,7 @@ export class VideoInfoCmd extends SlashCommand {
     locale,
   }: VideoInfoFetchData): Promise<EmbedBuilder | null> {
     const embed = new EmbedBuilder()
-      .setURL(url)
+      .setURL(VideoInfoCmd.sanitizeVideoUrl(url))
       .setColor(Col.Secondary);
 
     let hasRYDData = false,
