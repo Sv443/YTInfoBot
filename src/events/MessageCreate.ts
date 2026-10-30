@@ -94,6 +94,7 @@ export class MessageCreateEvt extends Event {
     }
 
     let checked = 0;
+    let onlyUrl: string | undefined;
 
     for(const { videoId, url } of allVidsDeduped) {
       checked++;
@@ -102,6 +103,9 @@ export class MessageCreateEvt extends Event {
           return notFound(tr.for(locale, "errors.noYtVidLinksFound"));
         else
           continue;
+
+      if(allVidsDeduped.length === 1)
+        onlyUrl = url;
 
       const embed = await VideoInfoCmd.getVideoInfoEmbed({
         url,
@@ -131,7 +135,10 @@ export class MessageCreateEvt extends Event {
       embeds,
       allowedMentions: { repliedUser: false },
       ...(isAutoReply
-        ? useButtons(new ButtonBuilder().setStyle(ButtonStyle.Secondary).setLabel(tr.for(locale, "buttons.delete")).setCustomId("delete_auto_reply").setEmoji("🗑️"))
+        ? useButtons([[
+          ...(onlyUrl ? [new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(tr.for(locale, "buttons.open")).setURL(onlyUrl)] : []),
+          new ButtonBuilder().setStyle(ButtonStyle.Secondary).setLabel(tr.for(locale, "buttons.delete")).setCustomId("delete_auto_reply").setEmoji("🗑️")
+        ]])
         : {}
       ),
     });

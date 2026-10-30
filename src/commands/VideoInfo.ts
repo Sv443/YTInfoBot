@@ -244,7 +244,7 @@ export class VideoInfoCmd extends SlashCommand {
     if(type === "dearrow_only" && !hasDeArrowData)
       return null;
 
-    hasDeArrowData && bestDeArrowTitle && embed.setTitle(bestDeArrowTitle.title);
+    embed.setTitle(hasDeArrowData && bestDeArrowTitle ? bestDeArrowTitle.title : ytData.title);
 
     //#SECTION votes
 

@@ -2,7 +2,8 @@
   "buttons": {
     "cancel": "Abbrechen",
     "delete": "Löschen",
-    "reset": "Zurücksetzen"
+    "reset": "Zurücksetzen",
+    "open": "Öffnen"
   },
   "errors": {
     "unknown": "Unbekannter Error",
