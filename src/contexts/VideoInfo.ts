@@ -4,7 +4,7 @@ import { Col, useEmbedify } from "@lib/embedify.js";
 import { getLocMap, tr } from "@lib/translate.js";
 import { ApplicationCommandType, ContextMenuCommandBuilder, InteractionContextType, type ContextMenuCommandInteraction } from "discord.js";
 
-//#region c:basic
+//#region c:basic video info
 
 /** Reply with video info using the server's default type or "everything" as a fallback */
 export class VideoInfoCtx extends ContextCommand {
@@ -35,39 +35,5 @@ export class VideoInfoCtx extends ContextCommand {
       });
 
     return await MessageCreateEvt.handleYtLinkMsg(targetMsg, int);
-  }
-}
-
-//#region c:extended
-
-/** Reply with video info using "everything" as the type */
-export class VideoInfoExtendedCtx extends ContextCommand {
-  constructor() {
-    super(new ContextMenuCommandBuilder()
-      .setName(tr.for("en-US", "commands.video_info_ctx.nameExtended"))
-      .setNameLocalizations(getLocMap("commands.video_info_ctx.nameExtended"))
-      .setType(ApplicationCommandType.Message as number)
-      .setContexts([
-        InteractionContextType.Guild,
-        InteractionContextType.PrivateChannel,
-      ])
-    );
-  }
-
-  //#region pb:run
-
-  public async run(int: ContextMenuCommandInteraction) {
-    await int.deferReply();
-
-    const fetchColl = await int.channel?.messages.fetch({ limit: 1, around: int.targetId });
-    const targetMsg = fetchColl?.get(int.targetId);
-    const t = await VideoInfoExtendedCtx.getTrFunc(int);
-
-    if(!targetMsg)
-      return int.editReply({
-        ...useEmbedify(t("errors.messageInaccessible"), Col.Error),
-      });
-
-    return await MessageCreateEvt.handleYtLinkMsg(targetMsg, int, "everything");
   }
 }

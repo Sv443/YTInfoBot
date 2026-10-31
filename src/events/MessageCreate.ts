@@ -133,15 +133,19 @@ export class MessageCreateEvt extends Event {
         allowedMentions: { repliedUser: false },
       });
 
+    const getOnlyUrlLinkBtnBuilder = () => onlyUrl ? [new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(tr.for(locale, "buttons.open")).setURL(onlyUrl)] : [];
+
     const rep = await msg.reply({
       embeds,
       allowedMentions: { repliedUser: false },
       ...(isAutoReply
         ? useButtons([[
-          ...(onlyUrl ? [new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(tr.for(locale, "buttons.open")).setURL(onlyUrl)] : []),
+          ...getOnlyUrlLinkBtnBuilder(),
           new ButtonBuilder().setStyle(ButtonStyle.Secondary).setLabel(tr.for(locale, "buttons.delete")).setCustomId("delete_auto_reply").setEmoji("🗑️")
         ]])
-        : {}
+        : useButtons([[
+          ...getOnlyUrlLinkBtnBuilder(),
+        ]])
       ),
     });
 
