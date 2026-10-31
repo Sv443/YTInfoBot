@@ -90,6 +90,7 @@
         "success": "Der Wert von \"${settingName}\" wurde erfolgreich auf `${newValue}` gesetzt",
         "error": "Der Wert von \"${settingName}\" konnte nicht gesetzt werden: ${err}",
         "localeInvalidHint": "Es werden nur die aufgelisteten Sprachen unterstützt.",
+        "linksPerReplyLimitInvalidHint": "Bitte gib eine ganze Zahl zwischen ${min} und ${max} ein.",
         "localeNotFoundWarning": "Für die Sprache `${localeName}` wurden keine Übersetzungen gefunden.\nDie Änderung wurde gespeichert, da die Zahlenformatierung trotzdem funktioniert, aber alle Texte werden auf Englisch angezeigt.\n\nWenn du bei den Übersetzungen mithelfen möchtest, [tritt bitte dem Support-Server bei.](${supportServerInviteUrl})"
       },
       "reset": {

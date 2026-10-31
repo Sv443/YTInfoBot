@@ -41,6 +41,14 @@ async function init() {
     initDatabase(),
   ]);
 
+  try {
+    const fixed = await GuildConfig.sanitizeAll();
+    fixed > 0 && console.log(k.yellow(`Fixed ${fixed} out-of-bounds guild config ${autoPlural("value", fixed)}`));
+  }
+  catch(e) {
+    console.error(k.red("Couldn't sanitize guild configs:"), e);
+  }
+
   client.on(Events.Error, (err) => console.error(k.red("Client error:"), err));
 
   console.log(k.blue(`${client.user?.displayName ?? client.user?.username} is ready.\n`));

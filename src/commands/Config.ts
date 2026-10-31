@@ -2,8 +2,8 @@ import { ButtonBuilder, ButtonStyle, MessageFlags, PermissionFlagsBits, SlashCom
 import { Col, useEmbedify } from "@lib/embedify.js";
 import { CmdBase, SlashCommand } from "@lib/Command.js";
 import { getNumberFormatChoices, getNumberFormatLabel, getVideoInfoTypeChoices, getVideoInfoTypeLabel } from "@cmd/VideoInfo.js";
-import { em } from "@lib/db.js";
-import { GuildConfig } from "@models/GuildConfig.model.js";
+import { discardEntity, em, resetEntity } from "@lib/db.js";
+import { GuildConfig, isValidLinksPerReplyLimit, linksPerReplyLimitMax, linksPerReplyLimitMin } from "@models/GuildConfig.model.js";
 import { useButtons } from "@lib/components.js";
 import { capitalize } from "@lib/text.js";
 import { registerCommandsForGuild } from "@lib/registry.js";
@@ -124,6 +124,9 @@ const getConfigurableOptions = () => {
       cfgProp: "linksPerReplyLimit",
       settingNameTrKey: "commands.config.names.subcmd.settingNames.linksPerReplyLimit",
       getValueLabel: (val: unknown) => String(val),
+      validateValue: (val: unknown) => isValidLinksPerReplyLimit(val),
+      invalidHintTrKey: "commands.config.set.linksPerReplyLimitInvalidHint",
+      invalidHintArgs: { min: linksPerReplyLimitMin, max: linksPerReplyLimitMax },
       builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
         .setNameLocalizations(getLocMap("commands.config.names.subcmd.settings.linksPerReplyLimit"))
         .setDescription(tr.for("en-US", "commands.config.descriptions.settings.linksPerReplyLimit"))
@@ -133,6 +136,8 @@ const getConfigurableOptions = () => {
             .setNameLocalizations(getLocMap("commands.config.names.subcmd.args.newValue"))
             .setDescription(tr.for("en-US", "commands.config.descriptions.args.newValue"))
             .setDescriptionLocalizations(getLocMap("commands.config.descriptions.args.newValue"))
+            .setMinValue(linksPerReplyLimitMin)
+            .setMaxValue(linksPerReplyLimitMax)
             .setRequired(true)
         )
     }
@@ -251,9 +256,7 @@ export class ConfigCmd extends SlashCommand {
         await conf.deferUpdate();
 
         if(conf.customId === "confirm-reset-config") {
-          const cfg = await em.findOne(GuildConfig, { id: int.guildId });
-          cfg && await em.removeAndFlush(cfg);
-          await em.persistAndFlush(new GuildConfig(int.guildId));
+          await resetEntity(GuildConfig, int.guildId);
           return conf.editReply({
             ...useEmbedify(tr.for(locale, "commands.config.reset.success"), Col.Success),
             components: [],
@@ -326,6 +329,7 @@ export class ConfigCmd extends SlashCommand {
     getValueLabel = (val) => val,
     validateValue,
     invalidHintTrKey,
+    invalidHintArgs,
   }: {
     int: CommandInteraction;
     opt: CommandInteractionOption;
@@ -334,6 +338,8 @@ export class ConfigCmd extends SlashCommand {
     getValueLabel?: (value: TCfgValue, locale: string) => Stringifiable | undefined;
     validateValue?: (value: TCfgValue) => boolean;
     invalidHintTrKey?: TrKeyEn;
+    /** Placeholder values for the invalid hint translation */
+    invalidHintArgs?: Record<string, Stringifiable>;
   }) {
     if(!ConfigCmd.checkInGuild(int))
       return;
@@ -343,19 +349,17 @@ export class ConfigCmd extends SlashCommand {
 
     const locale = await ConfigCmd.getGuildLocale(int);
 
+    let cfg: GuildConfig | null = null;
+
     try {
       await GuildConfig.ensureExists(int.guildId);
-      const cfg = await em.findOne(GuildConfig, { id: int.guildId });
+      cfg = await em.findOne(GuildConfig, { id: int.guildId });
 
       if(!cfg)
         return await ConfigCmd.noConfigFound(int);
 
       const newValue = opt.options?.[0]?.options?.find(o => o.name === tr.for("en-US", "commands.config.names.subcmd.args.newValue"))?.value as TCfgValue | undefined;
       if(typeof newValue === "undefined") {
-        const cfg = await em.findOne(GuildConfig, { id: int.guildId });
-        if(!cfg)
-          return await ConfigCmd.noConfigFound(int);
-
         return int.editReply(useEmbedify(tr.for(locale, "commands.config.set.currentValue", {
           settingName: tr.for(locale, settingNameTrKey),
           newValue: getValueLabel(cfg[cfgProp] as TCfgValue, locale) ?? cfg[cfgProp],
@@ -366,7 +370,7 @@ export class ConfigCmd extends SlashCommand {
         return int.editReply(useEmbedify(tr.for(locale, "commands.config.set.invalidValue", {
           settingName: tr.for(locale, settingNameTrKey),
           newValue,
-          invalidHintSuffix: invalidHintTrKey ? `\n${tr.for(locale, invalidHintTrKey)}` : "",
+          invalidHintSuffix: invalidHintTrKey ? `\n${tr.for(locale, invalidHintTrKey, invalidHintArgs ?? {})}` : "",
         }), Col.Error));
 
       cfg[cfgProp] = newValue;
@@ -392,6 +396,9 @@ export class ConfigCmd extends SlashCommand {
       }), Col.Success));
     }
     catch(err) {
+      // a failed flush leaves the rejected change in the unit of work, which would make all following flushes (including `/config reset`) fail too
+      discardEntity(cfg);
+
       return int.editReply(useEmbedify(tr.for(locale, "commands.config.set.error", {
         settingName: tr.for(locale, settingNameTrKey),
         err: err instanceof Error ? err.message : tr.for(locale, "errors.unknown"),

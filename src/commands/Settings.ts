@@ -1,7 +1,7 @@
 import { ButtonBuilder, ButtonStyle, MessageFlags, SlashCommandBuilder, type CommandInteraction, type CommandInteractionOption, type SlashCommandSubcommandBuilder } from "discord.js";
 import { Col, useEmbedify } from "@lib/embedify.js";
 import { CmdBase, SlashCommand } from "@lib/Command.js";
-import { em } from "@lib/db.js";
+import { discardEntity, em, resetEntity } from "@lib/db.js";
 import { UserSettings } from "@models/UserSettings.model.js";
 import { useButtons } from "@lib/components.js";
 import { capitalize } from "@lib/text.js";
@@ -149,9 +149,7 @@ export class SettingsCmd extends SlashCommand {
         await conf.deferUpdate();
 
         if(conf.customId === "confirm-reset-settings") {
-          const sett = await em.findOne(UserSettings, { id: int.user.id });
-          sett && await em.removeAndFlush(sett);
-          await em.persistAndFlush(new UserSettings(int.user.id));
+          await resetEntity(UserSettings, int.user.id);
           return conf.editReply({
             ...useEmbedify(t("commands.settings.reset.success"), Col.Success),
             components: [],
@@ -203,9 +201,11 @@ export class SettingsCmd extends SlashCommand {
   }) {
     const locale = await SettingsCmd.getGuildLocale(int);
 
+    let cfg: UserSettings | null = null;
+
     try {
       await UserSettings.ensureExists(int.user.id);
-      const cfg = await em.findOne(UserSettings, { id: int.user.id });
+      cfg = await em.findOne(UserSettings, { id: int.user.id });
 
       if(!cfg)
         return SettingsCmd.noSettingsFound(int);
@@ -237,6 +237,9 @@ export class SettingsCmd extends SlashCommand {
       }), Col.Success));
     }
     catch(err) {
+      // a failed flush leaves the rejected change in the unit of work, which would make all following flushes (including `/settings reset`) fail too
+      discardEntity(cfg);
+
       return int.editReply(useEmbedify(tr.for(locale, "commands.settings.set.error", {
         settingName: tr.for(locale, settingNameTrKey),
         err: err instanceof Error ? err.message : tr.for(locale, "errors.unknown"),
