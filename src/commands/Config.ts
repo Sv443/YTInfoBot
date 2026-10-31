@@ -282,7 +282,8 @@ export class ConfigCmd extends SlashCommand {
   public async autocomplete(int: AutocompleteInteraction) {
     const searchVal = int.options.getFocused().toLowerCase().trim();
     const maxAcRes = getEnvVar("MAX_AUTOCOMPLETE_RESULTS", "number");
-    const acResAmt = isNaN(maxAcRes) ? 25 : Math.min(maxAcRes, 25);
+    // an unset or empty env var is cast to 0 by getEnvVar(), which would result in an always-empty response:
+    const acResAmt = !Number.isFinite(maxAcRes) || maxAcRes < 1 ? 25 : Math.min(Math.floor(maxAcRes), 25);
 
     switch(int.options.getSubcommand(true)) {
     case "locale": {
