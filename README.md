@@ -135,14 +135,18 @@ Alternatively, if you don't want anything to do with the bot on any server, you 
 2. Have a [PostgreSQL database](https://www.postgresql.org/) and a user set up (you may [follow this guide](https://medium.com/coding-blocks/creating-user-database-and-adding-access-on-postgresql-8bfcd2f4a91e) on Linux or [WSL](https://learn.microsoft.com/en-us/windows/wsl/install)).
 3. Clone the repository or download the ZIP file and extract it.
 4. Open a terminal in the folder containing `package.json` and run `pnpm i` to install all dependencies.
-5. Run `pnpm prepare-env` to create all environment files.  
+5. Open the [Developer Portal](https://discord.com/developers/applications) and create an app that has a bot account, and the "Server Members" and "Message Content" intents.
+6. Generate a token in the Developer Portal and copy it, and also copy the application ID for the next step.
+7. Run `pnpm prepare-env` to create all environment files.  
   Edit all files that are listed in the console to fill in the required values.
-6. Run `pnpm start` to start the bot or `pnpm dev` to start it in development mode.  
+8. Run `pnpm start` to start the bot or `pnpm dev` to start it in development mode.  
   You may also use the VS Code debugger to start and debug the bot using breakpoints.
+9. Use the following URL to invite the bot to a server you have admin perms in, after inserting your previously copied application ID: `https://discord.com/api/oauth2/authorize?client_id=APPLICATION_ID_HERE&permissions=292058098752&scope=bot%20applications.commands`
   
 Refer to `scripts` in `package.json` for a list of all commands.  
   
-Use `pnpm start -R` to manually reregister commands for all guilds the bot is in.
+Use `pnpm start -R` to manually reregister commands for all guilds the bot is in.  
+This will require users of your bot to wait a few minutes or reload their client with <kbd>Ctrl</kbd><kbd>R</kbd> to fetch the new commands.
 
 <br>
 
