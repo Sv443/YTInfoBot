@@ -16,7 +16,7 @@ export async function initDatabase() {
   orm = await MikroORM.init(await getConfig());
   em = orm.em.fork();
 
-  await orm.getSchemaGenerator().updateSchema();
+  await orm.schema.updateSchema();
 }
 
 /**
