@@ -1,5 +1,6 @@
 import { DeleteReplyCtx } from "@ctx/DeleteReply.js";
-import { VideoInfoCtx, VideoInfoExtendedCtx } from "@ctx/VideoInfo.js";
+import { VideoInfoCtx } from "@ctx/VideoInfo.js";
+import { VideoInfoExtendedCtx } from "@ctx/VideoInfoExtended.js";
 import type { ContextCommand } from "@lib/Command.js";
 import type { Newable } from "@src/types.js";
 
