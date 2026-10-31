@@ -16,7 +16,7 @@ export class UserSettings {
   @PrimaryKey({ type: "string", length: 24 })
     id!: string;
 
-  @Property({ type: "bool" })
+  @Property({ type: "boolean" })
     autoReplyEnabled: boolean = true;
 
   @Property({ type: "datetime", nullable: true })

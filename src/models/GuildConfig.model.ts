@@ -55,7 +55,7 @@ export class GuildConfig {
   @Property({ type: "string", length: 5 })
     locale: (typeof localesJson)[number]["code"] = "en-US";
 
-  @Property({ type: "bool" })
+  @Property({ type: "boolean" })
     autoReplyEnabled: boolean = true;
 
   @Property({ type: "number" })
