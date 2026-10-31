@@ -8,7 +8,8 @@ import { ActionRowBuilder, ButtonBuilder } from "discord.js";
  * ```
  */
 export function useButtons(buttons?: ButtonBuilder | ButtonBuilder[][]) {
-  const actRows = Array.isArray(buttons) ? buttons : (buttons ? [[buttons]] : []);
+  // empty action rows are rejected by the Discord API, so they're dropped
+  const actRows = (Array.isArray(buttons) ? buttons : (buttons ? [[buttons]] : [])).filter(row => row.length > 0);
   const rows: ActionRowBuilder<ButtonBuilder>[] = actRows.map(row => new ActionRowBuilder<ButtonBuilder>().setComponents(row));
 
   return rows.length > 0 ? { components: rows } : {};

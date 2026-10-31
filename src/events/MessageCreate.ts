@@ -133,13 +133,17 @@ export class MessageCreateEvt extends Event {
     if(embeds.length === 0)
       return isAutoReply ? undefined : notFound(tr.for(locale, "errors.noVidInfoFound"));
 
+    const getOnlyUrlLinkBtnBuilder = () => onlyUrl ? [new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(tr.for(locale, "buttons.open")).setURL(onlyUrl)] : [];
+
+    // link buttons don't emit interactions, so there's nothing to await for context menu / command replies
     if(int)
       return int.editReply({
         embeds,
         allowedMentions: { repliedUser: false },
+        ...useButtons([[
+          ...getOnlyUrlLinkBtnBuilder(),
+        ]]),
       });
-
-    const getOnlyUrlLinkBtnBuilder = () => onlyUrl ? [new ButtonBuilder().setStyle(ButtonStyle.Link).setLabel(tr.for(locale, "buttons.open")).setURL(onlyUrl)] : [];
 
     const rep = await msg.reply({
       embeds,
