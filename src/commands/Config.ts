@@ -1,7 +1,7 @@
 import { ButtonBuilder, ButtonStyle, MessageFlags, PermissionFlagsBits, SlashCommandBuilder, type AutocompleteInteraction, type CommandInteraction, type CommandInteractionOption, type SlashCommandSubcommandBuilder } from "discord.js";
 import { Col, useEmbedify } from "@lib/embedify.js";
 import { CmdBase, SlashCommand } from "@lib/Command.js";
-import { numberFormatChoices, videoInfoTypeChoices } from "@cmd/VideoInfo.js";
+import { getNumberFormatChoices, getNumberFormatLabel, getVideoInfoTypeChoices, getVideoInfoTypeLabel } from "@cmd/VideoInfo.js";
 import { em } from "@lib/db.js";
 import { GuildConfig } from "@models/GuildConfig.model.js";
 import { useButtons } from "@lib/components.js";
@@ -53,8 +53,9 @@ const getConfigurableOptions = () => {
     [scNames.defaultVideoInfoType]: {
       cfgProp: "defaultVideoInfoType",
       settingNameTrKey: "commands.config.names.subcmd.settingNames.defaultVideoInfoType",
-      getValueLabel: (val: unknown) => videoInfoTypeChoices.find(c => c.value === val)?.name,
+      getValueLabel: (val: unknown, loc: string) => getVideoInfoTypeLabel(val, loc),
       builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
+        .setNameLocalizations(getLocMap("commands.config.names.subcmd.settings.defaultVideoInfoType"))
         .setDescription(tr.for("en-US", "commands.config.descriptions.settings.defaultVideoInfoType"))
         .setDescriptionLocalizations(getLocMap("commands.config.descriptions.settings.defaultVideoInfoType"))
         .addStringOption(opt =>
@@ -62,15 +63,16 @@ const getConfigurableOptions = () => {
             .setNameLocalizations(getLocMap("commands.config.names.subcmd.args.newValue"))
             .setDescription(tr.for("en-US", "commands.config.descriptions.args.newValue"))
             .setDescriptionLocalizations(getLocMap("commands.config.descriptions.args.newValue"))
-            .setChoices(videoInfoTypeChoices)
+            .setChoices(getVideoInfoTypeChoices())
             .setRequired(true)
         )
     },
     [scNames.numberFormat]: {
       cfgProp: "numberFormat",
       settingNameTrKey: "commands.config.names.subcmd.settingNames.numberFormat",
-      getValueLabel: (val: unknown) => numberFormatChoices.find(c => c.value === val)?.name,
+      getValueLabel: (val: unknown, loc: string) => getNumberFormatLabel(val, loc),
       builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
+        .setNameLocalizations(getLocMap("commands.config.names.subcmd.settings.numberFormat"))
         .setDescription(tr.for("en-US", "commands.config.descriptions.settings.numberFormat"))
         .setDescriptionLocalizations(getLocMap("commands.config.descriptions.settings.numberFormat"))
         .addStringOption(opt =>
@@ -78,7 +80,7 @@ const getConfigurableOptions = () => {
             .setNameLocalizations(getLocMap("commands.config.names.subcmd.args.newValue"))
             .setDescription(tr.for("en-US", "commands.config.descriptions.args.newValue"))
             .setDescriptionLocalizations(getLocMap("commands.config.descriptions.args.newValue"))
-            .setChoices(numberFormatChoices)
+            .setChoices(getNumberFormatChoices())
             .setRequired(true)
         )
     },
@@ -89,6 +91,7 @@ const getConfigurableOptions = () => {
       validateValue: (val: unknown) => localesJson.some(({ code }) => code === val),
       invalidHintTrKey: "commands.config.set.localeInvalidHint",
       builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
+        .setNameLocalizations(getLocMap("commands.config.names.subcmd.settings.locale"))
         .setDescription(tr.for("en-US", "commands.config.descriptions.settings.locale"))
         .setDescriptionLocalizations(getLocMap("commands.config.descriptions.settings.locale"))
         .addStringOption(opt =>
@@ -106,6 +109,7 @@ const getConfigurableOptions = () => {
       settingNameTrKey: "commands.config.names.subcmd.settingNames.autoReplyEnabled",
       getValueLabel: (val: unknown, loc: string) => getAutoReplyValues(loc).find(c => c.value === Boolean(val))?.name,
       builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
+        .setNameLocalizations(getLocMap("commands.config.names.subcmd.settings.autoReplyEnabled"))
         .setDescription(tr.for("en-US", "commands.config.descriptions.settings.autoReplyEnabled"))
         .setDescriptionLocalizations(getLocMap("commands.config.descriptions.settings.autoReplyEnabled"))
         .addBooleanOption(opt =>
@@ -121,6 +125,7 @@ const getConfigurableOptions = () => {
       settingNameTrKey: "commands.config.names.subcmd.settingNames.linksPerReplyLimit",
       getValueLabel: (val: unknown) => String(val),
       builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
+        .setNameLocalizations(getLocMap("commands.config.names.subcmd.settings.linksPerReplyLimit"))
         .setDescription(tr.for("en-US", "commands.config.descriptions.settings.linksPerReplyLimit"))
         .setDescriptionLocalizations(getLocMap("commands.config.descriptions.settings.linksPerReplyLimit"))
         .addIntegerOption(opt =>
@@ -360,7 +365,7 @@ export class ConfigCmd extends SlashCommand {
         return int.editReply(useEmbedify(tr.for(locale, "commands.config.set.invalidValue", {
           settingName: tr.for(locale, settingNameTrKey),
           newValue,
-          invalidHint: invalidHintTrKey ? `\n${tr.for(locale, invalidHintTrKey)}` : "",
+          invalidHintSuffix: invalidHintTrKey ? `\n${tr.for(locale, invalidHintTrKey)}` : "",
         }), Col.Error));
 
       cfg[cfgProp] = newValue;

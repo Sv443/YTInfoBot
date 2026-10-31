@@ -6,69 +6,74 @@ import { UserSettings } from "@models/UserSettings.model.js";
 import { useButtons } from "@lib/components.js";
 import { capitalize } from "@lib/text.js";
 import { getAutoReplyValues } from "@cmd/Config.js";
-import { GuildConfig } from "@models/GuildConfig.model.js";
 import type { Stringifiable } from "@src/types.js";
-import { getLocMap, tr } from "@lib/translate.js";
-
-// TODO: translate
+import { getLocMap, tr, type TrKeyEn } from "@lib/translate.js";
 
 //#region constants
 
 /** Configuration setting name mapping - value has to adhere to Discord slash command naming rules (lowercase and underscores only!) */
-const scNames = {
-  autoReplyEnabled: "auto_reply",
-} as const satisfies Partial<Record<keyof UserSettings, string>>;
+const getSCNames = () => ({
+  autoReplyEnabled: tr.for("en-US", "commands.settings.names.subcmd.settings.autoReplyEnabled"),
+} as const satisfies Partial<Record<keyof UserSettings, string>>);
 
-/** All options that can be configured */
-const getConfigurableOptions: (locale: string) => Record<
-  typeof scNames[keyof typeof scNames],
-  Omit<Parameters<typeof SettingsCmd.editSetting>[0], "int" | "opt"> & {
-    builder: (grpOpt: SlashCommandSubcommandBuilder) => SlashCommandSubcommandBuilder;
-  }
-> = (locale: string) => ({
-  [scNames.autoReplyEnabled]: {
-    settProp: "autoReplyEnabled",
-    settingName: tr.for(locale, "commands.settings.settingName.autoReplyEnabled"),
-    getValueLabel: (val, loc) => getAutoReplyValues(loc).find(c => c.value === Boolean(val))?.name,
-    builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
-      .setDescription(tr.for("en-US", "commands.settings.changeSettingDescription.autoReplyEnabled"))
-      .setDescriptionLocalizations(getLocMap("commands.settings.changeSettingDescription.autoReplyEnabled"))
-      .addBooleanOption(opt =>
-        opt.setName(tr.for("en-US", "commands.settings.names.subcmd.args.newValue"))
-          .setNameLocalizations(getLocMap("commands.settings.names.subcmd.args.newValue"))
-          .setDescription(tr.for("en-US", "commands.settings.changeSettingDescription.autoReplyEnabledArg"))
-          .setDescriptionLocalizations(getLocMap("commands.settings.changeSettingDescription.autoReplyEnabledArg"))
-          .setRequired(true)
-      )
-  },
-} as const);
+/** All options that can be configured - has to be called lazily, after the translations were loaded */
+const getConfigurableOptions = () => {
+  const scNames = getSCNames();
+
+  return {
+    [scNames.autoReplyEnabled]: {
+      settProp: "autoReplyEnabled",
+      settingNameTrKey: "commands.settings.settingName.autoReplyEnabled",
+      getValueLabel: (val: unknown, loc: string) => getAutoReplyValues(loc).find(c => c.value === Boolean(val))?.name,
+      builder: (grpOpt: SlashCommandSubcommandBuilder) => grpOpt
+        .setNameLocalizations(getLocMap("commands.settings.names.subcmd.settings.autoReplyEnabled"))
+        .setDescription(tr.for("en-US", "commands.settings.changeSettingDescription.autoReplyEnabled"))
+        .setDescriptionLocalizations(getLocMap("commands.settings.changeSettingDescription.autoReplyEnabled"))
+        .addBooleanOption(opt =>
+          opt.setName(tr.for("en-US", "commands.settings.names.subcmd.args.newValue"))
+            .setNameLocalizations(getLocMap("commands.settings.names.subcmd.args.newValue"))
+            .setDescription(tr.for("en-US", "commands.settings.changeSettingDescription.autoReplyEnabledArg"))
+            .setDescriptionLocalizations(getLocMap("commands.settings.changeSettingDescription.autoReplyEnabledArg"))
+            .setRequired(true)
+        )
+    },
+  } as const satisfies Record<
+    ReturnType<typeof getSCNames>[keyof ReturnType<typeof getSCNames>],
+    Omit<Parameters<typeof SettingsCmd.editSetting>[0], "int" | "opt"> & {
+      builder: (grpOpt: SlashCommandSubcommandBuilder) => SlashCommandSubcommandBuilder;
+    }
+  >;
+};
 
 //#region constructor
 
 export class SettingsCmd extends SlashCommand {
   constructor() {
     super(new SlashCommandBuilder()
-      .setName(CmdBase.getCmdName("settings"))
+      .setName(CmdBase.getCmdName(tr.for("en-US", "commands.settings.names.command")))
       .setNameLocalizations(getLocMap("commands.settings.names.command", SettingsCmd.cmdPrefix))
       .setDescription(tr.for("en-US", "commands.settings.descriptions.command"))
       .setDescriptionLocalizations(getLocMap("commands.settings.descriptions.command"))
       .addSubcommand(option => option
-        .setName("reset")
+        .setName(tr.for("en-US", "commands.settings.names.subcmd.reset"))
         .setNameLocalizations(getLocMap("commands.settings.names.subcmd.reset"))
         .setDescription(tr.for("en-US", "commands.settings.descriptions.subcmd.reset"))
+        .setDescriptionLocalizations(getLocMap("commands.settings.descriptions.subcmd.reset"))
       )
       .addSubcommand(option => option
-        .setName("list")
+        .setName(tr.for("en-US", "commands.settings.names.subcmd.list"))
         .setNameLocalizations(getLocMap("commands.settings.names.subcmd.list"))
         .setDescription(tr.for("en-US", "commands.settings.descriptions.subcmd.list"))
+        .setDescriptionLocalizations(getLocMap("commands.settings.descriptions.subcmd.list"))
       )
       .addSubcommandGroup(grpOpt => {
         grpOpt
-          .setName("set")
+          .setName(tr.for("en-US", "commands.settings.names.subcmd.set"))
           .setNameLocalizations(getLocMap("commands.settings.names.subcmd.set"))
-          .setDescription(tr.for("en-US", "commands.settings.descriptions.subcmd.set"));
+          .setDescription(tr.for("en-US", "commands.settings.descriptions.subcmd.set"))
+          .setDescriptionLocalizations(getLocMap("commands.settings.descriptions.subcmd.set"));
 
-        for(const [name, { builder }] of Object.entries(getConfigurableOptions("en-US")))
+        for(const [name, { builder }] of Object.entries(getConfigurableOptions()))
           grpOpt.addSubcommand(option => builder(option).setName(name));
 
         return grpOpt;
@@ -82,10 +87,8 @@ export class SettingsCmd extends SlashCommand {
     const reply = await int.deferReply({ flags: [MessageFlags.Ephemeral] });
 
     const locale = await SettingsCmd.getGuildLocale(int);
-    const configurableOptions = getConfigurableOptions(locale);
+    const configurableOptions = getConfigurableOptions();
     const t = tr.use(locale);
-
-    void ["TODO:", t];
 
     switch(opt.name) {
     case "set":
@@ -104,21 +107,14 @@ export class SettingsCmd extends SlashCommand {
       if(!sett)
         return SettingsCmd.noSettingsFound(int);
 
-      let locale = "en-US";
-      if(int.inGuild()) {
-        await GuildConfig.ensureExists(int.guildId);
-        const guildCfg = await em.findOne(GuildConfig, { id: int.guildId });
-        locale = guildCfg?.locale ?? locale;
-      }
-
-      const cfgList = Object.entries(configurableOptions).reduce((acc, [, { settProp: cfgProp, settingName, getValueLabel: getLabel }], i) => {
+      const cfgList = Object.entries(configurableOptions).reduce((acc, [, { settProp: cfgProp, settingNameTrKey, getValueLabel: getLabel }], i) => {
         const val = getLabel ? getLabel(sett[cfgProp], locale) : sett[cfgProp];
-        return `${acc}${i !== 0 ? "\n" : ""}- **${capitalize(settingName)}**: \`${val}\``;
+        return `${acc}${i !== 0 ? "\n" : ""}- **${capitalize(t(settingNameTrKey))}**: \`${val}\``;
       }, "");
 
       return int.editReply(useEmbedify(cfgList, Col.Info, (e) => e
-        .setTitle("User settings values:")
-        .setFooter({ text: "Use '/settings set <name>' to edit a setting" })
+        .setTitle(t("commands.settings.listEmbed.title"))
+        .setFooter({ text: t("commands.settings.listEmbed.footer") })
       ));
     }
     case "reset": {
@@ -126,18 +122,18 @@ export class SettingsCmd extends SlashCommand {
         new ButtonBuilder()
           .setCustomId("confirm-reset-settings")
           .setStyle(ButtonStyle.Danger)
-          .setLabel("Reset")
+          .setLabel(t("buttons.reset"))
           .setEmoji("♻️"),
         new ButtonBuilder()
           .setCustomId("cancel-reset-settings")
           .setStyle(ButtonStyle.Secondary)
-          .setLabel("Cancel")
+          .setLabel(t("buttons.cancel"))
           .setEmoji("❌"),
       ];
 
       await int.editReply({
-        ...useEmbedify("**Are you sure you want to reset your settings?**", Col.Warning, (e) =>
-          e.setFooter({ text: "This prompt will expire in 30s" })
+        ...useEmbedify(`**${t("commands.settings.reset.confirm")}**`, Col.Warning, (e) =>
+          e.setFooter({ text: t("general.promptExpiryNotice", 30) })
         ),
         ...useButtons([confirmBtns]),
       });
@@ -157,20 +153,20 @@ export class SettingsCmd extends SlashCommand {
           sett && await em.removeAndFlush(sett);
           await em.persistAndFlush(new UserSettings(int.user.id));
           return conf.editReply({
-            ...useEmbedify("Settings successfully reset to the default values.", Col.Success),
+            ...useEmbedify(t("commands.settings.reset.success"), Col.Success),
             components: [],
           });
         }
         else {
           await conf.editReply({
-            ...useEmbedify("Reset cancelled.", Col.Secondary),
+            ...useEmbedify(t("commands.settings.reset.cancelled"), Col.Secondary),
             components: [],
           });
         }
       }
       catch {
         await (conf ?? int).editReply({
-          ...useEmbedify("Confirmation not received within 30s, cancelling reset.", Col.Secondary),
+          ...useEmbedify(t("general.confirmationTimeoutNotice", 30), Col.Secondary),
           components: [],
         });
       }
@@ -180,8 +176,8 @@ export class SettingsCmd extends SlashCommand {
 
   //#region s:utils
 
-  static noSettingsFound(int: CommandInteraction) {
-    int[int.deferred || int.replied ? "editReply" : "reply"](useEmbedify("No user settings found - please run `/settings reset`", Col.Error));
+  static async noSettingsFound(int: CommandInteraction) {
+    int[int.deferred || int.replied ? "editReply" : "reply"](useEmbedify(tr.for(await SettingsCmd.getGuildLocale(int), "errors.userSettingsInaccessible"), Col.Error));
   }
 
   /** Call to edit or view the passed configuration setting */
@@ -192,52 +188,59 @@ export class SettingsCmd extends SlashCommand {
     int,
     opt,
     settProp,
-    settingName,
+    settingNameTrKey,
     getValueLabel = (val) => val,
     validateValue,
-    invalidHint,
+    invalidHintTrKey,
   }: {
     int: CommandInteraction;
     opt: CommandInteractionOption;
     settProp: TSettKey;
-    settingName: string;
+    settingNameTrKey: TrKeyEn;
     getValueLabel?: (value: TSettValue, locale: string) => Stringifiable | undefined;
     validateValue?: (value: TSettValue) => boolean;
-    invalidHint?: string;
+    invalidHintTrKey?: TrKeyEn;
   }) {
+    const locale = await SettingsCmd.getGuildLocale(int);
+
     try {
       await UserSettings.ensureExists(int.user.id);
       const cfg = await em.findOne(UserSettings, { id: int.user.id });
 
-      let locale = "en-US";
-      if(int.inGuild()) {
-        await GuildConfig.ensureExists(int.guildId);
-        const guildCfg = await em.findOne(GuildConfig, { id: int.guildId });
-        locale = guildCfg?.locale ?? locale;
-      }
-
       if(!cfg)
         return SettingsCmd.noSettingsFound(int);
 
-      const newValue = opt.options?.[0]?.options?.find(o => o.name === "new_value")?.value as TSettValue | undefined;
+      const settingName = tr.for(locale, settingNameTrKey);
+
+      const newValue = opt.options?.[0]?.options?.find(o => o.name === tr.for("en-US", "commands.settings.names.subcmd.args.newValue"))?.value as TSettValue | undefined;
       if(typeof newValue === "undefined") {
-        const cfg = await em.findOne(UserSettings, { id: int.user.id });
-        if(!cfg)
-          return SettingsCmd.noSettingsFound(int);
-        return int.editReply(useEmbedify(`The current ${settingName} is \`${getValueLabel(cfg[settProp] as TSettValue, locale) ?? cfg[settProp]}\``));
+        return int.editReply(useEmbedify(tr.for(locale, "commands.settings.set.currentValue", {
+          settingName,
+          newValue: getValueLabel(cfg[settProp] as TSettValue, locale) ?? cfg[settProp],
+        })));
       }
 
       if(typeof validateValue === "function" && !validateValue(newValue))
-        return int.editReply(useEmbedify(`Invalid ${settingName} specified: \`${newValue}\`${invalidHint ? `\n${invalidHint}` : ""}`, Col.Error));
+        return int.editReply(useEmbedify(tr.for(locale, "commands.settings.set.invalidValue", {
+          settingName,
+          newValue,
+          invalidHintSuffix: invalidHintTrKey ? `\n${tr.for(locale, invalidHintTrKey)}` : "",
+        }), Col.Error));
 
       cfg[settProp] = newValue;
       cfg.lastAccessed = new Date();
       await em.flush();
 
-      return int.editReply(useEmbedify(`Successfully set the ${settingName} to \`${getValueLabel(newValue, locale) ?? newValue}\``, Col.Success));
+      return int.editReply(useEmbedify(tr.for(locale, "commands.settings.set.success", {
+        settingName,
+        newValue: getValueLabel(newValue, locale) ?? newValue,
+      }), Col.Success));
     }
     catch(err) {
-      return int.editReply(useEmbedify(`Couldn't set the ${settingName} due to an error: ${err}`, Col.Error));
+      return int.editReply(useEmbedify(tr.for(locale, "commands.settings.set.error", {
+        settingName: tr.for(locale, settingNameTrKey),
+        err: err instanceof Error ? err.message : tr.for(locale, "errors.unknown"),
+      }), Col.Error));
     }
   }
 }

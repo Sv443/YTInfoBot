@@ -12,7 +12,9 @@
     "noDataFoundToDelete": "No data found to delete.",
     "guildCfgInaccessible": "No server configuration found - please run `/config reset`",
     "messageInaccessible": "The targeted message could not be accessed.",
-    "onlyRunInGuild": "This command can only be run in a server."
+    "userSettingsInaccessible": "No user settings found - please run `/settings reset`",
+    "onlyRunInGuild": "This command can only be run in a server.",
+    "commandExecution": "An error occurred while executing the command: ${err}"
   },
   "general": {
     "promptExpiryNotice": "This prompt will expire in ${sec}s",
@@ -74,6 +76,12 @@
           "locale": "The language and country setting for the server, used for translations, number formatting and more",
           "autoReplyEnabled": "Whether the bot will automatically reply to all messages containing a video link",
           "linksPerReplyLimit": "The maximum number of links the bot will process in a single message"
+        }
+      },
+      "choices": {
+        "numberFormat": {
+          "long": "Long",
+          "short": "Short"
         }
       },
       "set": {
@@ -183,6 +191,9 @@
           "reset": "reset",
           "list": "list",
           "set": "set",
+          "settings": {
+            "autoReplyEnabled": "auto_reply"
+          },
           "args": {
             "newValue": "new_value"
           }
@@ -198,6 +209,21 @@
       },
       "settingName": {
         "autoReplyEnabled": "auto reply state"
+      },
+      "set": {
+        "currentValue": "The current ${settingName} is `${newValue}`",
+        "invalidValue": "Invalid ${settingName} specified: `${newValue}`${invalidHintSuffix}",
+        "success": "Successfully set the ${settingName} to `${newValue}`",
+        "error": "Couldn't set the ${settingName} due to an error: ${err}"
+      },
+      "reset": {
+        "confirm": "Are you sure you want to reset your settings?",
+        "success": "Settings successfully reset to the default values.",
+        "cancelled": "Reset cancelled."
+      },
+      "listEmbed": {
+        "title": "User settings values:",
+        "footer": "Use '/settings set <name>' to edit a setting"
       },
       "changeSettingDescription": {
         "autoReplyEnabled": "Change whether the bot will automatically reply to your messages containing a video link",
@@ -219,6 +245,16 @@
           "type": "Type of information to show - defaults to reduced"
         }
       },
+      "choices": {
+        "type": {
+          "everything": "Everything",
+          "reduced": "Reduced",
+          "votes_only": "Votes only",
+          "dearrow_only": "DeArrow only",
+          "timestamps_only": "Timestamps only"
+        }
+      },
+      "embedFooter": "Powered by ${providers}",
       "errors": {
         "invalidUrlOrId": "Invalid video URL or ID",
         "foundNoVidInfo": "Found no data for this video - please try again later"

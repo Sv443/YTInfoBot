@@ -17,20 +17,36 @@ import type { DeArrowObj, ReturnYouTubeDislikeObj, SponsorBlockActionType, Spons
 
 const allowedHosts = ["www.youtube.com", "youtube.com", "music.youtube.com", "youtu.be"];
 
-// TODO: translate
+const videoInfoTypes = ["everything", "reduced", "votes_only", "dearrow_only", "timestamps_only"] as const satisfies VideoInfoType[];
+const numberFormats = ["long", "short"] as const satisfies NumberFormat[];
 
-export const videoInfoTypeChoices = [
-  { name: "Everything", value: "everything" }, // (default)
-  { name: "Reduced", value: "reduced" },
-  { name: "Votes only", value: "votes_only" },
-  { name: "DeArrow only", value: "dearrow_only" },
-  { name: "Timestamps only", value: "timestamps_only" },
-] as const satisfies APIApplicationCommandOptionChoice<VideoInfoType>[];
+/** Returns the localized choices for the video info type option */
+export const getVideoInfoTypeChoices = (): APIApplicationCommandOptionChoice<VideoInfoType>[] =>
+  videoInfoTypes.map((value) => ({
+    name: tr.for("en-US", `commands.video_info.choices.type.${value}`),
+    name_localizations: getLocMap(`commands.video_info.choices.type.${value}`),
+    value,
+  }));
 
-export const numberFormatChoices = [
-  { name: "Long", value: "long" }, // (default)
-  { name: "Short", value: "short" },
-] as const satisfies APIApplicationCommandOptionChoice<NumberFormat>[];
+/** Returns the translated label of a video info type in the given locale */
+export const getVideoInfoTypeLabel = (value: unknown, locale: string) =>
+  videoInfoTypes.includes(value as VideoInfoType)
+    ? tr.for(locale, `commands.video_info.choices.type.${value as VideoInfoType}`)
+    : undefined;
+
+/** Returns the localized choices for the number format option */
+export const getNumberFormatChoices = (): APIApplicationCommandOptionChoice<NumberFormat>[] =>
+  numberFormats.map((value) => ({
+    name: tr.for("en-US", `commands.config.choices.numberFormat.${value}`),
+    name_localizations: getLocMap(`commands.config.choices.numberFormat.${value}`),
+    value,
+  }));
+
+/** Returns the translated label of a number format in the given locale */
+export const getNumberFormatLabel = (value: unknown, locale: string) =>
+  numberFormats.includes(value as NumberFormat)
+    ? tr.for(locale, `commands.config.choices.numberFormat.${value as NumberFormat}`)
+    : undefined;
 
 const sponsorBlockCategoryColorEmojiMap = {
   sponsor: "🟩", // green
@@ -100,7 +116,7 @@ export class VideoInfoCmd extends SlashCommand {
           .setNameLocalizations(getLocMap("commands.video_info.names.args.type"))
           .setDescription(tr.for("en-US", "commands.video_info.descriptions.options.type"))
           .setDescriptionLocalizations(getLocMap("commands.video_info.descriptions.options.type"))
-          .addChoices(videoInfoTypeChoices)
+          .addChoices(getVideoInfoTypeChoices())
       )
     );
   }
@@ -115,7 +131,7 @@ export class VideoInfoCmd extends SlashCommand {
     const videoId = VideoInfoCmd.parseVideoId(videoUrl);
 
     if(!videoId)
-      return int.reply(useEmbedify("commands.video_info.errors.invalidUrlOrId", Col.Error));
+      return int.reply(useEmbedify(tr.for(await VideoInfoCmd.getGuildLocale(int), "commands.video_info.errors.invalidUrlOrId"), Col.Error));
 
     const type = (int.options.get("type")?.value ?? "everything") as VideoInfoType;
 
@@ -339,7 +355,7 @@ export class VideoInfoCmd extends SlashCommand {
         const catList = joinArrayReadable(
           categories.map(cat => `${sponsorBlockCategoryColorEmojiMap[cat]} ${t(`commands.video_info.embedFields.sponsorBlockCategories.${cat as "sponsor"}`)}`),
           t("general.listSeparator"),
-          t("general.listSeparator"),
+          t("general.listSeparatorLast"),
         );
 
         const atVidEnd = valsWithin(segment[1], videoDuration);
@@ -371,16 +387,17 @@ export class VideoInfoCmd extends SlashCommand {
 
     const poweredByStr = [
       ...(hasRYDData ? ["ReturnYouTubeDislike"] : []),
-      ...(hasDeArrowData ? ["SponsorBlock"] : []),
-      ...(hasSponsorBlockData ? ["DeArrow"] : []),
+      ...(hasDeArrowData ? ["DeArrow"] : []),
+      ...(hasSponsorBlockData ? ["SponsorBlock"] : []),
     ];
 
     if(poweredByStr.length === 0)
       return null;
 
-    // TODO: translate
     embed.setFooter({
-      text: `Powered by ${joinArrayReadable(poweredByStr, t("general.listSeparator"), t("general.listSeparatorLast"))}`,
+      text: t("commands.video_info.embedFooter", {
+        providers: joinArrayReadable(poweredByStr, t("general.listSeparator"), t("general.listSeparatorLast")),
+      }),
     });
 
     return embed;

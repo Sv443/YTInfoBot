@@ -7,6 +7,7 @@ import { exists, getHash } from "@lib/misc.js";
 import type { ContextCommand, SlashCommand } from "@lib/Command.js";
 import type { Event } from "@lib/Event.js";
 import { client, clientId, rest } from "@lib/client.js";
+import { tr } from "@lib/translate.js";
 import { commands } from "@cmd/_commands.js";
 import { ctxCommands } from "@ctx/_contexts.js";
 import { events } from "@evt/_events.js";
@@ -47,7 +48,7 @@ async function registerGuildCommands() {
       }
       catch(err) {
         try {
-          int[int.deferred || int.replied ? "editReply" : "reply"](useEmbedify(`An error occurred while executing the command: ${err}`, Col.Error));
+          int[int.deferred || int.replied ? "editReply" : "reply"](useEmbedify(tr.for(int.locale, "errors.commandExecution", { err: err instanceof Error ? err.message : String(err) }), Col.Error));
         }
         catch(err) {
           console.error(`Error while executing command "${int.commandName}":`, err);

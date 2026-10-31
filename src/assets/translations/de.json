@@ -6,18 +6,32 @@
     "open": "Öffnen"
   },
   "errors": {
-    "unknown": "Unbekannter Error",
-    "noYtVidLinksFound": "Keine YouTube Links in der Nachricht gefunden.",
+    "unknown": "Unbekannter Fehler",
+    "noYtVidLinksFound": "Keine YouTube-Links in der Nachricht gefunden.",
     "noVidInfoFound": "Keine Informationen über das Video gefunden.",
     "noDataFoundToDelete": "Keine Daten zum Löschen gefunden.",
     "guildCfgInaccessible": "Keine Serverkonfiguration gefunden - bitte `/konfiguration zurücksetzen` ausführen.",
     "messageInaccessible": "Die Nachricht konnte nicht abgerufen werden.",
-    "onlyRunInGuild": "Dieser Befehl kann nur in einem Server ausgeführt werden."
+    "userSettingsInaccessible": "Keine Benutzereinstellungen gefunden - bitte `/einstellungen zurücksetzen` ausführen.",
+    "onlyRunInGuild": "Dieser Befehl kann nur in einem Server ausgeführt werden.",
+    "commandExecution": "Beim Ausführen des Befehls ist ein Fehler aufgetreten: ${err}"
   },
   "general": {
     "promptExpiryNotice": "Dieses Fenster läuft in ${sec}s ab.",
     "confirmationTimeoutNotice": "Abgebrochen, da keine Bestätigung innerhalb von ${sec}s erhalten wurde.",
-    "commandOnlyUsableInServers": "Dieser Befehl kann nur in einem Server benutzt werden."
+    "commandOnlyUsableInServers": "Dieser Befehl kann nur in einem Server benutzt werden.",
+    "enabled": "Aktiviert",
+    "disabled": "Deaktiviert",
+    "listSeparator": ", ",
+    "listSeparatorLast": " und ",
+    "time": {
+      "short": {
+        "days": "T",
+        "hours": "h",
+        "minutes": "m",
+        "seconds": "s"
+      }
+    }
   },
   "commands": {
     "config": {
@@ -26,7 +40,24 @@
         "subcmd": {
           "reset": "zurücksetzen",
           "list": "liste",
-          "set": "setzen"
+          "set": "setzen",
+          "settings": {
+            "defaultVideoInfoType": "standard_video_info_typ",
+            "numberFormat": "zahlenformat",
+            "locale": "sprache",
+            "autoReplyEnabled": "auto_antwort",
+            "linksPerReplyLimit": "links_pro_antwort_limit"
+          },
+          "settingNames": {
+            "defaultVideoInfoType": "Standard-Video-Info-Typ",
+            "numberFormat": "Zahlenformat",
+            "locale": "Sprache",
+            "autoReplyEnabled": "Status der automatischen Antworten",
+            "linksPerReplyLimit": "Link-Limit pro Antwort"
+          },
+          "args": {
+            "newValue": "neuer_wert"
+          }
         }
       },
       "descriptions": {
@@ -35,28 +66,47 @@
           "reset": "Setze die Konfiguration auf die Standardeinstellungen zurück",
           "list": "Liste alle konfigurierbaren Einstellungen und ihre aktuellen Werte",
           "set": "Setze eine spezifische Einstellung auf einen neuen Wert"
+        },
+        "args": {
+          "newValue": "Der neue Wert"
+        },
+        "settings": {
+          "defaultVideoInfoType": "Der Standardtyp für video_info, der bei gesendeten Links oder fehlendem Typ-Argument verwendet wird",
+          "numberFormat": "Das Zahlenformat für diesen Server, z.B. für die Anzeige von Likes und Dislikes",
+          "locale": "Die Sprach- und Ländereinstellung für den Server, verwendet für Übersetzungen, Zahlenformate & mehr",
+          "autoReplyEnabled": "Ob der Bot automatisch auf alle Nachrichten mit einem Video-Link antwortet",
+          "linksPerReplyLimit": "Die maximale Anzahl an Links, die der Bot pro Nachricht verarbeitet"
         }
       },
-      "embedTitles": {
-        "list": "Serverkonfiguration:"
+      "choices": {
+        "numberFormat": {
+          "long": "Lang",
+          "short": "Kurz"
+        }
       },
       "set": {
         "currentValue": "Der Wert von \"${settingName}\" ist momentan `${newValue}`",
-        "invalidValue": "Ungültiger Wert für \"${settingName}\": `${newValue}`${invalidHint}",
+        "invalidValue": "Ungültiger Wert für \"${settingName}\": `${newValue}`${invalidHintSuffix}",
         "success": "Der Wert von \"${settingName}\" wurde erfolgreich auf `${newValue}` gesetzt",
-        "error": "Der Wert von \"${settingName}\" konnte nicht gesetzt werden: ${err}"
+        "error": "Der Wert von \"${settingName}\" konnte nicht gesetzt werden: ${err}",
+        "localeInvalidHint": "Es werden nur die aufgelisteten Sprachen unterstützt.",
+        "localeNotFoundWarning": "Für die Sprache `${localeName}` wurden keine Übersetzungen gefunden.\nDie Änderung wurde gespeichert, da die Zahlenformatierung trotzdem funktioniert, aber alle Texte werden auf Englisch angezeigt.\n\nWenn du bei den Übersetzungen mithelfen möchtest, [tritt bitte dem Support-Server bei.](${supportServerInviteUrl})"
       },
       "reset": {
         "confirm": "Bist du sicher, dass du die Konfiguration zurücksetzen möchtest?",
         "success": "Konfiguration erfolgreich auf Standardeinstellungen zurückgesetzt.",
         "cancelled": "Zurücksetzen abgebrochen."
+      },
+      "listEmbed": {
+        "title": "Serverkonfiguration:",
+        "footer": "Nutze '/konfiguration setzen', um die Serverkonfiguration zu ändern"
       }
     },
     "help": {
       "names": {
         "command": "hilfe",
         "subcmd": {
-          "commands": "kommandos",
+          "commands": "befehle",
           "info": "info"
         },
         "args": {
@@ -64,38 +114,42 @@
         }
       },
       "descriptions": {
-        "command": "Zeigt alle Kommandos oder Infos über den Bot an.",
+        "command": "Zeigt alle Befehle oder Infos über den Bot an",
         "subcmd": {
-          "commands": "Listet alle Kommandos auf.",
-          "info": "Zeige informationen über den Bot an."
+          "commands": "Listet alle Befehle auf",
+          "info": "Zeigt Informationen über den Bot an"
         },
         "args": {
-          "show_hidden": "Zeige alle versteckten Kommandos, auf die du Zugriff hast - die Antwort wird nur dir angezeigt."
+          "show_hidden": "Zeige Befehle, die hohe Berechtigungen benötigen, wenn du sie nutzen kannst. Wird nur dir angezeigt."
         }
       },
       "info": {
         "name": "info",
-        "version": "Version: ${version}",
-        "createdBy": "Erstellt von [<authorName>](${authorUrl})",
-        "globalOptOut": "Deaktiviere automatische Antworten mit `/einstellungen setze auto_antwort`.",
-        "bugsLink": "- Fehler oder Wünsche bitte auf [GitHub](${bugsUrl}) melden.",
-        "supportServerLink": "- Tritt dem [Support-Server](${supportServerInviteUrl}) bei, wenn du Fragen hast.",
-        "donationLink": "- Der Bot ist gratis. Wenn du kannst, bitte unterstütze die Entwicklung [hier ❤️](${fundingUrl}).",
-        "poweredBy": "Verwendet die APIs [ReturnYoutubeDislike](https://returnyoutubedislike.com/), [SponsorBlock](https://sponsor.ajay.app/) und [DeArrow](https://dearrow.ajay.app/)."
+        "headline": "Version ${version} - erstellt von [${name}.](${url})",
+        "donationLink": "Dieser Bot ist komplett gratis. Wenn du kannst, [unterstütze bitte die Entwicklung ❤️](${url})",
+        "bugsLink": "- Melde Fehler oder Wünsche [auf GitHub](${url})",
+        "supportServerLink": "- [Tritt dem Support-Server bei](${supportServerInviteUrl}), wenn du Fragen hast oder Hilfe brauchst",
+        "globalOptOut": "- Deaktiviere automatische Antworten auf allen Servern mit dem Befehl `/einstellungen setzen auto_antwort neuer_wert:false`",
+        "installExtensions": "Installiere diese Browser-Erweiterungen, um dein YouTube-Erlebnis zu verbessern:",
+        "installExtReturnYtDislike": "- [ReturnYoutubeDislike](https://returnyoutubedislike.com/) - zeigt ungefähre Likes und Dislikes bei Videos an",
+        "installExtSponsorBlock": "- [SponsorBlock](https://sponsor.ajay.app/) - zeigt Segmente und Kapitel an, die automatisch oder manuell übersprungen werden können",
+        "installExtDeArrow": "- [DeArrow](https://dearrow.ajay.app/) - zeigt von der Community erstellte Thumbnails und Titel an, um Clickbait zu verringern",
+        "installExtMobile": "In Firefox Beta für Android kannst du diese Erweiterungen installieren, indem du [eine eigene Erweiterungssammlung erstellst.](https://www.androidpolice.com/install-add-on-extension-mozilla-firefox-android/)",
+        "poweredBy": "Dieser Bot wäre ohne die APIs von [ReturnYoutubeDislike](https://returnyoutubedislike.com/), [SponsorBlock](https://sponsor.ajay.app/) und [DeArrow](https://dearrow.ajay.app/) nicht möglich gewesen."
       },
       "embedTitles": {
         "commands": "Befehle:",
         "info": "Informationen:"
       },
       "embedFooters": {
-        "commands": "Du kannst auch auf eine Nachricht rechtsklicken bzw. tippen und halten und unter \"Apps\" Kommandos ausführen."
+        "commands": "Du kannst auch auf eine Nachricht rechtsklicken bzw. tippen und halten und unter \"Apps\" Befehle ausführen"
       }
     },
     "invite": {
       "names": {
-        "command": "invite"
+        "command": "einladen"
       },
-      "description": "Lade YTInfoBot in deinen Server ein.",
+      "description": "Lade YTInfoBot in deinen eigenen Server ein",
       "embedContent": "Lade YTInfoBot zu einem deiner Server ein, indem du [hier klickst.](${inviteUrl})"
     },
     "privacy": {
@@ -107,7 +161,7 @@
         }
       },
       "descriptions": {
-        "command": "Infos zum Datenschutz, oder alle Daten löschen.",
+        "command": "Infos zum Datenschutz des Bots oder alle deine Daten löschen.",
         "subcmd": {
           "info": "Zeigt Infos zum Datenschutz des Bots.",
           "delete_data": "Löscht alle Daten, die der Bot über dich gespeichert hat."
@@ -115,19 +169,65 @@
       },
       "info": {
         "line1": "**YTInfoBot speichert folgende Daten über dich und deinen Server:**",
-        "line2": "- Beim Einladen wird die Server-ID und Konfiguration gespeichert.",
-        "line3": "  Wenn der Bot gekickt wird, wird alles gelöscht.",
-        "line4": "- Beim Bearbeiten von Benutzereinstellungen wird die Benutzer-ID gespeichert.",
-        "line5": "  Lösche deine Daten mit `/privacy delete_data`."
+        "line2": "- Beim Einladen in deinen Server werden die Server-ID und die Serverkonfiguration (Sprache, Zahlenformat usw.) gespeichert.  ",
+        "line3": "  Wenn du den Bot vom Server wirfst, werden auch alle Serverdaten gelöscht.",
+        "line4": "- Beim Bearbeiten deiner Benutzereinstellungen werden deine Benutzer-ID und die geänderten Einstellungen gespeichert.  ",
+        "line5": "  Du kannst deine Benutzerdaten mit dem Befehl `/datenschutz daten_löschen` löschen."
       },
       "delete": {
-        "confirmLine1": "**Willst du wirklich alle dir zugehörigen Daten löschen?**",
-        "confirmLine2": "Beim Nutzen mancher Befehlen werden deine Benutzer-ID und Einstellungen erneut gespeichert.",
-        "confirmLine3": "Du kannst den Bot blockieren, damit er deine Nachrichten nie wieder liest.",
-        "confirmLine4": "Bei allen automatischen Antworten werden keine Daten gespeichert, nur beim manuellen Benutzen von Kommandos.",
+        "confirmLine1": "**Willst du wirklich alle deinem Konto zugehörigen Daten löschen?**",
+        "confirmLine2": "Beim Nutzen mancher Befehle werden deine Benutzer-ID und Standardeinstellungen erneut gespeichert.",
+        "confirmLine3": "Du kannst den Bot auch blockieren, damit er deine Nachrichten nie wieder liest.",
+        "confirmLine4": "Bei automatischen Antworten an dich werden keine Daten gespeichert, nur beim manuellen Ausführen von Befehlen.",
         "success": "Daten wurden erfolgreich gelöscht.",
         "cancelled": "Löschen der Daten wurde abgebrochen.",
-        "noConfirmation": "Keine Bestätigung erhalten, Löschen wurde abgebrochen."
+        "noConfirmation": "Keine Bestätigung erhalten, Löschen der Daten wurde abgebrochen."
+      }
+    },
+    "settings": {
+      "names": {
+        "command": "einstellungen",
+        "subcmd": {
+          "reset": "zurücksetzen",
+          "list": "liste",
+          "set": "setzen",
+          "settings": {
+            "autoReplyEnabled": "auto_antwort"
+          },
+          "args": {
+            "newValue": "neuer_wert"
+          }
+        }
+      },
+      "descriptions": {
+        "command": "Zeige oder bearbeite die Bot-Einstellungen für dein Benutzerkonto",
+        "subcmd": {
+          "reset": "Setze die Einstellungen auf die Standardwerte zurück",
+          "list": "Liste alle konfigurierbaren Einstellungen und ihre aktuellen Werte",
+          "set": "Setze eine spezifische Einstellung auf einen neuen Wert"
+        }
+      },
+      "settingName": {
+        "autoReplyEnabled": "Status der automatischen Antworten"
+      },
+      "set": {
+        "currentValue": "Der Wert von \"${settingName}\" ist momentan `${newValue}`",
+        "invalidValue": "Ungültiger Wert für \"${settingName}\": `${newValue}`${invalidHintSuffix}",
+        "success": "Der Wert von \"${settingName}\" wurde erfolgreich auf `${newValue}` gesetzt",
+        "error": "Der Wert von \"${settingName}\" konnte nicht gesetzt werden: ${err}"
+      },
+      "reset": {
+        "confirm": "Bist du sicher, dass du deine Einstellungen zurücksetzen möchtest?",
+        "success": "Einstellungen erfolgreich auf die Standardwerte zurückgesetzt.",
+        "cancelled": "Zurücksetzen abgebrochen."
+      },
+      "listEmbed": {
+        "title": "Benutzereinstellungen:",
+        "footer": "Nutze '/einstellungen setzen <name>', um eine Einstellung zu ändern"
+      },
+      "changeSettingDescription": {
+        "autoReplyEnabled": "Ändere, ob der Bot automatisch auf deine Nachrichten mit einem Video-Link antwortet",
+        "autoReplyEnabledArg": "Ob automatische Antworten aktiviert sein sollen"
       }
     },
     "video_info": {
@@ -139,19 +239,40 @@
         }
       },
       "descriptions": {
-        "command": "Zeigt Infos zu einem Video anhand seiner URL oder ID.",
+        "command": "Zeigt Infos zu einem Video anhand seiner URL oder ID",
         "options": {
-          "video": "URL oder ID des Videos - unterstützt music.youtube.com, youtube.com und youtu.be links.",
-          "type": "Typ der Infos - Standardwert ist \"reduziert\"."
+          "video": "URL oder ID des Videos - unterstützt music.youtube.com-, youtube.com- und youtu.be-Links",
+          "type": "Typ der anzuzeigenden Infos - Standardwert ist \"Reduziert\""
         }
       },
+      "choices": {
+        "type": {
+          "everything": "Alles",
+          "reduced": "Reduziert",
+          "votes_only": "Nur Bewertungen",
+          "dearrow_only": "Nur DeArrow",
+          "timestamps_only": "Nur Zeitmarken"
+        }
+      },
+      "embedFooter": "Bereitgestellt von ${providers}",
       "errors": {
-        "invalidUrlOrId": "Ungültige Video-URL oder ID.",
-        "foundNoVidInfo": "Keine Infos zum Video gefunden - versuche es später erneut."
+        "invalidUrlOrId": "Ungültige Video-URL oder ID",
+        "foundNoVidInfo": "Keine Daten zu diesem Video gefunden - versuche es später erneut"
       },
       "embedFields": {
-        "votes": "Likes & Dislikes (zirka):",
-        "timestamps": "Zeitmarken:"
+        "votes": "Bewertungen (geschätzt):",
+        "duration": "Videolänge:",
+        "timestamps": "Zeitmarken:",
+        "sponsorBlockCategories": {
+          "sponsor": "Gesponsert",
+          "selfpromo": "Eigen- / Unbezahlte Werbung",
+          "interaction": "Interaktionsaufforderung",
+          "intro": "Intro / Pause",
+          "outro": "Outro / Endkarten",
+          "preview": "Vorschau / Rückblick",
+          "music_offtopic": "Keine Musik",
+          "filler": "Füllmaterial / Themenfremd"
+        }
       }
     },
     "video_info_ctx": {
@@ -159,7 +280,9 @@
       "nameExtended": "Video-Infos (Erweitert)"
     },
     "delete_reply_ctx": {
-      "name": "Antwort löschen"
+      "name": "Antwort löschen",
+      "success": "Die Antwort auf [diese Nachricht](${msgLink}) wurde erfolgreich gelöscht.",
+      "wrongMessageError": "Dieser Befehl kann nur auf eine Antwort von YTInfoBot auf eine deiner Nachrichten angewendet werden."
     }
   }
 }
