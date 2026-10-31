@@ -53,5 +53,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Prepare environment
+        run: pnpm run prepare-env
+
       - name: Lint & compile
         run: pnpm run lint
