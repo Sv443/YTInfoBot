@@ -85,7 +85,7 @@ export class PrivacyCmd extends SlashCommand {
         await conf.deferUpdate();
 
         if(conf.customId === "confirm-delete-data") {
-          await em.removeAndFlush(await em.find(UserSettings, { id: int.user.id }));
+          await em.remove(await em.find(UserSettings, { id: int.user.id })).flush();
           return conf.editReply({
             ...useEmbedify(t("commands.privacy.delete.success"), Col.Success),
             components: [],

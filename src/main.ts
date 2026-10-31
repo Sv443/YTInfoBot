@@ -95,13 +95,13 @@ async function checkGuilds(client: Client) {
   for(const { id } of [...client.guilds.cache.values()])
     !registeredGuilds.find(g => g.id === id)
       && tasks.push(
-        em.persistAndFlush(new GuildConfig(id)),
+        em.persist(new GuildConfig(id)).flush(),
         registerCommandsForGuild(id),
       );
 
   for(const guild of registeredGuilds)
     if(!client.guilds.cache.has(guild.id))
-      tasks.push(em.removeAndFlush(guild));
+      tasks.push(em.remove(guild).flush());
 
   try {
     await Promise.allSettled(tasks);

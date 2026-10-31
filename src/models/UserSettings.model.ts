@@ -10,7 +10,7 @@ export class UserSettings {
   /** Ensures that a UserSettings entry exists for the given user ID */
   static async ensureExists(id: string) {
     const sett = await em.findOne(UserSettings, { id });
-    !sett && await em.persistAndFlush(new UserSettings(id));
+    !sett && await em.persist(new UserSettings(id)).flush();
   }
 
   @PrimaryKey({ type: "string", length: 24 })

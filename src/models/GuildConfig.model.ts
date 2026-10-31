@@ -32,7 +32,7 @@ export class GuildConfig {
     catch(e) {
       void e;
     }
-    !exists && await em.persistAndFlush(new GuildConfig(id));
+    !exists && await em.persist(new GuildConfig(id)).flush();
   }
 
   /** Clamps all out-of-bounds values that are currently stored in the database back into their valid range */

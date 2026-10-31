@@ -12,6 +12,6 @@ export class GuildDeleteEvt extends Event {
 
   public async run({ id }: Guild) {
     const cfg = await em.findOne(GuildConfig, { id });
-    cfg && await em.removeAndFlush(cfg);
+    cfg && await em.remove(cfg).flush();
   }
 }

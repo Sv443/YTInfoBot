@@ -13,7 +13,7 @@ export class GuildCreateEvt extends Event {
 
   public async run({ id }: Guild) {
     if(!await em.findOne(GuildConfig, { id }))
-      await em.persistAndFlush(new GuildConfig(id));
+      await em.persist(new GuildConfig(id)).flush();
     await registerCommandsForGuild(id);
   }
 }
