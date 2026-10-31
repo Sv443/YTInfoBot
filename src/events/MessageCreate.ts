@@ -2,7 +2,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionFlagsBits, type
 import { Event } from "@lib/Event.js";
 import { VideoInfoCmd, type VideoInfoType } from "@cmd/VideoInfo.js";
 import { em } from "@lib/db.js";
-import { GuildConfig } from "@models/GuildConfig.model.js";
+import { GuildConfig, isValidLinksPerReplyLimit, linksPerReplyLimitDefault } from "@models/GuildConfig.model.js";
 import { UserSettings } from "@models/UserSettings.model.js";
 import { Col, useEmbedify } from "@lib/embedify.js";
 import { useButtons } from "@lib/components.js";
@@ -95,18 +95,22 @@ export class MessageCreateEvt extends Event {
         return;
     }
 
-    let checked = 0;
+    // only links with a parsable video ID count towards the guild's limit; anything beyond it is ignored
+    const limit = isValidLinksPerReplyLimit(guildCfg.linksPerReplyLimit)
+      ? guildCfg.linksPerReplyLimit
+      : linksPerReplyLimitDefault;
+    const vidsToProcess = allVidsDeduped.filter(({ videoId }) => Boolean(videoId)).slice(0, limit);
+
+    if(vidsToProcess.length === 0)
+      return notFound(tr.for(locale, "errors.noYtVidLinksFound"));
+
     let onlyUrl: string | undefined;
 
-    for(const { videoId, url } of allVidsDeduped) {
-      checked++;
+    for(const { videoId, url } of vidsToProcess) {
       if(!videoId)
-        if(allVidsDeduped.length === checked)
-          return notFound(tr.for(locale, "errors.noYtVidLinksFound"));
-        else
-          continue;
+        continue;
 
-      if(allVidsDeduped.length === 1) {
+      if(vidsToProcess.length === 1) {
         try {
           onlyUrl = VideoInfoCmd.sanitizeVideoUrl(url);
         }

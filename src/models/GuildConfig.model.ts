@@ -8,6 +8,9 @@ export const linksPerReplyLimitMin = 1;
 /** Highest allowed value of `GuildConfig.linksPerReplyLimit` (Discord allows a maximum of 10 embeds per message) */
 export const linksPerReplyLimitMax = 10;
 
+/** Default value of `GuildConfig.linksPerReplyLimit` */
+export const linksPerReplyLimitDefault = 5;
+
 /** Checks whether the passed value is a valid `GuildConfig.linksPerReplyLimit` */
 export const isValidLinksPerReplyLimit = (val: unknown): val is number =>
   typeof val === "number"
@@ -56,7 +59,7 @@ export class GuildConfig {
     autoReplyEnabled: boolean = true;
 
   @Property({ type: "number" })
-    linksPerReplyLimit: number = 5;
+    linksPerReplyLimit: number = linksPerReplyLimitDefault;
 
   @Property({ type: "datetime", nullable: true })
     lastAccessed: Date = new Date();
