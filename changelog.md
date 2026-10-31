@@ -1,3 +1,10 @@
+# 1.0.2
+**Features:**
+- Added support for using SQLite as the database engine instead of PostgreSQL, via the new `.env` settings `DB_DRIVER` and `DB_PATH`.  
+  Note however that data created on one engine will not be transferred to a different engine, so this setting should only really be set once and then left alone.
+
+<br>
+
 # 1.0.1
 **Fixes:**
 - Fixed uncapped `/config` and `/settings` value field that allowed configurations to be broken beyond repair.

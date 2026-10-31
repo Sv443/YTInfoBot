@@ -5,3 +5,4 @@ dist/
 .cmd_hash
 emojis.json
 .metrics.json
+ytinfobot.sqlite

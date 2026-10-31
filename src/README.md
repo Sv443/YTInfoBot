@@ -10,13 +10,13 @@
 - `lib/` - utility functions, sectioned into files by their general category
   - `lib/client.ts` - has all discord.js client related information and the client object itself
   - `lib/Command.ts` - has the base classes for slash and context commands
-  - `lib/db.ts` - has the [TypeORM EntityManager instance](https://typeorm.io/#/working-with-entity-manager) and the database connection stuff
+  - `lib/db.ts` - has the [MikroORM EntityManager instance](https://mikro-orm.io/docs/entity-manager) and the database connection stuff
   - `lib/Event.ts` - base class for events
   - `lib/registry.ts` - where all commands and events are registered and eventually get run from
   - `lib/translate.ts` - custom translation system
-- `models/` - contains all the [TypeORM database entity classes](https://typeorm.io/#/entities)
+- `models/` - contains all the [MikroORM database entity classes](https://mikro-orm.io/docs/defining-entities)
 - `tools/` - various CLI tools
   - `tools/prepare-env.ts` - a tool to prepare all environment files for the bot - run via `pnpm prepare-env`
 - `main.ts` - the main entry point for the bot, where everything is initialized
-- `mikro-orm.config.ts` - the [MikroORM configuration file](https://mikro-orm.io/docs/usage-with-typescript)
+- `mikro-orm.config.ts` - the [MikroORM configuration file](https://mikro-orm.io/docs/usage-with-typescript), which picks the database driver (PostgreSQL or SQLite) through the `DB_DRIVER` env var
 - `types.ts` - custom types for the bot and for data returned by APIs

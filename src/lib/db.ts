@@ -1,15 +1,19 @@
-import { MikroORM } from "@mikro-orm/postgresql";
-import type { EntityName, FilterQuery } from "@mikro-orm/core";
-import { config } from "@src/mikro-orm.config.js";
+import { MikroORM, type EntityName, type FilterQuery } from "@mikro-orm/core";
+import { mkdir } from "node:fs/promises";
+import { dirname } from "node:path";
+import { dbDriver, getConfig, sqlitePath } from "@src/mikro-orm.config.js";
 
 /** MikroORM instance */
-export let orm: Awaited<ReturnType<typeof MikroORM.init>>;
+export let orm: MikroORM;
 /** EntityManager instance */
 export let em: typeof orm.em;
 
 /** Load MikroORM instances */
 export async function initDatabase() {
-  orm = await MikroORM.init(config);
+  // SQLite creates the file but not the folder it's in:
+  dbDriver === "sqlite" && await mkdir(dirname(sqlitePath), { recursive: true });
+
+  orm = await MikroORM.init(await getConfig());
   em = orm.em.fork();
 
   await orm.getSchemaGenerator().updateSchema();

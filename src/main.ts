@@ -7,13 +7,14 @@ import { initRegistry, registerCommandsForGuild } from "@lib/registry.js";
 import { autoPlural } from "@lib/text.js";
 import { envVarEq, getEnvVar } from "@lib/env.js";
 import { initTranslations } from "@lib/translate.js";
+import { requiredDbEnvVars } from "@src/mikro-orm.config.js";
 import { updateMetrics } from "@src/metrics.js";
 import { chkGldInterval, metChanId, metGuildId, metUpdInterval, updateLastGldChkTime } from "@src/constants.js";
 import { GuildConfig } from "@models/GuildConfig.model.js";
 
 //#region validate env
 
-const requiredEnvVars = ["DB_URL", "APPLICATION_ID", "BOT_TOKEN", "BOT_INVITE_URL", "SUPPORT_SERVER_INVITE_URL"] as const;
+const requiredEnvVars = [...requiredDbEnvVars, "APPLICATION_ID", "BOT_TOKEN", "BOT_INVITE_URL", "SUPPORT_SERVER_INVITE_URL"] as const;
 
 /** Called before the client is ready to check for environment variables and to initialize the client and database */
 async function init() {

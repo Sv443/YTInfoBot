@@ -132,7 +132,10 @@ Alternatively, if you don't want anything to do with the bot on any server, you 
 
 ## Local Development:
 1. Have [Node.js](https://nodejs.org/) and [pnpm](https://pnpm.io/installation) installed.
-2. Have a [PostgreSQL database](https://www.postgresql.org/) and a user set up (you may [follow this guide](https://medium.com/coding-blocks/creating-user-database-and-adding-access-on-postgresql-8bfcd2f4a91e) on Linux or [WSL](https://learn.microsoft.com/en-us/windows/wsl/install)).
+2. Pick a database:
+  - **PostgreSQL** (default): have a [PostgreSQL database](https://www.postgresql.org/) and a user set up (you may [follow this guide](https://medium.com/coding-blocks/creating-user-database-and-adding-access-on-postgresql-8bfcd2f4a91e) on Linux or [WSL](https://learn.microsoft.com/en-us/windows/wsl/install)), then set `DB_URL` in the `.env` file.
+  - **SQLite**: no setup needed, just set `DB_DRIVER=sqlite` in the `.env` file. The database file is created at `DB_PATH` (default `data/ytinfobot.sqlite`).  
+    Data is not transferred when switching between drivers.
 3. Clone the repository or download the ZIP file and extract it.
 4. Open a terminal in the folder containing `package.json` and run `pnpm i` to install all dependencies.
 5. Open the [Developer Portal](https://discord.com/developers/applications) and create an app that has a bot account, and the "Server Members" and "Message Content" intents.
