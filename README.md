@@ -16,7 +16,13 @@ Since the bot is free to use, I rely on donations to keep it running and maintai
 
 <br><br>
 
-<img alt="Example 1; showing the bot's automatic reply" src="./src/assets/example1.png" width="375" /> <img alt="Example 2; showing the bot configuration process" src="./src/assets/example2.png" width="375" />
+<div style="display: flex;align-items: center;justify-content: center;text-align: center;" align="center">
+
+<img alt="Example 1; showing the bot's automatic reply" src="./src/assets/example1.png" width="375" />
+<img src="./src/assets/example_separator.png" width="20" />
+<img alt="Example 2; showing the bot configuration process" src="./src/assets/example2.png" width="375" />
+
+</div>
 
 </div>
 
