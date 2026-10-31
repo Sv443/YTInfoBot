@@ -40,6 +40,9 @@ const config = [
         SharedArrayBuffer: "readonly",
       },
       parser: tsParser,
+      parserOptions: {
+        projectService: true,
+      },
       ecmaVersion: "latest",
       sourceType: "module",
     },
@@ -70,6 +73,7 @@ const config = [
         allowTaggedTemplates: true,
       }],
       "@typescript-eslint/no-unsafe-declaration-merging": "off",
+      "@typescript-eslint/no-deprecated": "error",
       "comma-dangle": ["error", "only-multiline"],
       "no-misleading-character-class": "off",
     },
