@@ -1,3 +1,10 @@
+# 1.0.1
+**Fixes:**
+- Fixed uncapped `/config` and `/settings` value field that allowed configurations to be broken beyond repair.
+- "Links per reply limit" is now actually applied.
+
+<br>
+
 # 1.0.0
 Initial release:
 - Automatic responses to messages containing YouTube URLs, showing their [ReturnYoutubeDislike](https://returnyoutubedislike.com/), [SponsorBlock](https://sponsor.ajay.app/) and [DeArrow](https://dearrow.ajay.app/) data, and normalizing the URL parameters.  
