@@ -106,8 +106,14 @@ export class MessageCreateEvt extends Event {
         else
           continue;
 
-      if(allVidsDeduped.length === 1)
-        onlyUrl = url;
+      if(allVidsDeduped.length === 1) {
+        try {
+          onlyUrl = VideoInfoCmd.sanitizeVideoUrl(url);
+        }
+        catch {
+          onlyUrl = undefined;
+        }
+      }
 
       const embed = await VideoInfoCmd.getVideoInfoEmbed({
         url,

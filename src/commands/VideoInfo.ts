@@ -199,7 +199,15 @@ export class VideoInfoCmd extends SlashCommand {
     if(!videoId)
       throw new Error("URL doesn't contain the 'v' video ID parameter.");
 
-    const { searchParams } = new URL(url);
+    // the input may also be a bare video ID, in which case there are no extra params
+    let searchParams: URLSearchParams;
+    try {
+      searchParams = new URL(url).searchParams;
+    }
+    catch {
+      searchParams = new URLSearchParams();
+    }
+
     const extraParams = allowedExtraUrlParams.reduce((a, key) => {
       const val = searchParams.get(key);
       if(!val)
@@ -222,8 +230,10 @@ export class VideoInfoCmd extends SlashCommand {
     omitTitleAndThumb = false,
     locale,
   }: VideoInfoFetchData): Promise<EmbedBuilder | null> {
+    const sanitizedUrl = VideoInfoCmd.sanitizeVideoUrl(url);
+
     const embed = new EmbedBuilder()
-      .setURL(VideoInfoCmd.sanitizeVideoUrl(url))
+      .setURL(sanitizedUrl)
       .setColor(Col.Secondary);
 
     let hasRYDData = false,
@@ -361,13 +371,13 @@ export class VideoInfoCmd extends SlashCommand {
         const atVidEnd = valsWithin(segment[1], videoDuration);
 
         if(actionType === "poi") {
-          const startUrl = new URL(url);
+          const startUrl = new URL(sanitizedUrl);
           startUrl.searchParams.set("t", String(Math.floor(segment[0])));
 
           timestampList += `[\`${secsToYtTime(segment[0])}\`](${startUrl}) ${catList}\n`;
         }
         else {
-          const endUrl = new URL(url);
+          const endUrl = new URL(sanitizedUrl);
           endUrl.searchParams.set("t", String(Math.floor(segment[1])));
 
           timestampList += `\`${secsToYtTime(segment[0])}\`-${atVidEnd ? "" : "["}\`${secsToYtTime(segment[1])}\`${atVidEnd ? "" : `](${endUrl})`} ${catList}\n`;
