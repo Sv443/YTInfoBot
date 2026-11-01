@@ -50,11 +50,13 @@ export class PrivacyCmd extends SlashCommand {
       if(!await em.findOne(UserSettings, { id: int.user.id }))
         return int.editReply(useEmbedify(t("errors.noDataFoundToDelete"), Col.Warning));
 
+      const promptSec = 60;
+
       const confirmBtns = [
         new ButtonBuilder()
           .setCustomId("confirm-delete-data")
           .setStyle(ButtonStyle.Danger)
-          .setLabel(t("buttons.delete"))
+          .setLabel(t("buttons.delete_limited", promptSec * 1000))
           .setEmoji("🗑️"),
         new ButtonBuilder()
           .setCustomId("cancel-delete-data")
@@ -62,8 +64,6 @@ export class PrivacyCmd extends SlashCommand {
           .setLabel(t("buttons.cancel"))
           .setEmoji("❌"),
       ];
-
-      const promptSec = 60;
 
       const reply = await int.editReply({
         ...useEmbedify(

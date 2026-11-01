@@ -2,6 +2,7 @@
   "buttons": {
     "cancel": "Abbrechen",
     "delete": "Löschen",
+    "delete_limited": "Delete (< ${sec}s)",
     "reset": "Zurücksetzen",
     "open": "Öffnen"
   },

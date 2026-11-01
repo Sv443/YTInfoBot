@@ -149,13 +149,15 @@ export class MessageCreateEvt extends Event {
         ]]),
       });
 
+    const promptSec = 60;
+
     const rep = await msg.reply({
       embeds,
       allowedMentions: { repliedUser: false },
       ...(isAutoReply
         ? useButtons([[
           ...getOnlyUrlLinkBtnBuilder(),
-          new ButtonBuilder().setStyle(ButtonStyle.Secondary).setLabel(tr.for(locale, "buttons.delete")).setCustomId("delete_auto_reply").setEmoji("🗑️")
+          new ButtonBuilder().setStyle(ButtonStyle.Secondary).setLabel(tr.for(locale, "buttons.delete_limited", promptSec * 1000)).setCustomId("delete_auto_reply").setEmoji("🗑️")
         ]])
         : useButtons([[
           ...getOnlyUrlLinkBtnBuilder(),
@@ -169,7 +171,7 @@ export class MessageCreateEvt extends Event {
       conf = await rep.awaitMessageComponent({
         filter: ({ user, memberPermissions }) =>
           user.id === userId || (memberPermissions?.has(PermissionFlagsBits.ManageMessages) ?? false),
-        time: 60_000,
+        time: promptSec * 1000,
       }) as ButtonInteraction;
 
       await conf.deferUpdate();
