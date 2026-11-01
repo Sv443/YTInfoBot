@@ -56,7 +56,7 @@ export class PrivacyCmd extends SlashCommand {
         new ButtonBuilder()
           .setCustomId("confirm-delete-data")
           .setStyle(ButtonStyle.Danger)
-          .setLabel(t("buttons.delete_limited", promptSec * 1000))
+          .setLabel(t("buttons.delete_limited", promptSec))
           .setEmoji("🗑️"),
         new ButtonBuilder()
           .setCustomId("cancel-delete-data")

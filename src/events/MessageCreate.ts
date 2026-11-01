@@ -157,7 +157,7 @@ export class MessageCreateEvt extends Event {
       ...(isAutoReply
         ? useButtons([[
           ...getOnlyUrlLinkBtnBuilder(),
-          new ButtonBuilder().setStyle(ButtonStyle.Secondary).setLabel(tr.for(locale, "buttons.delete_limited", promptSec * 1000)).setCustomId("delete_auto_reply").setEmoji("🗑️")
+          new ButtonBuilder().setStyle(ButtonStyle.Secondary).setLabel(tr.for(locale, "buttons.delete_limited", promptSec)).setCustomId("delete_auto_reply").setEmoji("🗑️")
         ]])
         : useButtons([[
           ...getOnlyUrlLinkBtnBuilder(),
