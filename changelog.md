@@ -1,3 +1,15 @@
+# 1.1.0
+**Features:**
+- TODO: Added user settings and guild config option to not reply to links wrapped in `<>` (on by default).
+- TODO: SponsorBlock segments of type Chapter and Highlight are now also shown.
+  
+**Changes & Improvements:**
+- TODO: The automatic response will now be a new embed with summarized info about the video, and buttons to edit the message to contain the information density from before.
+- TODO: Video data sources can now be toggled independently, instead of working via presets configured in `/config set default_video_info_type`.
+- Switched to the LGPL-3.0-or-later license. See `LICENSE.txt` for more info.
+
+<br>
+
 # 1.0.2
 **Features:**
 - Added support for using SQLite as the database engine instead of PostgreSQL, via the new `.env` settings `DB_DRIVER` and `DB_PATH`.  
