@@ -1,3 +1,4 @@
+import { styleText } from "node:util";
 import { ButtonBuilder, ButtonStyle, MessageFlags, PermissionFlagsBits, SlashCommandBuilder, type AutocompleteInteraction, type CommandInteraction, type CommandInteractionOption, type SlashCommandSubcommandBuilder } from "discord.js";
 import { Col, useEmbedify } from "@lib/embedify.js";
 import { CmdBase, SlashCommand } from "@lib/Command.js";
@@ -11,7 +12,6 @@ import { getLocMap, getRegisteredTranslations, tr, type TrKeyEn } from "@lib/tra
 import { getEnvVar } from "@lib/env.js";
 import type { Stringifiable } from "@src/types.js";
 import localesJson from "@assets/locales.json" with { type: "json" };
-import k from "kleur";
 
 //#region constants
 
@@ -270,7 +270,7 @@ export class ConfigCmd extends SlashCommand {
         }
       }
       catch(err) {
-        console.error(k.red("Error while sending confirmation for `/config reset`:"), err);
+        console.error(styleText("red", "Error while sending confirmation for `/config reset`:"), err);
         await (conf ?? int).editReply({
           ...useEmbedify(tr.for(locale, "general.confirmationTimeoutNotice", 30), Col.Secondary),
           components: [],
@@ -303,7 +303,7 @@ export class ConfigCmd extends SlashCommand {
         await int.respond(res);
       }
       catch(err) {
-        console.error(k.red("Error while sending autocomplete response for `/config set locale`:"), err);
+        console.error(styleText("red", "Error while sending autocomplete response for `/config set locale`:"), err);
       }
     }
     }

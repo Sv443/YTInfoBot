@@ -1,7 +1,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import { styleText } from "node:util";
 import { Collection, Events, Routes } from "discord.js";
-import k from "kleur";
 import { Col, useEmbedify } from "@lib/embedify.js";
 import { exists, getHash } from "@lib/misc.js";
 import type { ContextCommand, SlashCommand } from "@lib/Command.js";
@@ -85,7 +85,7 @@ async function registerGuildCommands() {
     const promises = guilds.map(async (guildId) => {
       const data = await registerCommandsForGuild(guildId);
 
-      console.log(k.magenta(`Registered ${(data as unknown[])?.length} guild commands for "${client.guilds.cache.find(g => g.id === guildId)?.name ?? guildId}"`));
+      console.log(styleText("magenta", `Registered ${(data as unknown[])?.length} guild commands for "${client.guilds.cache.find(g => g.id === guildId)?.name ?? guildId}"`));
     });
 
     await Promise.allSettled(promises);

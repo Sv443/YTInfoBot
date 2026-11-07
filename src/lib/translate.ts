@@ -1,6 +1,6 @@
-import type { LocalizationMap } from "discord.js";
-import k from "kleur";
 import { readdir, readFile } from "node:fs/promises";
+import { styleText } from "node:util";
+import type { LocalizationMap } from "discord.js";
 import type { Stringifiable } from "@src/types.js";
 import trEn from "@assets/translations/en-US.json" with { type: "json" };
 
@@ -400,7 +400,7 @@ export async function initTranslations(): Promise<void> {
         enName = langCode;
     }
     catch(err) {
-      console.error(k.red(`Error while loading translations from '${file}':\n`), err);
+      console.error(styleText("red", `Error while loading translations from '${file}':\n`), err);
     }
   }
 

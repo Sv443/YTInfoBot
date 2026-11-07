@@ -1,10 +1,10 @@
+import { styleText } from "node:util";
 import type { AutocompleteInteraction, ChatInputCommandInteraction, CommandInteraction, CommandInteractionOption, ContextMenuCommandBuilder, ContextMenuCommandInteraction, RESTPostAPIChatInputApplicationCommandsJSONBody, RESTPostAPIContextMenuApplicationCommandsJSONBody, SharedSlashCommand } from "discord.js";
 import { getEnvVar } from "@lib/env.js";
 import { Col, useEmbedify } from "@lib/embedify.js";
 import { defaultLocale, tr } from "@lib/translate.js";
 import { em } from "@lib/db.js";
 import { GuildConfig } from "@models/GuildConfig.model.js";
-import k from "kleur";
 
 const cmdPrefix = getEnvVar("CMD_PREFIX", "stringOrUndefined");
 
@@ -81,7 +81,7 @@ export abstract class SlashCommand extends CmdBase {
           errors.push(`Subcommand name "${sub.name}" cannot start with the command prefix "${cmdPrefix}"`);
       }
       if(errors.length > 0)
-        throw new Error(`${k.red(`Encountered ${errors.length === 1 ? "error" : "errors"} while creating slash command instance "${this.constructor.name}":`)}\n${errors.join("\n")}`);
+        throw new Error(`${styleText("red", `Encountered ${errors.length === 1 ? "error" : "errors"} while creating slash command instance "${this.constructor.name}":`)}\n${errors.join("\n")}`);
     }
   }
 

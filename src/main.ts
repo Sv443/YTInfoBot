@@ -1,5 +1,5 @@
+import { styleText } from "node:util";
 import { Events, type Client } from "discord.js";
-import k from "kleur";
 import "dotenv/config";
 import { client, botToken } from "@lib/client.js";
 import { em, initDatabase } from "@lib/db.js";
@@ -21,14 +21,14 @@ async function init() {
   const missingEnvVars = requiredEnvVars.filter((envVar) => !getEnvVar(envVar, "stringOrUndefined"));
 
   if(missingEnvVars.length > 0) {
-    console.error(`${k.red(`Missing ${missingEnvVars.length} required environment ${autoPlural("variable", missingEnvVars)}:`)}\n- ${missingEnvVars.join("\n- ")}\n`);
+    console.error(`${styleText("red", `Missing ${missingEnvVars.length} required environment ${autoPlural("variable", missingEnvVars)}:`)}\n- ${missingEnvVars.join("\n- ")}\n`);
     console.error("Use the command `pnpm prepare-env` to create the necessary env files if they don't exist already.\n");
     return setImmediate(() => process.exit(1));
   }
 
   //#region init bot
 
-  console.log(k.gray("\nInitializing and logging in..."));
+  console.log(styleText("gray", "\nInitializing and logging in..."));
 
   await initTranslations();
 
@@ -44,15 +44,15 @@ async function init() {
 
   try {
     const fixed = await GuildConfig.sanitizeAll();
-    fixed > 0 && console.log(k.yellow(`Fixed ${fixed} out-of-bounds guild config ${autoPlural("value", fixed)}`));
+    fixed > 0 && console.log(styleText("yellow", `Fixed ${fixed} out-of-bounds guild config ${autoPlural("value", fixed)}`));
   }
   catch(e) {
-    console.error(k.red("Couldn't sanitize guild configs:"), e);
+    console.error(styleText("red", "Couldn't sanitize guild configs:"), e);
   }
 
-  client.on(Events.Error, (err) => console.error(k.red("Client error:"), err));
+  client.on(Events.Error, (err) => console.error(styleText("red", "Client error:"), err));
 
-  console.log(k.blue(`${client.user?.displayName ?? client.user?.username} is ready.\n`));
+  console.log(styleText("blue", `${client.user?.displayName ?? client.user?.username} is ready.\n`));
   envVarEq("BELL_ON_READY", true) && process.stdout.write("\u0007");
 
   let i = 0;
@@ -108,18 +108,18 @@ async function checkGuilds(client: Client) {
     updateLastGldChkTime();
   }
   catch(e) {
-    console.error(k.red("Couldn't check guilds:"), e);
+    console.error(styleText("red", "Couldn't check guilds:"), e);
   }
 }
 
 //#region run init
 
 process.on("unhandledRejection", (reason, promise) => {
-  console.error(k.red(`${k.bold("[!]")} Unhandled Promise rejection:`), promise, k.red(`\n\n${k.bold("[!]")} Rejection reason:`), reason);
+  console.error(styleText("red", `${styleText("bold", "[!]")} Unhandled Promise rejection:`), promise, styleText("red", `\n\n${styleText("bold", "[!]")} Rejection reason:`), reason);
 });
 
 process.on("uncaughtException", (err, origin) => {
-  console.error(k.red(`${k.bold("[!]")} Uncaught exception:`), err, k.red(`\n\n${k.bold("[!]")} Origin:`), origin);
+  console.error(styleText("red", `${styleText("bold", "[!]")} Uncaught exception:`), err, styleText("red", `\n\n${styleText("bold", "[!]")} Origin:`), origin);
 });
 
 init();
