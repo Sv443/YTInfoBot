@@ -267,8 +267,8 @@
         "timestamps": "Timestamps:",
         "sponsorBlockCategories": {
           "sponsor": "Sponsored",
-          "selfpromo": "Self- / Unpaid promo",
-          "interaction": "Interaction reminder",
+          "selfpromo": "Self- / Unpaid Promo",
+          "interaction": "Interaction Reminder",
           "intro": "Intro / Intermission",
           "outro": "Outro / Endcards",
           "preview": "Preview / Recap",
