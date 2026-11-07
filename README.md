@@ -155,6 +155,6 @@ This will require users of your bot to wait a few minutes or reload their client
 
 <div style="text-align:center;" align="center">
 
-©️ Copyright 2024 Sv443 - [AGPL-3.0-or-later license](./LICENSE.txt)  
+©️ Copyright 2024 Sv443 - [LGPL-3.0-or-later license](./LICENSE.txt)  
 Made with ❤️ - please consider [donating](https://github.com/sponsors/Sv443) to support development
 </div>
